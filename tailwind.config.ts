@@ -24,8 +24,8 @@ const config: Config = {
     extend: {
       colors: {
         primary: {
-          DEFAULT: "var(--primary, #FF6A00)",
-          dark: "var(--primary-dark, #E85D00)",
+          DEFAULT: "#FF6A00",
+          dark: "#E85D00",
           light: "#FF8533",
           soft: "#FFB366",
         },
