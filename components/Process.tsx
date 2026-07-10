@@ -7,6 +7,7 @@ import {
   Rocket,
   BarChart3,
   Headphones,
+  TrendingUp,
   type LucideIcon,
 } from "lucide-react";
 import { PROCESS_STEPS } from "@/lib/constants";
@@ -17,12 +18,13 @@ const iconMap: Record<string, LucideIcon> = {
   rocket: Rocket,
   "bar-chart": BarChart3,
   headphones: Headphones,
+  "trending-up": TrendingUp,
 };
 
 export default function Process() {
   return (
-    <section id="process" className="py-20 lg:py-28">
-      <div className="container mx-auto px-4 lg:px-8">
+    <section id="process" className="section-block bg-white">
+      <div className="container mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -30,8 +32,11 @@ export default function Process() {
           className="mb-14 text-center"
         >
           <span className="section-label">فرآیند همکاری</span>
-          <h2 className="section-title">از ایده تا رشد پایدار</h2>
-          <a href="/process" className="mt-4 inline-flex text-sm text-primary transition-colors hover:text-primary-dark">
+          <h2 className="section-title">از ایده تا رشد، در کنار شما هستیم</h2>
+          <a
+            href="/process"
+            className="mt-4 inline-flex text-sm text-primary transition-colors hover:text-primary-dark"
+          >
             جزئیات فرآیند همکاری
           </a>
         </motion.div>
@@ -45,16 +50,14 @@ export default function Process() {
                 initial={{ opacity: 0, y: 24 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: index * 0.07 }}
-                className="process-step lux-card"
+                transition={{ duration: 0.4, delay: index * 0.06 }}
+                className="process-step"
               >
-                <div className="mb-4 flex items-center justify-between">
-                  <span className="text-sm font-semibold text-primary">{step.id}</span>
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/12 text-primary">
-                    <Icon size={18} />
-                  </div>
+                <span className="process-step-num">{step.id}</span>
+                <div className="process-step-icon" aria-hidden="true">
+                  <Icon size={22} strokeWidth={1.75} />
                 </div>
-                <h3 className="mb-2 text-lg font-bold">{step.title}</h3>
+                <h3 className="mb-2 text-base font-bold">{step.title}</h3>
                 <p className="text-sm leading-relaxed text-muted">{step.description}</p>
               </motion.div>
             );

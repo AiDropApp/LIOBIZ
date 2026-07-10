@@ -6,6 +6,7 @@ import {
   Rocket,
   BarChart3,
   Headphones,
+  TrendingUp,
   type LucideIcon,
 } from "lucide-react";
 import SiteShell from "@/components/SiteShell";
@@ -19,6 +20,7 @@ const iconMap: Record<string, LucideIcon> = {
   rocket: Rocket,
   "bar-chart": BarChart3,
   headphones: Headphones,
+  "trending-up": TrendingUp,
 };
 
 export const dynamic = "force-dynamic";
@@ -53,13 +55,13 @@ export default async function ProcessPage() {
           {steps.map((step) => {
             const Icon = iconMap[step.icon] ?? Search;
             return (
-              <article key={step.id} className="lux-card grid gap-4">
+              <article key={step.id} className="service-deliverable lux-card grid gap-4">
                 <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/15 text-primary">
-                  <Icon size={24} />
+                  <Icon size={24} strokeWidth={1.75} />
                 </div>
                 <div>
                   <div className="mb-1 flex items-center gap-3">
-                    <span className="text-sm font-semibold text-primary">{step.id}</span>
+                    <span className="service-step-num">{step.id}</span>
                     <h2 className="text-xl font-bold">{step.title}</h2>
                   </div>
                   <p className="leading-relaxed text-muted">{step.description}</p>
@@ -70,7 +72,7 @@ export default async function ProcessPage() {
         </div>
 
         <div className="mt-12 text-center">
-          <Link href="/contact" className="btn-primary px-8 py-3.5">
+          <Link href="/contact" className="btn-accent px-8 py-3.5">
             شروع همکاری
           </Link>
         </div>

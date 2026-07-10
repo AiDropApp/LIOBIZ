@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "db:seed": "tsx scripts/seed-db.ts",
-    "screenshots": "node scripts/capture-screenshots.mjs"
+    "screenshots": "node scripts/capture-screenshots.mjs",
+    "screenshots:audit": "node scripts/capture-ui-audit.mjs"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

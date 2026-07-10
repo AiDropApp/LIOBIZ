@@ -24,10 +24,10 @@ const config: Config = {
     extend: {
       colors: {
         primary: {
-          DEFAULT: "#FF6A00",
-          dark: "#E85D00",
-          light: "#FF8533",
-          soft: "#FFB366",
+          DEFAULT: "#FF4D24",
+          dark: "#E03E18",
+          light: "#FF6A45",
+          soft: "#FF9A7A",
         },
         background: {
           DEFAULT: "#FFFFFF",
@@ -53,8 +53,8 @@ const config: Config = {
           DEFAULT: "#6B7280",
         },
         warm: {
-          DEFAULT: "#FF6A00",
-          soft: "#FF8533",
+          DEFAULT: "#FF4D24",
+          soft: "#FF6A45",
         },
       },
       fontFamily: {

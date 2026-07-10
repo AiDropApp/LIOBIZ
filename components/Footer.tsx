@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Instagram, Linkedin, Send } from "lucide-react";
+import { Instagram, Linkedin, Send, Phone, Mail, MapPin } from "lucide-react";
 import Link from "next/link";
 import {
   FOOTER_QUICK_LINKS,
@@ -65,12 +65,12 @@ export default function Footer() {
     <footer id="contact" className="site-footer">
       <div className="footer-panel">
         <div className="footer-panel-inner">
-          <div className="footer-cta lux-card mb-14 flex flex-col items-center gap-5 text-center md:flex-row md:justify-between md:text-right">
+          <div className="footer-cta mb-14 flex flex-col items-center gap-5 rounded-[var(--radius-card)] border border-white/10 bg-white/[0.03] px-6 py-8 text-center md:flex-row md:justify-between md:px-8 md:text-right">
             <div>
               <h3 className="text-2xl font-bold md:text-3xl">آمادهٔ ساختن برند بعدی هستید؟</h3>
               <p className="mt-2 text-muted">یک گفتگوی کوتاه کافی است تا مسیر رشد را طراحی کنیم.</p>
             </div>
-            <Link href="/contact" className="btn-primary px-8 py-3.5">
+            <Link href="/contact" className="btn-accent px-8">
               شروع همکاری
             </Link>
           </div>
@@ -81,14 +81,14 @@ export default function Footer() {
               <p className="mb-6 max-w-sm leading-relaxed text-muted">
                 {site.footerText || site.description || SITE.description}
               </p>
-              <div className="flex items-center gap-3">
+              <div className="footer-socials">
                 {socials.map((link) => (
                   <a
                     key={link.name}
                     href={link.href}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-white/70 transition-all hover:border-primary/40 hover:bg-primary/10 hover:text-white"
+                    className="footer-social"
                     aria-label={link.name}
                   >
                     <SocialIcon name={link.name} />
@@ -125,8 +125,9 @@ export default function Footer() {
 
             <div>
               <h3 className="mb-4 text-lg font-bold">تماس با ما</h3>
-              <ul className="space-y-3 text-muted">
-                <li>
+              <ul className="space-y-3.5 text-muted">
+                <li className="flex items-start gap-2.5">
+                  <Phone size={16} className="mt-1 shrink-0 text-primary" aria-hidden="true" />
                   <a
                     href={`tel:${phone.replace(/\s/g, "")}`}
                     className="transition-colors hover:text-white"
@@ -135,12 +136,16 @@ export default function Footer() {
                     {phone}
                   </a>
                 </li>
-                <li>
+                <li className="flex items-start gap-2.5">
+                  <Mail size={16} className="mt-1 shrink-0 text-primary" aria-hidden="true" />
                   <a href={`mailto:${email}`} className="transition-colors hover:text-white" dir="ltr">
                     {email}
                   </a>
                 </li>
-                <li>{site.address || SITE.address}</li>
+                <li className="flex items-start gap-2.5">
+                  <MapPin size={16} className="mt-1 shrink-0 text-primary" aria-hidden="true" />
+                  <span>{site.address || SITE.address}</span>
+                </li>
                 <li>
                   <Link href="/contact" className="text-primary-soft transition-colors hover:text-white">
                     صفحه تماس و فرم پیام

@@ -32,7 +32,7 @@ export default async function AboutPage() {
 
         <section className="mb-12 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {STATS.map((stat) => (
-            <div key={stat.label} className="lux-card text-center">
+            <div key={stat.label} className="service-deliverable lux-card text-center">
               <p className="text-3xl font-extrabold text-primary">{stat.value}</p>
               <p className="mt-2 text-muted">{stat.label}</p>
             </div>
@@ -43,7 +43,7 @@ export default async function AboutPage() {
           <h2 className="mb-6 text-center text-2xl font-bold">ارزش‌های لیوبیز</h2>
           <div className="grid gap-5 sm:grid-cols-2">
             {ABOUT_PAGE.values.map((item) => (
-              <article key={item.title} className="lux-card">
+              <article key={item.title} className="service-deliverable lux-card">
                 <h3 className="mb-2 text-lg font-bold">{item.title}</h3>
                 <p className="leading-relaxed text-muted">{item.description}</p>
               </article>
@@ -52,7 +52,7 @@ export default async function AboutPage() {
         </section>
 
         <div className="text-center">
-          <Link href="/contact" className="btn-primary px-8 py-3.5">
+          <Link href="/contact" className="btn-accent px-8 py-3.5">
             گفتگو با تیم لیوبیز
           </Link>
         </div>

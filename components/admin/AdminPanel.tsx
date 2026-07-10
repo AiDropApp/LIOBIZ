@@ -1,6 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import {
+  LayoutDashboard,
+  Palette,
+  Images,
+  ShoppingBag,
+  MessageSquare,
+  Users,
+  Mail,
+} from "lucide-react";
 import DashboardShell from "@/components/dashboard/DashboardShell";
 import AdminEditor from "@/components/admin/AdminEditor";
 import AdminCmsEditor from "@/components/admin/AdminCmsEditor";
@@ -71,13 +80,13 @@ type TicketRow = {
 };
 
 const NAV = [
-  { id: "overview", label: "نمای کلی" },
-  { id: "cms", label: "صفحات و ظاهر" },
-  { id: "content", label: "نمونه کار / بک‌استیج" },
-  { id: "orders", label: "سفارش‌ها" },
-  { id: "tickets", label: "تیکت‌ها" },
-  { id: "users", label: "کاربران" },
-  { id: "messages", label: "پیام‌های تماس" },
+  { id: "overview", label: "نمای کلی", icon: LayoutDashboard },
+  { id: "cms", label: "صفحات و ظاهر", icon: Palette },
+  { id: "content", label: "نمونه کار / بک‌استیج", icon: Images },
+  { id: "orders", label: "سفارش‌ها", icon: ShoppingBag },
+  { id: "tickets", label: "تیکت‌ها", icon: MessageSquare },
+  { id: "users", label: "کاربران", icon: Users },
+  { id: "messages", label: "پیام‌های تماس", icon: Mail },
 ];
 
 const ORDER_STATUS: Record<string, string> = {

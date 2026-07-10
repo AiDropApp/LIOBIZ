@@ -90,7 +90,11 @@ export default function ContactForm() {
         <p className={`text-sm ${status === "ok" ? "text-emerald-700" : "text-red-600"}`}>{feedback}</p>
       )}
 
-      <button type="submit" className="btn-primary w-full justify-center py-3.5" disabled={status === "loading"}>
+      <button
+        type="submit"
+        className="btn-accent w-full justify-center py-3.5"
+        disabled={status === "loading"}
+      >
         {status === "loading" ? "در حال ارسال..." : "ارسال پیام"}
       </button>
     </form>

@@ -5,13 +5,13 @@ import { TESTIMONIALS } from "@/lib/constants";
 
 export default function Testimonials() {
   return (
-    <section className="py-20 lg:py-28" id="testimonials">
-      <div className="container mx-auto px-4 lg:px-8">
+    <section className="section-block bg-white" id="testimonials">
+      <div className="container mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mb-16 text-center"
+          className="mb-14 text-center"
         >
           <span className="section-label">گواهی مشتریان</span>
           <h2 className="section-title mb-4">وقتی برندها، نتیجه را می‌بینند</h2>
@@ -28,15 +28,14 @@ export default function Testimonials() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.45, delay: index * 0.08 }}
-              className="lux-card"
+              className="lux-card testimonial-card flex flex-col"
             >
-              <div className="mb-6 h-1 w-16 rounded-full bg-gradient-to-l from-primary to-warm/60" />
-              <p className="mb-8 leading-8 text-foreground/80">“{item.quote}”</p>
+              <p className="mb-8 flex-1 leading-8 text-foreground/80">“{item.quote}”</p>
               <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/15 text-sm font-bold text-primary">
+                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/12 text-sm font-bold text-primary">
                   {item.initial}
                 </div>
-                <div>
+                <div className="testimonial-meta">
                   <h3 className="font-bold text-foreground">{item.name}</h3>
                   <p className="text-sm text-muted">{item.role}</p>
                 </div>

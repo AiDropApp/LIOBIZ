@@ -2,6 +2,14 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import {
+  Home,
+  ShoppingBag,
+  MessageSquare,
+  FolderOpen,
+  Bell,
+  UserRound,
+} from "lucide-react";
 import DashboardShell from "@/components/dashboard/DashboardShell";
 import { SERVICES } from "@/lib/constants";
 
@@ -44,12 +52,12 @@ type Notif = {
 };
 
 const NAV = [
-  { id: "home", label: "خانه" },
-  { id: "orders", label: "سفارش‌ها" },
-  { id: "tickets", label: "تیکت‌ها" },
-  { id: "files", label: "فایل‌ها" },
-  { id: "notifications", label: "اعلان‌ها" },
-  { id: "profile", label: "پروفایل" },
+  { id: "home", label: "خانه", icon: Home },
+  { id: "orders", label: "سفارش‌ها", icon: ShoppingBag },
+  { id: "tickets", label: "تیکت‌ها", icon: MessageSquare },
+  { id: "files", label: "فایل‌ها", icon: FolderOpen },
+  { id: "notifications", label: "اعلان‌ها", icon: Bell },
+  { id: "profile", label: "پروفایل", icon: UserRound },
 ];
 
 const ORDER_STATUS: Record<string, string> = {
@@ -115,10 +123,14 @@ export default function ClientDashboard() {
     if (orderRes.ok) {
       const data = await orderRes.json();
       setOrders(data.orders || []);
+    } else if (orderRes.status === 401) {
+      flash("نشست منقضی شده؛ دوباره وارد شوید.");
     }
     if (ticketRes.ok) {
       const data = await ticketRes.json();
       setTickets(data.tickets || []);
+    } else if (ticketRes.status === 401) {
+      flash("نشست منقضی شده؛ دوباره وارد شوید.");
     }
     if (notifRes.ok) {
       const data = await notifRes.json();
@@ -163,7 +175,7 @@ export default function ClientDashboard() {
       if (!res.ok) return flash(data.message || "ثبت سفارش ناموفق بود");
       setOrderForm({ title: "", service: SERVICES[0]?.title || "برندینگ", description: "", budget: "" });
       flash("سفارش ثبت شد.");
-      load();
+      await load();
       setTab("orders");
     } finally {
       setBusy(false);
@@ -183,7 +195,8 @@ export default function ClientDashboard() {
       if (!res.ok) return flash(data.message || "ثبت تیکت ناموفق بود");
       setTicketForm({ subject: "", message: "" });
       flash("تیکت ثبت شد.");
-      load();
+      await load();
+      setTab("tickets");
     } finally {
       setBusy(false);
     }

@@ -1,0 +1,20 @@
+PASS | GET / home | {"status":200}
+PASS | POST register client | {"status":200,"json":{"ok":true,"redirect":"/dashboard","user":{"userId":4,"email":"audit.client.1783719916275@liobiz.test","name":"کاربر تست","role":"client"}},"cookie":true}
+PASS | GET /api/auth/me client | {"status":200,"role":"client","id":4}
+PASS | POST /api/orders | {"status":200,"json":{"ok":true,"id":1},"text":"{\"ok\":true,\"id\":1}"}
+PASS | GET /api/orders as client sees new order | {"status":200,"count":1,"found":true}
+PASS | POST /api/tickets | {"status":200,"json":{"ok":true,"id":1},"text":"{\"ok\":true,\"id\":1}"}
+PASS | GET /api/tickets as client sees new ticket | {"status":200,"count":1,"found":true,"msgs":1}
+PASS | POST login admin | {"status":200,"json":{"ok":true,"redirect":"/admin","user":{"userId":1,"email":"admin@liobiz.com","name":"مدیر لیوبیز","role":"admin"}},"cookie":true}
+PASS | GET /api/orders as admin sees client order | {"status":200,"count":1,"found":true}
+PASS | GET /api/tickets as admin sees client ticket | {"status":200,"count":1,"found":true}
+PASS | GET /api/admin/overview | {"status":200,"stats":{"users":3,"messages":1,"newMessages":1,"portfolio":34,"backstage":21,"orders":1,"newOrders":1,"tickets":1,"openTickets":1}}
+PASS | GET /api/admin/users | {"status":200,"count":3}
+PASS | GET /api/contact as admin | {"status":200,"count":1}
+PASS | POST /api/orders without auth -> 401 | {"status":401}
+PASS | PAGE /dashboard | {"status":200}
+PASS | PAGE /admin | {"status":200}
+PASS | PAGE /login | {"status":200}
+PASS | PAGE /register | {"status":200}
+
+Summary: 18 pass, 0 fail

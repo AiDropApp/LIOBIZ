@@ -19,9 +19,9 @@ export default function AboutLiobiz() {
   }, []);
 
   return (
-    <section id="about-liobiz" className="about-liobiz pb-16 lg:pb-24">
+    <section id="about-liobiz" className="about-liobiz section-block">
       <div className="container mx-auto">
-        <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14">
+        <div className="grid items-center gap-12 lg:grid-cols-[1fr_1.05fr] lg:gap-16">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -38,10 +38,7 @@ export default function AboutLiobiz() {
             <p className="mx-auto mt-4 max-w-xl leading-8 text-muted lg:mx-0">
               {landing.aboutText2}
             </p>
-            <Link
-              href="/about"
-              className="mt-8 inline-flex items-center justify-center rounded-xl bg-foreground px-7 py-3.5 text-sm font-bold text-white transition hover:bg-black/85"
-            >
+            <Link href="/about" className="btn-accent btn-accent--black mt-8">
               بیشتر درباره ما
             </Link>
           </motion.div>
@@ -55,24 +52,24 @@ export default function AboutLiobiz() {
           >
             <div className="about-liobiz-main">
               <Image
-                src="/images/about-liobiz-main.png"
-                alt="رشد و موفقیت با لیوبیز"
+                src="/images/about-liobiz-office.png"
+                alt="فضای کار لیوبیز"
                 fill
                 className="object-cover"
                 sizes="(max-width: 1024px) 100vw, 48vw"
                 priority={false}
               />
-              <div className="about-liobiz-badge">ارزش ما رشد شماست؛ افتخار ما</div>
             </div>
             <div className="about-liobiz-float">
               <Image
                 src="/images/about-liobiz-float.png"
-                alt="مسیر رشد برند"
+                alt="جلسه تیم لیوبیز"
                 fill
                 className="object-cover"
                 sizes="280px"
               />
             </div>
+            <div className="about-liobiz-badge">ارزش ما رشد شماست؛ افتخار ما</div>
           </motion.div>
         </div>
       </div>

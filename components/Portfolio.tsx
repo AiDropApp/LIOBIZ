@@ -1,17 +1,19 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import ContentImage from "@/components/ContentImage";
 import PortfolioDetailModal from "@/components/PortfolioDetailModal";
 import { PORTFOLIO_FILTERS } from "@/lib/constants";
 import type { PortfolioItem } from "@/lib/content-store";
 
+const LANDING_LIMIT = 8;
+
 export default function Portfolio() {
   const [filter, setFilter] = useState("همه");
   const [items, setItems] = useState<PortfolioItem[]>([]);
   const [selected, setSelected] = useState<PortfolioItem | null>(null);
-  const trackRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetch("/api/content", { cache: "no-store" })
@@ -20,30 +22,14 @@ export default function Portfolio() {
       .catch(() => setItems([]));
   }, []);
 
-  useEffect(() => {
-    trackRef.current?.scrollTo({ left: 0, behavior: "smooth" });
-  }, [filter]);
-
-  useEffect(() => {
-    const el = trackRef.current;
-    if (!el) return;
-
-    const onWheel = (event: WheelEvent) => {
-      if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
-      if (el.scrollWidth <= el.clientWidth) return;
-      event.preventDefault();
-      el.scrollLeft += event.deltaY;
-    };
-
-    el.addEventListener("wheel", onWheel, { passive: false });
-    return () => el.removeEventListener("wheel", onWheel);
-  }, []);
-
-  const visible =
-    filter === "همه" ? items : items.filter((item) => item.category === filter);
+  const visible = useMemo(() => {
+    const filtered =
+      filter === "همه" ? items : items.filter((item) => item.category === filter);
+    return filtered.slice(0, LANDING_LIMIT);
+  }, [filter, items]);
 
   return (
-    <section id="portfolio" className="portfolio-section py-20 lg:py-28">
+    <section id="portfolio" className="portfolio-section section-block">
       <div className="container mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -52,13 +38,7 @@ export default function Portfolio() {
           className="mb-10 text-center"
         >
           <span className="section-label">نمونه کارها</span>
-          <h2 className="section-title">آثاری که برندها را جلو بردند</h2>
-          <a
-            href="/portfolio"
-            className="mt-4 inline-flex text-sm text-primary transition-colors hover:text-primary-dark"
-          >
-            مشاهده همه نمونه کارها
-          </a>
+          <h2 className="section-title">پروژه‌هایی که به آن‌ها افتخار می‌کنیم</h2>
         </motion.div>
 
         <div className="mb-8 flex flex-wrap items-center justify-center gap-2.5">
@@ -74,44 +54,48 @@ export default function Portfolio() {
           ))}
         </div>
 
-        <div ref={trackRef} className="portfolio-album-wrap" aria-label="آلبوم نمونه کارها">
-          <div className="portfolio-album">
-            <AnimatePresence mode="popLayout">
-              {visible.map((item, index) => (
-                <motion.article
-                  key={item.id}
-                  layout
-                  initial={{ opacity: 0, scale: 0.96 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.96 }}
-                  transition={{ duration: 0.3, delay: index * 0.03 }}
-                  className="portfolio-card group"
+        <div className="portfolio-grid" aria-label="نمونه کارهای منتخب">
+          <AnimatePresence mode="popLayout">
+            {visible.map((item, index) => (
+              <motion.article
+                key={item.id}
+                layout
+                initial={{ opacity: 0, scale: 0.96 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.96 }}
+                transition={{ duration: 0.3, delay: index * 0.03 }}
+                className="portfolio-card group"
+              >
+                <button
+                  type="button"
+                  className="portfolio-card-trigger w-full text-right"
+                  onClick={() => setSelected(item)}
+                  aria-label={`مشاهده جزئیات ${item.title}`}
                 >
-                  <button
-                    type="button"
-                    className="portfolio-card-trigger"
-                    onClick={() => setSelected(item)}
-                    aria-label={`مشاهده جزئیات ${item.title}`}
-                  >
-                    <div className="relative aspect-[3/4] overflow-hidden">
-                      <ContentImage
-                        src={item.image}
-                        alt={item.title}
-                        fill
-                        sizes="(max-width: 768px) 45vw, 220px"
-                        className="object-cover transition-transform duration-700 group-hover:scale-105"
-                      />
-                      <div className="portfolio-card-overlay" />
-                      <div className="absolute inset-x-0 bottom-0 p-3.5 md:p-4">
-                        <p className="mb-1 text-xs text-primary-soft md:text-sm">{item.category}</p>
-                        <h3 className="text-base font-bold text-white md:text-lg">{item.title}</h3>
-                      </div>
+                  <div className="relative aspect-[4/5] overflow-hidden">
+                    <ContentImage
+                      src={item.image}
+                      alt={item.title}
+                      fill
+                      sizes="(max-width: 768px) 50vw, 25vw"
+                      className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                    <div className="portfolio-card-overlay" />
+                    <div className="portfolio-card-meta">
+                      <p>{item.category}</p>
+                      <h3>{item.title}</h3>
                     </div>
-                  </button>
-                </motion.article>
-              ))}
-            </AnimatePresence>
-          </div>
+                  </div>
+                </button>
+              </motion.article>
+            ))}
+          </AnimatePresence>
+        </div>
+
+        <div className="mt-12 flex justify-center">
+          <Link href="/portfolio" className="btn-accent px-12">
+            مشاهده همه پروژه‌ها
+          </Link>
         </div>
       </div>
 

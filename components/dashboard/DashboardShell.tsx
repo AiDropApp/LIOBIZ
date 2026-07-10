@@ -1,12 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Menu, X } from "lucide-react";
+import { Menu, X, type LucideIcon } from "lucide-react";
 import Logo from "@/components/Logo";
 
-type NavItem = { id: string; label: string };
+export type DashNavItem = {
+  id: string;
+  label: string;
+  icon?: LucideIcon;
+};
 
 export default function DashboardShell({
   title,
@@ -19,10 +23,10 @@ export default function DashboardShell({
 }: {
   title: string;
   subtitle: string;
-  nav: NavItem[];
+  nav: DashNavItem[];
   active: string;
   onNavigate: (id: string) => void;
-  children: React.ReactNode;
+  children: ReactNode;
   homeHref?: string;
 }) {
   const router = useRouter();
@@ -47,19 +51,27 @@ export default function DashboardShell({
 
   const NavButtons = () => (
     <>
-      {nav.map((item) => (
-        <button
-          key={item.id}
-          type="button"
-          className={active === item.id ? "is-active" : ""}
-          onClick={() => {
-            onNavigate(item.id);
-            setOpen(false);
-          }}
-        >
-          {item.label}
-        </button>
-      ))}
+      {nav.map((item) => {
+        const Icon = item.icon;
+        return (
+          <button
+            key={item.id}
+            type="button"
+            className={active === item.id ? "is-active" : ""}
+            onClick={() => {
+              onNavigate(item.id);
+              setOpen(false);
+            }}
+          >
+            {Icon ? (
+              <span className="dash-nav-icon" aria-hidden="true">
+                <Icon size={18} strokeWidth={1.85} />
+              </span>
+            ) : null}
+            <span>{item.label}</span>
+          </button>
+        );
+      })}
     </>
   );
 

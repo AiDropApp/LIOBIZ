@@ -10,11 +10,11 @@ export default function Plans() {
   const reducedMotion = usePrefersReducedMotion();
 
   return (
-    <section id="plans" className="py-20 lg:py-28">
-      <div className="container mx-auto px-4 lg:px-8">
+    <section id="plans" className="section-block bg-white">
+      <div className="container mx-auto">
         <div className="mb-12 text-center">
           <span className="section-label">پلن‌های همکاری</span>
-          <h2 className="section-title">مسیر رشد متناسب با برند شما</h2>
+          <h2 className="section-title">پلنی انتخاب کنید که مناسب شماست</h2>
           <p className="mx-auto mt-4 max-w-2xl text-muted">
             سه سطح همکاری شفاف؛ از شروع حرفه‌ای تا همراهی جامع برای مقیاس‌پذیری برند.
           </p>
@@ -47,8 +47,11 @@ export default function Plans() {
                   <strong>{plan.price}</strong>
                   <span>تومان / ماه</span>
                 </div>
-                <Link href="/contact" className="btn-primary plan-cta">
-                  شروع همکاری
+                <Link
+                  href="/contact"
+                  className={`btn-accent plan-cta ${plan.featured ? "" : "btn-accent--outline"}`}
+                >
+                  انتخاب پلن
                 </Link>
               </div>
             </motion.article>

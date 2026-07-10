@@ -120,3 +120,32 @@
 .auth-back:hover {
   color: #e85d00;
 }
+
+/* Auth polish */
+.auth-card {
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+
+.auth-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 28px 64px rgba(17, 24, 39, 0.12);
+}
+
+.auth-field input:focus {
+  border-color: rgba(255, 77, 36, 0.55);
+  box-shadow: 0 0 0 3px rgba(255, 77, 36, 0.16), 0 0 18px rgba(255, 77, 36, 0.12);
+}
+
+.auth-submit {
+  transition: transform 0.25s ease, box-shadow 0.25s ease !important;
+}
+
+.auth-submit:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 14px 32px rgba(255, 77, 36, 0.38), 0 0 22px rgba(255, 77, 36, 0.22);
+}
+
+.auth-switch a,
+.auth-back {
+  transition: color 0.25s ease;
+}

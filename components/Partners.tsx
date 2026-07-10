@@ -5,8 +5,8 @@ import { PARTNERS } from "@/lib/constants";
 
 export default function Partners() {
   return (
-    <section className="py-16 lg:py-20">
-      <div className="container mx-auto px-4 lg:px-8">
+    <section className="section-block bg-background-soft">
+      <div className="container mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}

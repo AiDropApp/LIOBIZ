@@ -9,6 +9,37 @@ export type AuthSession = {
   role: UserRole;
 };
 
+function asSession(data: unknown): AuthSession | null {
+  if (!data || typeof data !== "object") return null;
+  const s = data as AuthSession;
+  if (!s.userId || !s.email || !s.role) return null;
+  if (s.role !== "admin" && s.role !== "client") return null;
+  return {
+    userId: Number(s.userId),
+    email: String(s.email),
+    name: String(s.name || ""),
+    role: s.role,
+  };
+}
+
+/** Decode once or twice — Next.js may already encode cookie values. */
+function decodeCandidates(raw: string): string[] {
+  const out: string[] = [raw];
+  try {
+    const once = decodeURIComponent(raw);
+    if (once !== raw) out.push(once);
+    try {
+      const twice = decodeURIComponent(once);
+      if (twice !== once) out.push(twice);
+    } catch {
+      /* ignore */
+    }
+  } catch {
+    /* ignore */
+  }
+  return out;
+}
+
 export function parseAuthCookie(value?: string | null): AuthSession | null {
   if (!value) return null;
   try {
@@ -19,11 +50,16 @@ export function parseAuthCookie(value?: string | null): AuthSession | null {
       raw = match?.[1] ? match[1] : "";
     }
     if (!raw) return null;
-    const decoded = decodeURIComponent(raw);
-    const data = JSON.parse(decoded) as AuthSession;
-    if (!data?.userId || !data?.email || !data?.role) return null;
-    if (data.role !== "admin" && data.role !== "client") return null;
-    return data;
+
+    for (const candidate of decodeCandidates(raw)) {
+      try {
+        const session = asSession(JSON.parse(candidate));
+        if (session) return session;
+      } catch {
+        /* try next candidate */
+      }
+    }
+    return null;
   } catch {
     return null;
   }

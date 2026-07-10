@@ -30,6 +30,7 @@ export default function Services() {
           viewport={{ once: true }}
           className="mb-12 text-center"
         >
+          <span className="section-label">خدمات ما</span>
           <h2 className="section-title text-[1.7rem] md:text-3xl lg:text-[2.2rem]">
             راهکارهای جامع برای رشد کسب‌وکار شما
           </h2>
@@ -51,7 +52,7 @@ export default function Services() {
               >
                 <Link href={service.href} className="service-mini-card">
                   <span className="service-mini-icon" aria-hidden="true">
-                    <Icon size={20} />
+                    <Icon size={26} strokeWidth={1.75} />
                   </span>
                   <h3>{service.title}</h3>
                   <p>{service.description}</p>
@@ -59,12 +60,6 @@ export default function Services() {
               </motion.div>
             );
           })}
-        </div>
-
-        <div className="mt-10 flex justify-center">
-          <Link href="/contact" className="btn-primary px-10 py-3.5">
-            مشاهده تمام خدمات
-          </Link>
         </div>
       </div>
     </section>

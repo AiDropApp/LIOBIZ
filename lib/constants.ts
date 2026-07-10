@@ -164,6 +164,38 @@ export const PROCESS_STEPS = [
     description: "همراهی بلندمدت و پشتیبانی فنی برای رشد پایدار برند شما",
     icon: "headphones",
   },
+  {
+    id: "06",
+    title: "مقیاس‌پذیری",
+    description: "گسترش کانال‌ها و بهینه‌سازی مستمر برای رشد پایدار در بازار",
+    icon: "trending-up",
+  },
+];
+
+export const FAQ_ITEMS = [
+  {
+    q: "فرآیند شروع همکاری چگونه است؟",
+    a: "پس از یک جلسه کوتاه نیازسنجی، پیشنهاد و زمان‌بندی شفاف ارائه می‌شود و با تأیید شما اجرا آغاز می‌گردد.",
+  },
+  {
+    q: "تحویل پروژه چقدر طول می‌کشد؟",
+    a: "بسته به نوع خدمت، معمولاً از ۲ تا ۸ هفته متغیر است. زمان دقیق در پیشنهاد اولیه اعلام می‌شود.",
+  },
+  {
+    q: "آیا امکان تغییر پلن در میانه مسیر وجود دارد؟",
+    a: "بله؛ می‌توانید پلن را ارتقا دهید یا دامنه خدمات را متناسب با رشد برند تنظیم کنید.",
+  },
+  {
+    q: "پشتیبانی بعد از تحویل چگونه است؟",
+    a: "پس از تحویل، پشتیبانی فنی و مشاوره‌ای طبق پلن انتخابی ادامه دارد تا نتایج پایدار بماند.",
+  },
+];
+
+export const TEAM_STATS = [
+  { label: "پشتیبانی ۲۴/۷", value: "۲۴/۷", icon: "headphones" },
+  { label: "تعهد کامل", value: "۱۰۰٪", icon: "shield" },
+  { label: "تحویل به‌موقع", value: "۹۸٪", icon: "clock" },
+  { label: "رضایت مشتری", value: "+۹۵٪", icon: "heart" },
 ];
 
 export const PARTNERS = [
@@ -225,14 +257,16 @@ export const BACKSTAGE_TEAM = [
 ];
 
 export const BACKSTAGE_GALLERY = [
-  { id: 1, image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=700&h=900&q=80", caption: "جلسه استراتژی برند" },
-  { id: 2, image: "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=700&h=900&q=80", caption: "طراحی هویت بصری" },
-  { id: 3, image: "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=700&h=900&q=80", caption: "تولید محتوای کمپین" },
-  { id: 4, image: "https://images.unsplash.com/photo-1542744173-8e2bd585f281?auto=format&fit=crop&w=700&h=900&q=80", caption: "بررسی تجربه کاربری" },
-  { id: 5, image: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=700&h=900&q=80", caption: "شوتینگ تبلیغاتی" },
-  { id: 6, image: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=700&h=900&q=80", caption: "آنالیز رشد و داده" },
-  { id: 7, image: "https://images.unsplash.com/photo-1559136555-9303baea8ebd?auto=format&fit=crop&w=700&h=900&q=80", caption: "هماهنگی تیم اجرا" },
-  { id: 8, image: "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=700&h=900&q=80", caption: "ارائه نهایی به مشتری" },
+  { id: 1, image: "/images/backstage-meeting.png", caption: "جلسه استراتژی برند" },
+  { id: 2, image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=700&h=900&q=80", caption: "طوفان فکری تیم" },
+  { id: 3, image: "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=700&h=900&q=80", caption: "طراحی هویت بصری" },
+  { id: 4, image: "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=700&h=900&q=80", caption: "تولید محتوای کمپین" },
+  { id: 5, image: "https://images.unsplash.com/photo-1542744173-8e2bd585f281?auto=format&fit=crop&w=700&h=900&q=80", caption: "بررسی تجربه کاربری" },
+  { id: 6, image: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=700&h=900&q=80", caption: "شوتینگ تبلیغاتی" },
+  { id: 7, image: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=700&h=900&q=80", caption: "آنالیز رشد و داده" },
+  { id: 8, image: "https://images.unsplash.com/photo-1559136555-9303baea8ebd?auto=format&fit=crop&w=700&h=900&q=80", caption: "هماهنگی تیم اجرا" },
+  { id: 9, image: "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=700&h=900&q=80", caption: "ارائه نهایی به مشتری" },
+  { id: 10, image: "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=700&h=900&q=80", caption: "ورکشاپ خلاقیت" },
 ];
 
 export const TESTIMONIALS = [
