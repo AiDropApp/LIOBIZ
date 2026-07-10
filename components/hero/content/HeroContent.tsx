@@ -5,14 +5,16 @@ import HeroBadge from "./HeroBadge";
 import HeroHeading from "./HeroHeading";
 import HeroDescription from "./HeroDescription";
 import HeroCTAButtons from "./HeroCTAButtons";
-import HeroStats from "./HeroStats";
+import type { LandingContent } from "@/lib/cms-defaults";
 
 export default function HeroContent({
   reducedMotion = false,
   delay = 0,
+  landing,
 }: {
   reducedMotion?: boolean;
   delay?: number;
+  landing?: LandingContent;
 }) {
   const item = (extra = 0) =>
     reducedMotion
@@ -24,20 +26,27 @@ export default function HeroContent({
         };
 
   return (
-    <div className="order-2 text-center lg:order-1 lg:text-right">
+    <div className="hero-content-stack">
       <motion.div {...item(0)}>
-        <HeroBadge />
+        <HeroBadge text={landing?.heroBadge} />
       </motion.div>
       <motion.div {...item(0.08)}>
-        <HeroHeading />
+        <HeroHeading
+          title={landing?.heroTitle}
+          highlight={landing?.heroTitleHighlight}
+        />
       </motion.div>
       <motion.div {...item(0.14)}>
-        <HeroDescription />
+        <HeroDescription text={landing?.heroDescription} />
       </motion.div>
       <motion.div {...item(0.2)}>
-        <HeroCTAButtons />
+        <HeroCTAButtons
+          primaryLabel={landing?.heroPrimaryCta}
+          primaryHref={landing?.heroPrimaryHref}
+          secondaryLabel={landing?.heroSecondaryCta}
+          secondaryHref={landing?.heroSecondaryHref}
+        />
       </motion.div>
-      <HeroStats reducedMotion={reducedMotion} delay={delay + 0.28} />
     </div>
   );
 }

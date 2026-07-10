@@ -1,5 +1,5 @@
 export const SITE = {
-  name: "lobiz",
+  name: "liobiz",
   title: "لیوبیز | آژانس خلاقیت و تبلیغات دیجیتال",
   description:
     "آژانس خلاقیت و تبلیغات دیجیتال لیوبیز - ما به کسب‌وکارها کمک می‌کنیم تا با استراتژی‌های هوشمندانه برند خود را بسازند.",
@@ -58,6 +58,14 @@ export const SERVICES = [
     description: "کمپین‌های هدفمند برای افزایش فروش و رشد کسب‌وکار شما",
     icon: "trending-up",
   },
+  {
+    id: "05",
+    slug: "content",
+    href: "/contact",
+    title: "تولید محتوا",
+    description: "محتوای خلاق و استراتژیک برای جذب مخاطب و تقویت برند",
+    icon: "pen",
+  },
 ];
 
 export const PORTFOLIO_FILTERS = [
@@ -73,37 +81,55 @@ export const PORTFOLIO_ITEMS = [
     id: 1,
     title: "برند عطر لوکس",
     category: "برندینگ",
-    image: "/images/project1.svg",
+    image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&h=1067&q=80",
+    description: "طراحی هویت بصری کامل برای برند عطر لوکس؛ از لوگو و پالت رنگ تا بسته‌بندی و زبان بصری یکپارچه.",
+    client: "برند عطر",
+    year: "۱۴۰۳",
   },
   {
     id: 2,
     title: "وب‌سایت املاک",
     category: "طراحی وب‌سایت",
-    image: "/images/project2.svg",
+    image: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&h=1067&q=80",
+    description: "طراحی و توسعه وب‌سایت مدرن املاک با تجربه کاربری سریع، فیلترهای هوشمند و ساختار سئو‌محور.",
+    client: "آژانس املاک",
+    year: "۱۴۰۲",
   },
   {
     id: 3,
     title: "کمپین هدیه",
     category: "تبلیغات",
-    image: "/images/project3.svg",
+    image: "https://images.unsplash.com/photo-1626785774573-4b7993143464?auto=format&fit=crop&w=800&h=1067&q=80",
+    description: "کمپین تبلیغاتی فصلی با ایده خلاقانه، طراحی بصری و اجرای چندکاناله برای افزایش فروش.",
+    client: "برند خرده‌فروشی",
+    year: "۱۴۰۳",
   },
   {
     id: 4,
     title: "برند کفش ورزشی",
     category: "شبکه‌های اجتماعی",
-    image: "/images/project4.svg",
+    image: "https://images.unsplash.com/photo-1558655146-9f40138edfeb?auto=format&fit=crop&w=800&h=1067&q=80",
+    description: "مدیریت و تولید محتوای شبکه‌های اجتماعی برای برند ورزشی؛ تقویم محتوا، طراحی پست و رشد تعامل.",
+    client: "برند ورزشی",
+    year: "۱۴۰۲",
   },
   {
     id: 5,
     title: "هویت بصری کافه",
     category: "برندینگ",
-    image: "/images/project5.svg",
+    image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?auto=format&fit=crop&w=800&h=1067&q=80",
+    description: "خلق هویت بصری گرم و متمایز برای کافه؛ لوگو، منو، بسته‌بندی و المان‌های محیطی برند.",
+    client: "کافه محلی",
+    year: "۱۴۰۱",
   },
   {
     id: 6,
     title: "پلتفرم فروش آنلاین",
     category: "طراحی وب‌سایت",
-    image: "/images/project6.svg",
+    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&h=1067&q=80",
+    description: "طراحی رابط کاربری و توسعه فرانت پلتفرم فروش آنلاین با تمرکز بر تبدیل و تجربه خرید روان.",
+    client: "استارتاپ فروش",
+    year: "۱۴۰۳",
   },
 ];
 
@@ -199,14 +225,14 @@ export const BACKSTAGE_TEAM = [
 ];
 
 export const BACKSTAGE_GALLERY = [
-  { id: 1, image: "/images/backstage1.svg", caption: "جلسه استراتژی برند" },
-  { id: 2, image: "/images/backstage2.svg", caption: "طراحی هویت بصری" },
-  { id: 3, image: "/images/backstage3.svg", caption: "تولید محتوای کمپین" },
-  { id: 4, image: "/images/backstage4.svg", caption: "بررسی تجربه کاربری" },
-  { id: 5, image: "/images/backstage5.svg", caption: "شوتینگ تبلیغاتی" },
-  { id: 6, image: "/images/backstage6.svg", caption: "آنالیز رشد و داده" },
-  { id: 7, image: "/images/backstage7.svg", caption: "هماهنگی تیم اجرا" },
-  { id: 8, image: "/images/backstage8.svg", caption: "ارائه نهایی به مشتری" },
+  { id: 1, image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=700&h=900&q=80", caption: "جلسه استراتژی برند" },
+  { id: 2, image: "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=700&h=900&q=80", caption: "طراحی هویت بصری" },
+  { id: 3, image: "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=700&h=900&q=80", caption: "تولید محتوای کمپین" },
+  { id: 4, image: "https://images.unsplash.com/photo-1542744173-8e2bd585f281?auto=format&fit=crop&w=700&h=900&q=80", caption: "بررسی تجربه کاربری" },
+  { id: 5, image: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=700&h=900&q=80", caption: "شوتینگ تبلیغاتی" },
+  { id: 6, image: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=700&h=900&q=80", caption: "آنالیز رشد و داده" },
+  { id: 7, image: "https://images.unsplash.com/photo-1559136555-9303baea8ebd?auto=format&fit=crop&w=700&h=900&q=80", caption: "هماهنگی تیم اجرا" },
+  { id: 8, image: "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=700&h=900&q=80", caption: "ارائه نهایی به مشتری" },
 ];
 
 export const TESTIMONIALS = [
@@ -230,5 +256,52 @@ export const TESTIMONIALS = [
     quote:
       "تیم لیوبیز برند ما را از یک کسب‌وکار محلی به یک تجربهٔ به‌یادماندنی تبدیل کرد.",
     initial: "ا",
+  },
+];
+
+export const PLANS = [
+  {
+    id: "basic",
+    name: "پایه",
+    description: "شروع حرفه‌ای برای کسب‌وکارهای نوپا",
+    price: "۱۲٫۰۰۰٫۰۰۰",
+    featured: false,
+    features: [
+      "مشاوره اولیه استراتژی برند",
+      "طراحی هویت بصری پایه",
+      "مدیریت یک شبکه اجتماعی",
+      "گزارش ماهانه عملکرد",
+      "پشتیبانی ایمیلی",
+    ],
+  },
+  {
+    id: "pro",
+    name: "حرفه‌ای",
+    description: "انتخاب محبوب برندهای در حال رشد",
+    price: "۲۸٫۰۰۰٫۰۰۰",
+    featured: true,
+    features: [
+      "استراتژی کامل برند و محتوا",
+      "هویت بصری جامع + گایدلاین",
+      "مدیریت سه شبکه اجتماعی",
+      "کمپین تبلیغاتی ماهانه",
+      "طراحی لندینگ اختصاصی",
+      "پشتیبانی اولویت‌دار",
+    ],
+  },
+  {
+    id: "full",
+    name: "جامع",
+    description: "همراهی کامل برای برندهای مقیاس‌پذیر",
+    price: "۴۵٫۰۰۰٫۰۰۰",
+    featured: false,
+    features: [
+      "تیم اختصاصی برندینگ و رشد",
+      "طراحی و توسعه وب‌سایت",
+      "مدیریت کامل شبکه‌های اجتماعی",
+      "کمپین‌های چندکاناله",
+      "آنالیز داده و بهینه‌سازی مستمر",
+      "جلسات هفتگی راهبری",
+    ],
   },
 ];

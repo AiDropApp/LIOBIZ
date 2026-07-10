@@ -2,14 +2,24 @@
 
 import Link from "next/link";
 
-export default function HeroCTAButtons() {
+export default function HeroCTAButtons({
+  primaryLabel,
+  primaryHref,
+  secondaryLabel,
+  secondaryHref,
+}: {
+  primaryLabel?: string;
+  primaryHref?: string;
+  secondaryLabel?: string;
+  secondaryHref?: string;
+}) {
   return (
-    <div className="mb-9 flex flex-col items-center justify-center gap-3 sm:flex-row lg:justify-end">
-      <Link className="btn-primary px-7 py-3.5 text-[0.95rem]" href="/contact">
-        مشاوره
+    <div className="hero-cta-row">
+      <Link className="btn-primary" href={primaryHref || "/contact"}>
+        {primaryLabel || "شروع همکاری"}
       </Link>
-      <Link className="btn-outline btn-outline--quiet px-6 py-3 text-sm" href="/portfolio">
-        مشاهده نمونه کارها
+      <Link className="btn-outline" href={secondaryHref || "/#services"}>
+        {secondaryLabel || "مشاهده خدمات"}
       </Link>
     </div>
   );

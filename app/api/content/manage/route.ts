@@ -29,6 +29,9 @@ export async function POST(request: Request) {
       title: String(body?.title || "پروژه جدید").trim(),
       category: String(body?.category || "برندینگ").trim(),
       image: String(body?.image || "/images/project1.svg"),
+      description: String(body?.description || "").trim() || undefined,
+      client: String(body?.client || "").trim() || undefined,
+      year: String(body?.year || "").trim() || undefined,
     };
     content.portfolio = [item, ...content.portfolio];
   } else if (type === "backstage") {
@@ -64,6 +67,18 @@ export async function PUT(request: Request) {
             title: String(body?.title ?? item.title).trim(),
             category: String(body?.category ?? item.category).trim(),
             image: String(body?.image ?? item.image),
+            description:
+              body?.description !== undefined
+                ? String(body.description).trim() || undefined
+                : item.description,
+            client:
+              body?.client !== undefined
+                ? String(body.client).trim() || undefined
+                : item.client,
+            year:
+              body?.year !== undefined
+                ? String(body.year).trim() || undefined
+                : item.year,
           }
         : item,
     );

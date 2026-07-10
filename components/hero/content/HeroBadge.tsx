@@ -1,5 +1,5 @@
 "use client";
 
-export default function HeroBadge() {
-  return <span className="hero-badge">موتور برند شما</span>;
+export default function HeroBadge({ text }: { text?: string }) {
+  return <span className="hero-badge">{text || "آژانس رشد کسب‌وکار"}</span>;
 }

@@ -4,17 +4,26 @@ import SiteShell from "@/components/SiteShell";
 import PageHero from "@/components/PageHero";
 import { STATS } from "@/lib/constants";
 import { ABOUT_PAGE } from "@/lib/pages-content";
+import { readSiteContent } from "@/lib/content-store";
 
-export const metadata: Metadata = {
-  title: "درباره ما | لیوبیز",
-  description: ABOUT_PAGE.intro,
-};
+export const dynamic = "force-dynamic";
 
-export default function AboutPage() {
+export async function generateMetadata(): Promise<Metadata> {
+  const content = await readSiteContent();
+  return {
+    title: `${content.pages.about.title} | لیوبیز`,
+    description: content.pages.about.intro,
+  };
+}
+
+export default async function AboutPage() {
+  const content = await readSiteContent();
+  const about = content.pages.about;
+
   return (
     <SiteShell>
       <div className="container mx-auto px-4 pb-20 lg:px-8 lg:pb-28">
-        <PageHero label={ABOUT_PAGE.label} title={ABOUT_PAGE.title} intro={ABOUT_PAGE.intro} />
+        <PageHero label={about.label} title={about.title} intro={about.intro} />
 
         <section className="mb-12 lux-card">
           <h2 className="mb-4 text-xl font-bold">داستان ما</h2>

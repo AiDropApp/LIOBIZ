@@ -5,6 +5,7 @@ import "./auth.css";
 import "./admin.css";
 import { SITE } from "@/lib/constants";
 import PwaRegister from "@/components/PwaRegister";
+import ThemeProvider from "@/components/ThemeProvider";
 
 const vazirmatn = Vazirmatn({
   subsets: ["arabic"],
@@ -19,7 +20,7 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
-    statusBarStyle: "black-translucent",
+    statusBarStyle: "default",
     title: "لیوبیز",
   },
   icons: {
@@ -29,7 +30,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#3B82F6",
+  themeColor: "#FF6A00",
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
@@ -43,7 +44,7 @@ export default function RootLayout({
   return (
     <html lang="fa" dir="rtl">
       <body className={`${vazirmatn.variable} font-vazir`}>
-        {children}
+        <ThemeProvider>{children}</ThemeProvider>
         <PwaRegister />
       </body>
     </html>

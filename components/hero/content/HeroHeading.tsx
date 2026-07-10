@@ -1,11 +1,19 @@
 "use client";
 
-export default function HeroHeading() {
+export default function HeroHeading({
+  title,
+  highlight,
+}: {
+  title?: string;
+  highlight?: string;
+}) {
   return (
-    <h1 className="hero-heading mb-5 text-4xl font-black leading-[1.15] tracking-tight text-white md:text-5xl xl:text-[4.5rem]">
-      تجربهٔ برجسته و لوکس
+    <h1 className="hero-heading text-[2.25rem] font-black leading-[1.22] tracking-tight md:text-[2.75rem] xl:text-[3.35rem] xl:leading-[1.18]">
+      {title || "ما رشد"}{" "}
+      <span>{highlight || "کسب‌وکار شما"}</span>
+      {" "}را
       <br />
-      <span>برای برندهای موفق</span>
+      می‌سازیم
     </h1>
   );
 }

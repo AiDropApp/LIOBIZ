@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { AUTH_COOKIE, findUserById, parseAuthCookie } from "@/lib/auth";
+import { AUTH_COOKIE, findUserById, parseAuthCookie, clearAuthCookie } from "@/lib/auth";
 
 export const runtime = "nodejs";
 
@@ -12,8 +12,13 @@ export async function GET() {
   }
 
   const user = findUserById(session.userId);
-  if (!user) {
-    return NextResponse.json({ message: "کاربر یافت نشد." }, { status: 401 });
+  if (!user || user.blocked) {
+    const res = NextResponse.json(
+      { message: user?.blocked ? "حساب شما مسدود شده است." : "کاربر یافت نشد." },
+      { status: 401 },
+    );
+    clearAuthCookie(res);
+    return res;
   }
 
   return NextResponse.json({
@@ -24,6 +29,7 @@ export async function GET() {
       role: user.role,
       phone: user.phone,
       company: user.company,
+      blocked: Boolean(user.blocked),
       createdAt: user.createdAt,
     },
   });

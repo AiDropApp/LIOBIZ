@@ -31,13 +31,13 @@ export default function Testimonials() {
               className="lux-card"
             >
               <div className="mb-6 h-1 w-16 rounded-full bg-gradient-to-l from-primary to-warm/60" />
-              <p className="mb-8 leading-8 text-white/78">“{item.quote}”</p>
+              <p className="mb-8 leading-8 text-foreground/80">“{item.quote}”</p>
               <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/20 text-sm font-bold text-primary-light">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/15 text-sm font-bold text-primary">
                   {item.initial}
                 </div>
                 <div>
-                  <h3 className="font-bold text-white">{item.name}</h3>
+                  <h3 className="font-bold text-foreground">{item.name}</h3>
                   <p className="text-sm text-muted">{item.role}</p>
                 </div>
               </div>

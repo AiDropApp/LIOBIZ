@@ -2,18 +2,26 @@ import type { Metadata } from "next";
 import SiteShell from "@/components/SiteShell";
 import PageHero from "@/components/PageHero";
 import PortfolioGallery from "@/components/PortfolioGallery";
-import { PORTFOLIO_PAGE } from "@/lib/pages-content";
+import { readSiteContent } from "@/lib/content-store";
 
-export const metadata: Metadata = {
-  title: "نمونه کارها | لیوبیز",
-  description: PORTFOLIO_PAGE.intro,
-};
+export const dynamic = "force-dynamic";
 
-export default function PortfolioPage() {
+export async function generateMetadata(): Promise<Metadata> {
+  const content = await readSiteContent();
+  return {
+    title: `${content.pages.portfolio.title} | لیوبیز`,
+    description: content.pages.portfolio.intro,
+  };
+}
+
+export default async function PortfolioPage() {
+  const content = await readSiteContent();
+  const portfolio = content.pages.portfolio;
+
   return (
     <SiteShell>
       <div className="container mx-auto px-4 pb-20 lg:px-8 lg:pb-28">
-        <PageHero label={PORTFOLIO_PAGE.label} title={PORTFOLIO_PAGE.title} intro={PORTFOLIO_PAGE.intro} />
+        <PageHero label={portfolio.label} title={portfolio.title} intro={portfolio.intro} />
         <PortfolioGallery />
       </div>
     </SiteShell>

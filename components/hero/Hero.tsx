@@ -1,30 +1,70 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import Background from "./Background/Background";
+import Image from "next/image";
 import HeroContent from "./content/HeroContent";
-import HeroArtwork from "./HeroArtwork";
+import HeroStats from "./content/HeroStats";
 import usePrefersReducedMotion from "@/hooks/usePrefersReducedMotion";
+import type { LandingContent } from "@/lib/cms-defaults";
+import { defaultLanding } from "@/lib/cms-defaults";
 
 export default function Hero() {
   const reducedMotion = usePrefersReducedMotion();
+  const [landing, setLanding] = useState<LandingContent>(defaultLanding);
+
+  useEffect(() => {
+    fetch("/api/content", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.landing) setLanding({ ...defaultLanding, ...data.landing });
+      })
+      .catch(() => undefined);
+  }, []);
+
+  const media = landing.heroMediaUrl || "/videos/header.mp4";
+  const isVideo = landing.heroMediaType === "video" || media.endsWith(".mp4") || media.endsWith(".webm");
 
   return (
-    <section id="home" className="hero-section relative overflow-hidden pt-32 pb-20 lg:pb-28">
-      <Background opacity={1} />
+    <section id="home" className="hero-section">
+      <div className="hero-panel">
+        <div className="hero-video-stage" aria-hidden="true">
+          {isVideo ? (
+            <video
+              className="hero-video"
+              src={media}
+              autoPlay={!reducedMotion}
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              key={media}
+            />
+          ) : (
+            <Image src={media} alt="" fill className="hero-video object-cover" priority sizes="100vw" />
+          )}
+          <div className="hero-video-scrim" />
+        </div>
 
-      <div className="container relative z-20 mx-auto px-4 lg:px-8">
-        <div className="grid items-center gap-10 lg:grid-cols-[0.44fr_0.56fr] lg:gap-10 xl:gap-14">
-          <HeroContent reducedMotion={reducedMotion} delay={reducedMotion ? 0 : 0.22} />
+        <div className="hero-panel-inner">
+          <div className="hero-layout">
+            <motion.div
+              className="hero-copy"
+              initial={reducedMotion ? false : { opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.65, ease: "easeOut", delay: 0.1 }}
+            >
+              <HeroContent
+                reducedMotion={reducedMotion}
+                delay={reducedMotion ? 0 : 0.12}
+                landing={landing}
+              />
+            </motion.div>
+          </div>
+        </div>
 
-          <motion.div
-            initial={reducedMotion ? false : { opacity: 0, scale: 0.97, y: 12 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ duration: 0.9, ease: "easeOut", delay: reducedMotion ? 0 : 0.08 }}
-            className="order-1 flex justify-center lg:order-2 lg:justify-end"
-          >
-            <HeroArtwork />
-          </motion.div>
+        <div className="hero-stats-bridge">
+          <HeroStats reducedMotion={reducedMotion} delay={reducedMotion ? 0 : 0.25} />
         </div>
       </div>
     </section>

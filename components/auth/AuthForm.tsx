@@ -2,13 +2,21 @@
 
 import { useMemo, useState, type FormEvent } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Logo from "@/components/Logo";
 
 type Mode = "login" | "register";
 
+function safeNextPath(raw: string | null): string | null {
+  if (!raw) return null;
+  if (!raw.startsWith("/") || raw.startsWith("//")) return null;
+  if (raw.startsWith("/login") || raw.startsWith("/register")) return null;
+  return raw;
+}
+
 export default function AuthForm({ mode }: { mode: Mode }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const isLogin = mode === "login";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -41,7 +49,18 @@ export default function AuthForm({ mode }: { mode: Mode }) {
         setError(data.message || "خطایی رخ داد.");
         return;
       }
-      router.push(data.redirect || (isLogin ? "/dashboard" : "/dashboard"));
+
+      const next = safeNextPath(searchParams.get("next"));
+      const fallback = data.redirect || (data.user?.role === "admin" ? "/admin" : "/dashboard");
+      // Only honor next if it matches the user's role destination family
+      let dest = fallback;
+      if (next) {
+        if (data.user?.role === "admin" && next.startsWith("/admin")) dest = next;
+        else if (data.user?.role === "client" && next.startsWith("/dashboard")) dest = next;
+        else if (data.user?.role === "admin" && next.startsWith("/dashboard")) dest = next;
+      }
+
+      router.push(dest);
       router.refresh();
     } catch {
       setError("ارتباط با سرور برقرار نشد.");

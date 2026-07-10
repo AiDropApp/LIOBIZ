@@ -18,7 +18,7 @@ export default function Header() {
   const reducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 12);
+    const onScroll = () => setScrolled(window.scrollY > 24);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -76,101 +76,97 @@ export default function Header() {
         };
 
   return (
-    <header className={`lux-header fixed inset-x-0 top-0 z-50 ${scrolled ? "is-scrolled" : ""}`}>
-      <div className="container mx-auto px-3 sm:px-4 lg:px-8">
-        <motion.div
-          className="lux-header-shell"
-          initial={reducedMotion ? false : { opacity: 0, y: -16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, ease: "easeOut" }}
-        >
-          <div className="lux-header-glow" aria-hidden="true" />
-          <div className="header-bar grid grid-cols-[auto_1fr_auto] items-center gap-3 px-3 py-2.5 sm:gap-4 sm:px-4 lg:gap-6 lg:px-5 lg:py-3">
-            <motion.div className="justify-self-start" {...fade(0.05)}>
-              <Logo width={138} />
-            </motion.div>
+    <header className={`lux-header ${scrolled ? "is-scrolled" : ""}`}>
+      <motion.div
+        className="lux-header-shell"
+        initial={reducedMotion ? false : { opacity: 0, y: -12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.55, ease: "easeOut" }}
+      >
+        <div className="header-bar">
+          <motion.div className="header-brand" {...fade(0.05)}>
+            <Logo height={72} />
+          </motion.div>
 
-            <motion.nav
-              className="hidden items-center justify-center lg:flex"
-              aria-label="منوی اصلی"
-              {...fade(0.12)}
-            >
-              <div className="lux-nav-pill">
-                {NAV_LINKS.map((link) => {
-                  const active = isActive(link.href);
-                  const isServices = link.href === "/#services";
+          <motion.nav
+            className="header-nav hidden lg:flex"
+            aria-label="منوی اصلی"
+            {...fade(0.12)}
+          >
+            <div className="lux-nav-pill">
+              {NAV_LINKS.map((link) => {
+                const active = isActive(link.href);
+                const isServices = link.href === "/#services";
 
-                  if (isServices) {
-                    return (
-                      <div key={link.href} className="relative" ref={servicesRef}>
-                        <button
-                          type="button"
-                          className={`nav-link ${active || servicesOpen || servicesActive ? "is-active" : ""}`}
-                          onClick={() => setServicesOpen((v) => !v)}
-                          aria-expanded={servicesOpen}
-                          aria-haspopup="true"
-                        >
-                          <span className="nav-dot" aria-hidden="true" />
-                          <span className="nav-link-text">{link.label}</span>
-                          <ChevronDown
-                            size={14}
-                            className={`nav-caret ${servicesOpen ? "is-open" : ""}`}
-                          />
-                        </button>
-
-                        <div className={`nav-dropdown ${servicesOpen ? "is-open" : ""}`} role="menu">
-                          {SERVICES.map((service) => (
-                            <Link
-                              key={service.id}
-                              href={service.href}
-                              className="nav-dropdown-item"
-                              role="menuitem"
-                              onClick={() => setServicesOpen(false)}
-                            >
-                              <span className="nav-dropdown-index">{service.id}</span>
-                              <span>
-                                <strong>{service.title}</strong>
-                                <small>{service.description}</small>
-                              </span>
-                            </Link>
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  }
-
+                if (isServices) {
                   return (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      className={`nav-link ${active ? "is-active" : ""}`}
-                    >
-                      <span className="nav-dot" aria-hidden="true" />
-                      <span className="nav-link-text">{link.label}</span>
-                    </Link>
-                  );
-                })}
-              </div>
-            </motion.nav>
+                    <div key={link.href} className="relative" ref={servicesRef}>
+                      <button
+                        type="button"
+                        className={`nav-link ${active || servicesOpen || servicesActive ? "is-active" : ""}`}
+                        onClick={() => setServicesOpen((v) => !v)}
+                        aria-expanded={servicesOpen}
+                        aria-haspopup="true"
+                      >
+                        <span className="nav-dot" aria-hidden="true" />
+                        <span className="nav-link-text">{link.label}</span>
+                        <ChevronDown
+                          size={14}
+                          className={`nav-caret ${servicesOpen ? "is-open" : ""}`}
+                        />
+                      </button>
 
-            <motion.div className="flex items-center justify-self-end gap-2" {...fade(0.2)}>
-              <Link href="/login" className="btn-signup hidden lg:inline-flex">
-                <span className="btn-signup-shine" aria-hidden="true" />
-                <span>ورود</span>
-              </Link>
-              <button
-                type="button"
-                className="header-menu-btn lg:hidden"
-                onClick={() => setOpen((v) => !v)}
-                aria-label={open ? "بستن منو" : "باز کردن منو"}
-                aria-expanded={open}
-              >
-                {open ? <X size={18} /> : <Menu size={18} />}
-              </button>
-            </motion.div>
-          </div>
-        </motion.div>
-      </div>
+                      <div className={`nav-dropdown ${servicesOpen ? "is-open" : ""}`} role="menu">
+                        {SERVICES.map((service) => (
+                          <Link
+                            key={service.id}
+                            href={service.href}
+                            className="nav-dropdown-item"
+                            role="menuitem"
+                            onClick={() => setServicesOpen(false)}
+                          >
+                            <span className="nav-dropdown-index">{service.id}</span>
+                            <span>
+                              <strong>{service.title}</strong>
+                              <small>{service.description}</small>
+                            </span>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                }
+
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={`nav-link ${active ? "is-active" : ""}`}
+                  >
+                    <span className="nav-dot" aria-hidden="true" />
+                    <span className="nav-link-text">{link.label}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          </motion.nav>
+
+          <motion.div className="header-actions" {...fade(0.2)}>
+            <Link href="/login" className="header-login-btn hidden lg:inline-flex">
+              ورود
+            </Link>
+            <button
+              type="button"
+              className="header-menu-btn lg:hidden"
+              onClick={() => setOpen((v) => !v)}
+              aria-label={open ? "بستن منو" : "باز کردن منو"}
+              aria-expanded={open}
+            >
+              {open ? <X size={18} /> : <Menu size={18} />}
+            </button>
+          </motion.div>
+        </div>
+      </motion.div>
 
       <div className={`header-mobile-panel lg:hidden ${open ? "is-open" : ""}`}>
         <div className="header-mobile-backdrop" onClick={() => setOpen(false)} />
@@ -196,11 +192,18 @@ export default function Header() {
             </div>
             <Link
               href="/login"
-              className="btn-signup mt-4 w-full justify-center"
+              className="header-login-btn mt-4 w-full justify-center"
+              onClick={() => setOpen(false)}
+            >
+              ورود به حساب
+            </Link>
+            <Link
+              href="/contact"
+              className="btn-signup mt-2 w-full justify-center"
               onClick={() => setOpen(false)}
             >
               <span className="btn-signup-shine" aria-hidden="true" />
-              <span>ورود</span>
+              <span>تماس با ما</span>
             </Link>
           </nav>
         </div>

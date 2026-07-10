@@ -15,7 +15,7 @@ export default function PageHero({
       <h1 className="section-title mx-auto max-w-4xl">{title}</h1>
       {intro && <p className="mx-auto mt-5 max-w-2xl leading-relaxed text-muted">{intro}</p>}
       <div className="mt-6 flex justify-center">
-        <Link href="/" className="text-sm text-white/45 transition-colors hover:text-white">
+        <Link href="/" className="text-sm text-muted transition-colors hover:text-primary">
           بازگشت به صفحه اصلی
         </Link>
       </div>

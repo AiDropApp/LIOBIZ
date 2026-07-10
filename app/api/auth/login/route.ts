@@ -23,6 +23,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: "ایمیل یا رمز عبور نادرست است." }, { status: 401 });
   }
 
+  if (user.blocked) {
+    return NextResponse.json({ message: "حساب شما توسط مدیر مسدود شده است." }, { status: 403 });
+  }
+
   const session = toSession(user);
   const response = NextResponse.json({
     ok: true,

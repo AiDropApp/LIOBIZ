@@ -48,7 +48,7 @@ export default async function ServicePage({ params }: Props) {
             <p className="leading-relaxed text-muted">{service.audience}</p>
             <ul className="mt-6 grid gap-3 sm:grid-cols-2">
               {service.outcomes.map((item) => (
-                <li key={item} className="rounded-xl border border-white/8 bg-white/[0.03] px-4 py-3 text-sm text-white/85">
+                <li key={item} className="rounded-xl border border-black/8 bg-background-soft px-4 py-3 text-sm text-foreground/85">
                   {item}
                 </li>
               ))}

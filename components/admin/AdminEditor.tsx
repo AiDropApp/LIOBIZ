@@ -13,6 +13,9 @@ const emptyPortfolio = {
   title: "",
   category: "برندینگ",
   image: "",
+  description: "",
+  client: "",
+  year: "",
 };
 
 const emptyBackstage = {
@@ -213,6 +216,24 @@ export default function AdminEditor({ embedded = false }: { embedded?: boolean }
                   </option>
                 ))}
               </select>
+              <textarea
+                value={portfolioForm.description}
+                onChange={(e) => setPortfolioForm((v) => ({ ...v, description: e.target.value }))}
+                placeholder="توضیحات پروژه"
+                rows={3}
+              />
+              <div className="grid gap-2 sm:grid-cols-2">
+                <input
+                  value={portfolioForm.client}
+                  onChange={(e) => setPortfolioForm((v) => ({ ...v, client: e.target.value }))}
+                  placeholder="نام کارفرما / برند"
+                />
+                <input
+                  value={portfolioForm.year}
+                  onChange={(e) => setPortfolioForm((v) => ({ ...v, year: e.target.value }))}
+                  placeholder="سال (مثلاً ۱۴۰۳)"
+                />
+              </div>
               <input
                 type="file"
                 accept="image/*"
@@ -284,6 +305,57 @@ export default function AdminEditor({ embedded = false }: { embedded?: boolean }
                         </option>
                       ))}
                     </select>
+                    <textarea
+                      value={item.description || ""}
+                      rows={2}
+                      placeholder="توضیحات"
+                      onChange={(e) =>
+                        setContent((prev) =>
+                          prev
+                            ? {
+                                ...prev,
+                                portfolio: prev.portfolio.map((p) =>
+                                  p.id === item.id ? { ...p, description: e.target.value } : p,
+                                ),
+                              }
+                            : prev,
+                        )
+                      }
+                    />
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      <input
+                        value={item.client || ""}
+                        placeholder="کارفرما"
+                        onChange={(e) =>
+                          setContent((prev) =>
+                            prev
+                              ? {
+                                  ...prev,
+                                  portfolio: prev.portfolio.map((p) =>
+                                    p.id === item.id ? { ...p, client: e.target.value } : p,
+                                  ),
+                                }
+                              : prev,
+                          )
+                        }
+                      />
+                      <input
+                        value={item.year || ""}
+                        placeholder="سال"
+                        onChange={(e) =>
+                          setContent((prev) =>
+                            prev
+                              ? {
+                                  ...prev,
+                                  portfolio: prev.portfolio.map((p) =>
+                                    p.id === item.id ? { ...p, year: e.target.value } : p,
+                                  ),
+                                }
+                              : prev,
+                          )
+                        }
+                      />
+                    </div>
                     <input
                       type="file"
                       accept="image/*"

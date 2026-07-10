@@ -87,7 +87,7 @@ export default function ContactForm() {
       </label>
 
       {feedback && (
-        <p className={`text-sm ${status === "ok" ? "text-emerald-300" : "text-red-300"}`}>{feedback}</p>
+        <p className={`text-sm ${status === "ok" ? "text-emerald-700" : "text-red-600"}`}>{feedback}</p>
       )}
 
       <button type="submit" className="btn-primary w-full justify-center py-3.5" disabled={status === "loading"}>

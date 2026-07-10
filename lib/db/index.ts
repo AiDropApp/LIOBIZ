@@ -5,7 +5,15 @@ import bcrypt from "bcryptjs";
 import fs from "fs";
 import path from "path";
 import * as schema from "@/lib/db/schema";
-import { contactMessages, users } from "@/lib/db/schema";
+import {
+  contactMessages,
+  notifications,
+  orderFiles,
+  orders,
+  ticketMessages,
+  tickets,
+  users,
+} from "@/lib/db/schema";
 
 const DATA_DIR = path.join(process.cwd(), "data");
 const DB_PATH = path.join(DATA_DIR, "liobiz.db");
@@ -22,7 +30,9 @@ function ensureSchema(database: Database.Database) {
       role TEXT NOT NULL DEFAULT 'client',
       phone TEXT,
       company TEXT,
-      created_at TEXT NOT NULL
+      blocked INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL,
+      updated_at TEXT
     );
 
     CREATE TABLE IF NOT EXISTS contact_messages (
@@ -34,23 +44,97 @@ function ensureSchema(database: Database.Database) {
       status TEXT NOT NULL DEFAULT 'new',
       created_at TEXT NOT NULL
     );
+
+    CREATE TABLE IF NOT EXISTS orders (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      title TEXT NOT NULL,
+      service TEXT NOT NULL,
+      description TEXT NOT NULL,
+      budget TEXT,
+      status TEXT NOT NULL DEFAULT 'new',
+      admin_note TEXT,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS order_files (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      order_id INTEGER NOT NULL,
+      uploaded_by INTEGER NOT NULL,
+      file_name TEXT NOT NULL,
+      file_url TEXT NOT NULL,
+      kind TEXT NOT NULL DEFAULT 'delivery',
+      created_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS tickets (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      order_id INTEGER,
+      subject TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'open',
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS ticket_messages (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      ticket_id INTEGER NOT NULL,
+      sender_id INTEGER NOT NULL,
+      sender_role TEXT NOT NULL,
+      body TEXT NOT NULL,
+      created_at TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS notifications (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      title TEXT NOT NULL,
+      body TEXT NOT NULL,
+      href TEXT,
+      read INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL
+    );
   `);
+
+  // Safe migrations for existing DBs
+  const userCols = database.prepare(`PRAGMA table_info(users)`).all() as Array<{ name: string }>;
+  const names = new Set(userCols.map((c) => c.name));
+  if (!names.has("blocked")) {
+    database.exec(`ALTER TABLE users ADD COLUMN blocked INTEGER NOT NULL DEFAULT 0`);
+  }
+  if (!names.has("updated_at")) {
+    database.exec(`ALTER TABLE users ADD COLUMN updated_at TEXT`);
+  }
 }
 
 function seedAdmin(database: ReturnType<typeof drizzle<typeof schema>>) {
-  const existing = database.select().from(users).where(eq(users.email, "admin@liobiz.com")).get();
+  const email = (process.env.ADMIN_EMAIL || "admin@liobiz.com").toLowerCase().trim();
+  const password = process.env.ADMIN_PASSWORD || "Admin@12345";
+  const name = process.env.ADMIN_NAME || "مدیر لیوبیز";
+
+  const existing = database.select().from(users).where(eq(users.email, email)).get();
   if (existing) return;
+
+  if (process.env.NODE_ENV === "production" && !process.env.ADMIN_PASSWORD) {
+    console.warn(
+      "[liobiz] ADMIN_PASSWORD is not set. Seeding default admin — change it immediately after first login.",
+    );
+  }
 
   database
     .insert(users)
     .values({
-      name: "مدیر لیوبیز",
-      email: "admin@liobiz.com",
-      passwordHash: bcrypt.hashSync("Admin@12345", 10),
+      name,
+      email,
+      passwordHash: bcrypt.hashSync(password, 10),
       role: "admin",
       phone: null,
       company: "لیوبیز",
+      blocked: false,
       createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     })
     .run();
 }
@@ -105,5 +189,22 @@ export function getDb() {
   return dbInstance;
 }
 
-export type { User, ContactMessage } from "@/lib/db/schema";
-export { users, contactMessages };
+export type {
+  User,
+  ContactMessage,
+  Order,
+  OrderFile,
+  Ticket,
+  TicketMessage,
+  Notification,
+} from "@/lib/db/schema";
+
+export {
+  users,
+  contactMessages,
+  orders,
+  orderFiles,
+  tickets,
+  ticketMessages,
+  notifications,
+};

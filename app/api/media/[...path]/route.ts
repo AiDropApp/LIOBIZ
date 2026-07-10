@@ -12,7 +12,13 @@ const MIME: Record<string, string> = {
   webp: "image/webp",
   gif: "image/gif",
   svg: "image/svg+xml",
+  mp4: "video/mp4",
+  webm: "video/webm",
+  pdf: "application/pdf",
+  zip: "application/zip",
 };
+
+const ALLOWED_FOLDERS = ["portfolio", "backstage", "hero", "orders", "uploads"];
 
 type Params = { params: Promise<{ path: string[] }> };
 
@@ -23,7 +29,7 @@ export async function GET(_request: Request, { params }: Params) {
   }
 
   const [folder, ...rest] = segments;
-  if (!["portfolio", "backstage"].includes(folder)) {
+  if (!ALLOWED_FOLDERS.includes(folder)) {
     return NextResponse.json({ message: "پوشه نامعتبر" }, { status: 400 });
   }
 
@@ -36,7 +42,7 @@ export async function GET(_request: Request, { params }: Params) {
 
   try {
     const data = await fs.readFile(filePath);
-    const ext = filename.split(".").pop()?.toLowerCase() || "png";
+    const ext = filename.split(".").pop()?.toLowerCase() || "bin";
     return new NextResponse(data, {
       headers: {
         "Content-Type": MIME[ext] || "application/octet-stream",

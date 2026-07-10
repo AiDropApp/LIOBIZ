@@ -9,9 +9,9 @@ export default function SiteShell({
   className?: string;
 }) {
   return (
-    <div className={`min-h-screen bg-dark text-white ${className}`}>
+    <div className={`min-h-screen w-full overflow-x-clip bg-background text-foreground ${className}`}>
       <Header />
-      <main className="pt-28 lg:pt-32">{children}</main>
+      <main className="pt-[calc(var(--header-h)+1.5rem)]">{children}</main>
       <Footer />
     </div>
   );

@@ -38,6 +38,7 @@ export function setAuthCookie(response: NextResponse, session: AuthSession) {
     sameSite: "lax",
     path: "/",
     maxAge: 60 * 60 * 24 * 7,
+    secure: process.env.NODE_ENV === "production",
   });
 }
 

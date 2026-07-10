@@ -28,7 +28,7 @@ export default function Stats() {
                 className="trust-strip-item"
               >
                 <Icon className="mb-2 text-primary" size={20} />
-                <div className="text-2xl font-black text-primary-light md:text-3xl">{stat.value}</div>
+                <div className="text-2xl font-black text-primary md:text-3xl">{stat.value}</div>
                 <div className="mt-1 text-sm text-muted">{stat.label}</div>
               </motion.div>
             );

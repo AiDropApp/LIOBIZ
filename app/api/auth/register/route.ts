@@ -39,7 +39,9 @@ export async function POST(request: Request) {
       role: "client",
       phone: null,
       company: null,
+      blocked: false,
       createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     })
     .returning()
     .get();

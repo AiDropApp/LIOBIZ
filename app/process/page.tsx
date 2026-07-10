@@ -11,7 +11,7 @@ import {
 import SiteShell from "@/components/SiteShell";
 import PageHero from "@/components/PageHero";
 import { PROCESS_STEPS } from "@/lib/constants";
-import { PROCESS_PAGE } from "@/lib/pages-content";
+import { readSiteContent } from "@/lib/content-store";
 
 const iconMap: Record<string, LucideIcon> = {
   search: Search,
@@ -21,22 +21,39 @@ const iconMap: Record<string, LucideIcon> = {
   headphones: Headphones,
 };
 
-export const metadata: Metadata = {
-  title: "فرآیند همکاری | لیوبیز",
-  description: PROCESS_PAGE.intro,
-};
+export const dynamic = "force-dynamic";
 
-export default function ProcessPage() {
+export async function generateMetadata(): Promise<Metadata> {
+  const content = await readSiteContent();
+  return {
+    title: `${content.pages.process.title} | لیوبیز`,
+    description: content.pages.process.intro,
+  };
+}
+
+export default async function ProcessPage() {
+  const content = await readSiteContent();
+  const process = content.pages.process;
+  const steps =
+    content.pages.processSteps?.length > 0
+      ? content.pages.processSteps.map((s, i) => ({
+          id: s.id || String(i + 1).padStart(2, "0"),
+          title: s.title,
+          description: s.description,
+          icon: PROCESS_STEPS[i]?.icon || "search",
+        }))
+      : PROCESS_STEPS;
+
   return (
     <SiteShell>
       <div className="container mx-auto px-4 pb-20 lg:px-8 lg:pb-28">
-        <PageHero label={PROCESS_PAGE.label} title={PROCESS_PAGE.title} intro={PROCESS_PAGE.intro} />
+        <PageHero label={process.label} title={process.title} intro={process.intro} />
 
-        <div className="grid gap-5 lg:grid-cols-1">
-          {PROCESS_STEPS.map((step) => {
+        <div className="grid gap-5 md:grid-cols-2">
+          {steps.map((step) => {
             const Icon = iconMap[step.icon] ?? Search;
             return (
-              <article key={step.id} className="lux-card grid gap-4 md:grid-cols-[auto_1fr_auto] md:items-center">
+              <article key={step.id} className="lux-card grid gap-4">
                 <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/15 text-primary">
                   <Icon size={24} />
                 </div>

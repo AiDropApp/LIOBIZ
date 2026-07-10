@@ -1,10 +1,44 @@
-# Liobiz
+# Liobiz Light Dashboard
 
-وب‌سایت و پنل لیوبیز — لندینگ، داشبورد ادمین و داشبورد کاربر.
+وب‌سایت رسمی و پنل مدیریت **لیوبیز** — آژانس خلاقیت و تبلیغات دیجیتال (RTL / فارسی).
+
+این ریپو شامل لندینگ کامل، صفحات خدمات، احراز هویت، **پنل ادمین** و **داشبورد کاربر** است.
+
+---
+
+## این پروژه چیست؟
+
+| بخش | توضیح |
+|------|--------|
+| لندینگ | هیرو ویدیویی، خدمات، نمونه کار، بک‌استیج، پلن‌ها، درباره لیوبیز |
+| صفحات داخلی | درباره ما، فرآیند، پورتفolio، تماس، جزئیات هر خدمت |
+| پنل ادمین | CMS صفحات/ظاهر، نمونه کار، سفارش‌ها، تیکت‌ها، کاربران، پیام‌ها |
+| داشبورد کاربر | سفارش، تیکت، فایل تحویل، اعلان، پروفایل |
+| دیتابیس | SQLite + Drizzle (`data/liobiz.db`) |
+
+---
 
 ## Preview
 
-![Liobiz Landing Preview](docs/screenshots/preview.png)
+![پیش‌نمایش صفحه اصلی لیوبیز](docs/screenshots/preview.png)
+
+### فوتر (تمام‌عرض)
+
+![فوتر لیوبیز](docs/screenshots/14-footer.png)
+
+### موبایل
+
+![صفحه اصلی موبایل](docs/screenshots/15-home-mobile.png)
+
+### پنل ادمین
+
+![پنل ادمین](docs/screenshots/12-admin.png)
+
+### داشبورد کاربر
+
+![داشبورد کاربر](docs/screenshots/13-dashboard.png)
+
+---
 
 ## Screenshots
 
@@ -23,27 +57,58 @@
 | تبلیغات | [11-service-ads.png](docs/screenshots/11-service-ads.png) |
 | پنل ادمین | [12-admin.png](docs/screenshots/12-admin.png) |
 | داشبورد کاربر | [13-dashboard.png](docs/screenshots/13-dashboard.png) |
+| فوتر | [14-footer.png](docs/screenshots/14-footer.png) |
+| موبایل | [15-home-mobile.png](docs/screenshots/15-home-mobile.png) |
 
-## Run locally
+---
+
+## اجرا محلی
 
 ```bash
 pnpm install
+cp .env.example .env.local
 pnpm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+باز کنید: [http://localhost:3000](http://localhost:3000)
 
-### Recapture screenshots
+### ادمین پیش‌فرض (فقط توسعه)
 
-With the dev server running:
+- ایمیل: `admin@liobiz.com`
+- رمز: مقدار `ADMIN_PASSWORD` در `.env` (پیش‌فرض توسعه در کد seed شده است — قبل از production عوض کنید)
+
+### اسکرین‌شات دوباره
+
+با سرور در حال اجرا:
 
 ```bash
 pnpm run screenshots
 ```
 
+---
+
 ## Stack
 
-- Next.js 15
-- React 19
-- Tailwind CSS
-- Drizzle ORM + SQLite
+- Next.js 15 + React 19
+- Tailwind CSS + Framer Motion
+- Drizzle ORM + better-sqlite3
+- Auth با کوکی `httpOnly`
+
+## Deploy
+
+راهنما: [`docs/DEPLOY-VPS.md`](docs/DEPLOY-VPS.md)
+
+پوشه‌های قابل‌نوشتن روی سرور: `data/` و `public/uploads/`
+
+---
+
+## لینک‌های اصلی
+
+| مسیر | نقش |
+|------|------|
+| `/` | لندینگ |
+| `/login` `/register` | ورود / ثبت‌نام |
+| `/admin` | پنل ادمین |
+| `/dashboard` | پنل کاربر |
+| `/contact` | تماس |
+| `/portfolio` | نمونه کارها |

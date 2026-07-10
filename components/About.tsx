@@ -42,7 +42,7 @@ export default function About() {
             در لیوبیز، هر پروژه آغاز یک سفر برندینگ است؛ از تعریف هویت تا خلق
             تجربه‌ای که مشتریان را شیفته می‌کند.
           </p>
-          <a href="/about" className="mt-4 inline-flex text-sm text-primary-soft transition-colors hover:text-white">
+          <a href="/about" className="mt-4 inline-flex text-sm text-primary transition-colors hover:text-primary-dark">
             بیشتر درباره لیوبیز
           </a>
         </motion.div>

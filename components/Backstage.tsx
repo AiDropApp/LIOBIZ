@@ -29,9 +29,7 @@ function MarqueeRow({
             : { x: direction === "right" ? ["0%", "50%"] : ["0%", "-50%"] }
         }
         transition={
-          reduced
-            ? undefined
-            : { duration, ease: "linear", repeat: Infinity }
+          reduced ? undefined : { duration, ease: "linear", repeat: Infinity }
         }
       >
         {loop.map((item, index) => (
@@ -41,7 +39,7 @@ function MarqueeRow({
                 src={item.image}
                 alt={item.caption}
                 fill
-                sizes="(max-width: 768px) 180px, 240px"
+                sizes="(max-width: 768px) 140px, 200px"
                 className="object-cover"
               />
               <div className="backstage-card-overlay" />
@@ -63,7 +61,16 @@ export default function Backstage() {
   useEffect(() => {
     fetch("/api/content", { cache: "no-store" })
       .then((res) => res.json())
-      .then((data) => setGallery(Array.isArray(data.backstage) ? data.backstage : []))
+      .then((data) => {
+        const items = Array.isArray(data.backstage) ? data.backstage : [];
+        const valid = items.filter(
+          (item: BackstageItem) =>
+            item?.image &&
+            !String(item.image).startsWith("/api/media/") &&
+            !String(item.image).endsWith(".svg")
+        );
+        setGallery(valid.length ? valid : items);
+      })
       .catch(() => setGallery([]));
   }, []);
 
@@ -71,8 +78,8 @@ export default function Backstage() {
   const bottomRow = gallery.filter((_, i) => i % 2 === 1);
 
   return (
-    <section id="backstage" className="backstage-section relative overflow-hidden py-20 lg:py-28">
-      <div className="container mx-auto px-4 lg:px-8">
+    <section id="backstage" className="backstage-section relative py-20 lg:py-28">
+      <div className="container mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 36 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -85,16 +92,24 @@ export default function Backstage() {
             لحظه‌های واقعی تیم، جلسات استراتژی، تولید محتوا و اجرای کمپین — دو ردیف زنده از فضای کار لیوبیز.
           </p>
         </motion.div>
+
+        {gallery.length > 0 && (
+          <div className="backstage-marquee space-y-4 lg:space-y-5">
+            <MarqueeRow
+              items={topRow.length ? topRow : gallery}
+              direction="right"
+              duration={42}
+              reduced={reduced}
+            />
+            <MarqueeRow
+              items={bottomRow.length ? bottomRow : gallery}
+              direction="left"
+              duration={48}
+              reduced={reduced}
+            />
+          </div>
+        )}
       </div>
-
-      {gallery.length > 0 && (
-        <div className="backstage-marquee space-y-4 lg:space-y-5">
-          <MarqueeRow items={topRow.length ? topRow : gallery} direction="right" duration={42} reduced={reduced} />
-          <MarqueeRow items={bottomRow.length ? bottomRow : gallery} direction="left" duration={48} reduced={reduced} />
-        </div>
-      )}
-
-      <div className="backstage-fade" aria-hidden="true" />
     </section>
   );
 }

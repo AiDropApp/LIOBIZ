@@ -35,9 +35,16 @@ yarn-error.log*
 
 # env files
 .env*
+!.env.example
 
 # vercel
 .vercel
+
+# user uploads
+/public/uploads/
+
+# large media kept locally (copy into public/videos for deploy)
+/header.mp4
 
 # typescript
 *.tsbuildinfo

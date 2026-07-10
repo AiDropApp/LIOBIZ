@@ -31,7 +31,7 @@ export default function Process() {
         >
           <span className="section-label">فرآیند همکاری</span>
           <h2 className="section-title">از ایده تا رشد پایدار</h2>
-          <a href="/process" className="mt-4 inline-flex text-sm text-primary-soft transition-colors hover:text-white">
+          <a href="/process" className="mt-4 inline-flex text-sm text-primary transition-colors hover:text-primary-dark">
             جزئیات فرآیند همکاری
           </a>
         </motion.div>

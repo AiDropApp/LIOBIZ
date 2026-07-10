@@ -4,324 +4,446 @@
       "id": 1783664438666,
       "title": "کوروش کمپانی",
       "category": "تبلیغات",
-      "image": "/api/media/portfolio/1783664436850-ka97lp.png"
-    },
-    {
-      "id": 1783664386333,
-      "title": "نیو",
-      "category": "شبکه‌های اجتماعی",
-      "image": "/api/media/portfolio/1783664384621-bjdn6u.png"
-    },
-    {
-      "id": 1783664365382,
-      "title": "لیزارا",
-      "category": "طراحی وب‌سایت",
-      "image": "/api/media/portfolio/1783664354866-a06o1z.png"
+      "image": "/api/media/portfolio/1783705055617-hdb4gj.jpg"
     },
     {
       "id": 3,
       "title": "کمپین هدیه",
       "category": "تبلیغات",
-      "image": "/api/media/portfolio/1783635136958-5uq5g4.png"
+      "image": "/api/media/portfolio/1783705061595-dzb6tu.png"
     },
     {
       "id": 101,
       "title": "فروشگاه آنلاین آروما",
       "category": "طراحی وب‌سایت",
-      "image": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&h=1067&q=80"
+      "image": "/api/media/portfolio/1783705067618-xwcrly.jpg"
     },
     {
       "id": 102,
       "title": "پورتال املاک ویلاژ",
       "category": "طراحی وب‌سایت",
-      "image": "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&h=1067&q=80"
+      "image": "/api/media/portfolio/1783705073571-51rdtn.png"
     },
     {
       "id": 103,
       "title": "سایت کلینیک زیبایی نووا",
       "category": "طراحی وب‌سایت",
-      "image": "https://images.unsplash.com/photo-1558655146-d09347e92766?auto=format&fit=crop&w=800&h=1067&q=80"
+      "image": "/api/media/portfolio/1783705084928-lm57am.png"
     },
     {
       "id": 104,
       "title": "پلتفرم آموزش آنلاین مکتب",
       "category": "طراحی وب‌سایت",
-      "image": "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&h=1067&q=80"
+      "image": "/api/media/portfolio/1783705091059-e7r2m7.jpg"
     },
     {
       "id": 105,
       "title": "وب‌سایت رستوران سِفره",
       "category": "طراحی وب‌سایت",
-      "image": "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=800&h=1067&q=80"
+      "image": "/api/media/portfolio/1783705100383-r4kex8.jpg"
     },
     {
       "id": 106,
       "title": "داشبورد فین‌تک پی‌لاین",
       "category": "طراحی وب‌سایت",
-      "image": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&h=1067&q=80"
+      "image": "/api/media/portfolio/1783705105984-w9yix2.png"
     },
     {
       "id": 107,
       "title": "سایت برند پوشاک لومِن",
       "category": "طراحی وب‌سایت",
-      "image": "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=800&h=1067&q=80"
+      "image": "/api/media/portfolio/1783705118150-1u9tpd.png"
     },
     {
       "id": 108,
       "title": "لندینگ استارتاپ نِکسو",
       "category": "طراحی وب‌سایت",
-      "image": "https://images.unsplash.com/photo-1522542550221-31fd19575a2d?auto=format&fit=crop&w=800&h=1067&q=80"
+      "image": "/api/media/portfolio/1783705143875-oyuvcs.png"
     },
     {
       "id": 201,
       "title": "هویت بصری کافه آرتیسان",
       "category": "برندینگ",
-      "image": "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=800&h=1067&q=80"
+      "image": "/api/media/portfolio/1783705152148-vmefay.png"
     },
     {
       "id": 202,
       "title": "برند عطر سولِیس",
       "category": "برندینگ",
-      "image": "https://images.unsplash.com/photo-1541643600914-78b084683601?auto=format&fit=crop&w=800&h=1067&q=80"
+      "image": "/api/media/portfolio/1783705157713-xzit6l.png"
     },
     {
       "id": 203,
       "title": "پکیجینگ شکلات وِلوت",
       "category": "برندینگ",
-      "image": "https://images.unsplash.com/photo-1481391319762-47dff72954d9?auto=format&fit=crop&w=800&h=1067&q=80"
+      "image": "/api/media/portfolio/1783705174989-nmnzfb.png"
     },
     {
       "id": 204,
       "title": "هویت بصری استودیو نور",
       "category": "برندینگ",
-      "image": "https://images.unsplash.com/photo-1634942537034-2531766767d1?auto=format&fit=crop&w=800&h=1067&q=80"
+      "image": "/api/media/portfolio/1783705180536-8c5hk8.png"
     },
     {
       "id": 205,
       "title": "برندینگ کلینیک دنتال پلاس",
       "category": "برندینگ",
-      "image": "https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?auto=format&fit=crop&w=800&h=1067&q=80"
+      "image": "/api/media/portfolio/1783705186354-r2wxxc.png"
     },
     {
       "id": 206,
       "title": "لوگو و هویت فیت‌کلاب",
       "category": "برندینگ",
-      "image": "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&w=800&h=1067&q=80"
+      "image": "/api/media/portfolio/1783705192437-jfmlyd.png"
     },
     {
       "id": 207,
       "title": "برند جواهرات اُرا",
       "category": "برندینگ",
-      "image": "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=800&h=1067&q=80"
+      "image": "/api/media/portfolio/1783705202431-8ri8vk.png"
     },
     {
       "id": 208,
       "title": "ری‌برندینگ فروشگاه بوم",
       "category": "برندینگ",
-      "image": "https://images.unsplash.com/photo-1561070791-2526d30994b5?auto=format&fit=crop&w=800&h=1067&q=80"
+      "image": "/api/media/portfolio/1783705209291-f2boaz.png"
     },
     {
       "id": 301,
       "title": "مدیریت اینستاگرام فشن‌لاین",
       "category": "شبکه‌های اجتماعی",
-      "image": "https://images.unsplash.com/photo-1611162616475-46b635cb6868?auto=format&fit=crop&w=800&h=1067&q=80"
+      "image": "/api/media/portfolio/1783705226044-4ur0j4.png"
     },
     {
       "id": 302,
       "title": "محتوای ورزشی پالس",
       "category": "شبکه‌های اجتماعی",
-      "image": "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=800&h=1067&q=80"
+      "image": "/api/media/portfolio/1783705232986-ma9e20.png"
     },
     {
       "id": 303,
       "title": "کمپین ریلز کافه موج",
       "category": "شبکه‌های اجتماعی",
-      "image": "https://images.unsplash.com/photo-1511920170033-f8396924c348?auto=format&fit=crop&w=800&h=1067&q=80"
+      "image": "/api/media/portfolio/1783705241040-t7m6gt.png"
     },
     {
       "id": 304,
       "title": "استراتژی سوشال برند کفش وِلو",
       "category": "شبکه‌های اجتماعی",
-      "image": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=800&h=1067&q=80"
+      "image": "/api/media/portfolio/1783705250478-apbqny.png"
     },
     {
       "id": 305,
       "title": "تولید محتوا برای اسکین‌کِر",
       "category": "شبکه‌های اجتماعی",
-      "image": "https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=800&h=1067&q=80"
+      "image": "/api/media/portfolio/1783705009892-vlqnmm.png"
     },
     {
       "id": 306,
       "title": "تقویم محتوایی رستوران نارنج",
       "category": "شبکه‌های اجتماعی",
-      "image": "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&h=1067&q=80"
+      "image": "/api/media/portfolio/1783705032772-pxvz6z.jpg"
     },
     {
       "id": 307,
       "title": "کمپین یوتیوب گجت‌هاب",
       "category": "شبکه‌های اجتماعی",
-      "image": "https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?auto=format&fit=crop&w=800&h=1067&q=80"
+      "image": "/api/media/portfolio/1783704996108-y14bfi.jpg"
     },
     {
       "id": 308,
       "title": "استوری‌های برند تراول‌گو",
       "category": "شبکه‌های اجتماعی",
-      "image": "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=800&h=1067&q=80"
+      "image": "/api/media/portfolio/1783705002880-v0jvcb.png"
     },
     {
       "id": 401,
       "title": "بیلبورد شهری برند خودرو",
       "category": "تبلیغات",
-      "image": "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=800&h=1067&q=80"
+      "image": "/api/media/portfolio/1783704943568-u6qkcz.png"
     },
     {
       "id": 402,
       "title": "کمپین نوروزی فروشگاه دیجی‌استایل",
       "category": "تبلیغات",
-      "image": "https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?auto=format&fit=crop&w=800&h=1067&q=80"
+      "image": "/api/media/portfolio/1783704952644-37pnqa.png"
     },
     {
       "id": 403,
       "title": "تیزر تبلیغاتی اپلیکیشن فود",
       "category": "تبلیغات",
-      "image": "https://images.unsplash.com/photo-1556740749-887f6717d7e4?auto=format&fit=crop&w=800&h=1067&q=80"
+      "image": "/api/media/portfolio/1783704924469-v6rv85.png"
     },
     {
       "id": 404,
       "title": "کمپین پرینت بانک دیجیتال",
       "category": "تبلیغات",
-      "image": "https://images.unsplash.com/photo-1553729459-efe14ef6055d?auto=format&fit=crop&w=800&h=1067&q=80"
+      "image": "/api/media/portfolio/1783704933808-74yref.png"
     },
     {
       "id": 405,
       "title": "کمپین لانچ گوشی هوشمند",
       "category": "تبلیغات",
-      "image": "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=800&h=1067&q=80"
+      "image": "/api/media/portfolio/1783704915357-03jwyc.png"
     },
     {
       "id": 406,
       "title": "تبلیغات محیطی برند نوشیدنی",
       "category": "تبلیغات",
-      "image": "https://images.unsplash.com/photo-1523362628745-0c100150b504?auto=format&fit=crop&w=800&h=1067&q=80"
+      "image": "/api/media/portfolio/1783704903910-xvp2qq.png"
     },
     {
       "id": 407,
       "title": "کمپین بلک‌فرایدی فروشگاه مد",
       "category": "تبلیغات",
-      "image": "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=800&h=1067&q=80"
+      "image": "/api/media/portfolio/1783704889233-omzptg.jpg"
     },
     {
       "id": 408,
       "title": "کمپین آگاهی برند بیمه",
       "category": "تبلیغات",
-      "image": "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=800&h=1067&q=80"
+      "image": "/api/media/portfolio/1783704897982-8ibolq.jpg"
     }
   ],
   "backstage": [
     {
       "id": 1,
-      "image": "/api/media/backstage/1783635795309-7vqprz.png",
+      "image": "/api/media/backstage/1783705275961-6yufwm.png",
       "caption": "جلسه استراتژی برند"
     },
     {
       "id": 501,
-      "image": "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=700&h=900&q=80",
+      "image": "/api/media/backstage/1783705284659-n60qn2.png",
       "caption": "طوفان فکری تیم خلاقیت"
     },
     {
       "id": 502,
-      "image": "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=700&h=900&q=80",
+      "image": "/api/media/backstage/1783705291258-ihtsgc.png",
       "caption": "ورکشاپ هویت بصری"
     },
     {
       "id": 503,
-      "image": "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=700&h=900&q=80",
+      "image": "/api/media/backstage/1783705300664-lgbf9n.png",
       "caption": "هماهنگی کمپین با مشتری"
     },
     {
       "id": 504,
-      "image": "https://images.unsplash.com/photo-1542744173-8e2bd585f281?auto=format&fit=crop&w=700&h=900&q=80",
+      "image": "/api/media/backstage/1783705307320-fq7jc2.png",
       "caption": "بررسی وایرفریم وب‌سایت"
     },
     {
       "id": 505,
-      "image": "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=700&h=900&q=80",
+      "image": "/api/media/backstage/1783705315987-pb5xj1.png",
       "caption": "طراحی رابط کاربری"
     },
     {
       "id": 506,
-      "image": "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=700&h=900&q=80",
+      "image": "/api/media/backstage/1783705323238-y6h2ut.jpg",
       "caption": "جلسه رشد و مارکتینگ"
     },
     {
       "id": 507,
-      "image": "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&w=700&h=900&q=80",
+      "image": "/api/media/backstage/1783705349138-bmric0.jpg",
       "caption": "شوتینگ تبلیغاتی استودیو"
     },
     {
       "id": 508,
-      "image": "https://images.unsplash.com/photo-1516035069371-29a1b824cc32?auto=format&fit=crop&w=700&h=900&q=80",
+      "image": "/api/media/backstage/1783705363767-dwe8sm.png",
       "caption": "عکاسی محصول برند"
     },
     {
       "id": 509,
-      "image": "https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?auto=format&fit=crop&w=700&h=900&q=80",
+      "image": "/api/media/backstage/1783705369526-t1olpc.png",
       "caption": "تدوین تیزر کمپین"
     },
     {
       "id": 510,
-      "image": "https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=700&h=900&q=80",
+      "image": "/api/media/backstage/1783705374629-k17n1j.png",
       "caption": "استودیو تولید محتوا"
     },
     {
       "id": 511,
-      "image": "https://images.unsplash.com/photo-1553877522-43269d4ea984?auto=format&fit=crop&w=700&h=900&q=80",
+      "image": "/api/media/backstage/1783705380258-dc1rq3.png",
       "caption": "پلنینگ سوشال مدیا"
     },
     {
       "id": 512,
-      "image": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=700&h=900&q=80",
+      "image": "/api/media/backstage/1783705386192-trka4x.jpg",
       "caption": "آنالیز داده و عملکرد"
     },
     {
       "id": 513,
-      "image": "https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=700&h=900&q=80",
+      "image": "/api/media/backstage/1783705393157-22lfqo.png",
       "caption": "طراحی موکاپ بسته‌بندی"
     },
     {
       "id": 514,
-      "image": "https://images.unsplash.com/photo-1581291518633-83b4ebd1d83e?auto=format&fit=crop&w=700&h=900&q=80",
+      "image": "/api/media/backstage/1783705402212-rwoizq.png",
       "caption": "ریویو طراحی نهایی"
     },
     {
       "id": 515,
-      "image": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=700&h=900&q=80",
+      "image": "/api/media/backstage/1783705409374-wr6c9d.jpg",
       "caption": "فضای کار تیم لیوبیز"
     },
     {
       "id": 516,
-      "image": "https://images.unsplash.com/photo-1559136555-9303baea8ebd?auto=format&fit=crop&w=700&h=900&q=80",
+      "image": "/api/media/backstage/1783705416370-m5eixd.png",
       "caption": "ارائه نهایی به مشتری"
     },
     {
       "id": 517,
-      "image": "https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=700&h=900&q=80",
+      "image": "/api/media/backstage/1783705421173-jyy7wn.png",
       "caption": "جلسه کپی‌رایتینگ کمپین"
     },
     {
       "id": 518,
-      "image": "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=700&h=900&q=80",
+      "image": "/api/media/backstage/1783705426035-wojr2o.png",
       "caption": "هماهنگی تیم اجرا"
     },
     {
       "id": 519,
-      "image": "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=700&h=900&q=80",
+      "image": "/api/media/backstage/1783705432262-53nner.png",
       "caption": "بررسی پرزنت برند"
     },
     {
       "id": 520,
-      "image": "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=700&h=900&q=80",
+      "image": "/api/media/backstage/1783705438739-e2tek5.png",
       "caption": "پروتوتایپ تجربه کاربری"
     }
-  ]
+  ],
+  "landing": {
+    "heroBadge": "آژانس رشد کسب‌وکار",
+    "heroTitle": "ما رشد",
+    "heroTitleHighlight": "کسب‌وکار شما",
+    "heroDescription": "تبلیغات خلاقانه، فروش هدفمند و پشتیبانی حرفه‌ای؛ همه در یک مسیر رشد یکپارچه برای برند شما.",
+    "heroPrimaryCta": "شروع همکاری",
+    "heroPrimaryHref": "/contact",
+    "heroSecondaryCta": "مشاهده خدمات",
+    "heroSecondaryHref": "/#services",
+    "heroMediaType": "video",
+    "heroMediaUrl": "/videos/header.mp4",
+    "aboutLabel": "درباره لیوبیز",
+    "aboutTitle": "لیوبیز، شریک رشد کسب‌وکار شما",
+    "aboutText1": "ما با ترکیب استراتژی، طراحی و اجرای دیجیتال، مسیر رشد برندها را از ایده تا نتیجه همراهی می‌کنیم؛ شفاف، حرفه‌ای و نتیجه‌محور.",
+    "aboutText2": "از هویت بصری و وب‌سایت تا شبکه‌های اجتماعی و کمپین‌های تبلیغاتی، همه چیز در یک موتور برندینگ یکپارچه کنار هم قرار می‌گیرد.",
+    "servicesLabel": "خدمات",
+    "servicesTitle": "هر آنچه برای رشد برند نیاز دارید",
+    "processLabel": "فرآیند همکاری",
+    "processTitle": "مسیر شفاف از ایده تا نتیجه"
+  },
+  "pages": {
+    "about": {
+      "label": "درباره لیوبیز",
+      "title": "آژانسی برای ساختن برندهای ماندگار",
+      "intro": "لیوبیز یک آژانس خلاقیت و تبلیغات دیجیتال در مشهد است. ما به کسب‌وکارها کمک می‌کنیم هویت خود را دقیق تعریف کنند، آن را در وب و شبکه‌های اجتماعی به نمایش بگذارند و با کمپین‌های هوشمند رشد کنند."
+    },
+    "contact": {
+      "label": "تماس با ما",
+      "title": "بیایید درباره رشد برندتان حرف بزنیم",
+      "intro": "برای مشاوره، شروع پروژه یا دریافت پیشنهاد همکاری، از طریق فرم زیر اطلاعات تماس با ما در ارتباط باشید. معمولاً در کوتاه‌ترین زمان پاسخ می‌دهیم.",
+      "hours": "شنبه تا چهارشنبه، ۹ تا ۱۸"
+    },
+    "process": {
+      "label": "فرآیند همکاری",
+      "title": "مسیر شفاف از ایده تا رشد پایدار",
+      "intro": "همکاری با لیوبیز یک مسیر مرحله‌به‌مرحله و قابل پیگیری است. در هر گام می‌دانید چه اتفاقی می‌افتد، چه چیزی تحویل می‌گیرید و چطور به هدف نزدیک‌تر می‌شوید."
+    },
+    "portfolio": {
+      "label": "نمونه کارها",
+      "title": "پروژه‌هایی که برندها را جلو بردند",
+      "intro": "در این صفحه می‌توانید نمونه کارهای لیوبیز را بر اساس دسته‌بندی ببینید. هر پروژه جدید که در پنل ادمین اضافه شود، همین‌جا هم نمایش داده می‌شود."
+    },
+    "services": [
+      {
+        "id": "01",
+        "title": "طراحی هویت بصری",
+        "description": "خلق هویت بصری ماندگار و متفاوت برای برند شما",
+        "href": "/services/branding"
+      },
+      {
+        "id": "02",
+        "title": "طراحی و توسعه وب‌سایت",
+        "description": "طراحی سایت‌های مدرن، سریع و سئو شده برای کسب‌وکارها",
+        "href": "/services/web"
+      },
+      {
+        "id": "03",
+        "title": "مدیریت شبکه‌های اجتماعی",
+        "description": "تولید محتوا و مدیریت حرفه‌ای پیج‌ها برای تعامل و رشد بیشتر",
+        "href": "/services/social"
+      },
+      {
+        "id": "04",
+        "title": "تبلیغات و رشد برند",
+        "description": "کمپین‌های هدفمند برای افزایش فروش و رشد کسب‌وکار شما",
+        "href": "/services/ads"
+      },
+      {
+        "id": "05",
+        "title": "تولید محتوا",
+        "description": "محتوای خلاق و استراتژیک برای جذب مخاطب و تقویت برند",
+        "href": "/contact"
+      }
+    ],
+    "processSteps": [
+      {
+        "id": "01",
+        "title": "تحلیل و استراتژی",
+        "description": "بررسی دقیق کسب‌وکار، رقبا و مخاطبان هدف برای طراحی استراتژی مناسب"
+      },
+      {
+        "id": "02",
+        "title": "طراحی و برنامه‌ریزی",
+        "description": "طراحی راهکار خلاقانه و برنامه‌ریزی دقیق برای اجرای پروژه"
+      },
+      {
+        "id": "03",
+        "title": "اجرا و توسعه",
+        "description": "پیاده‌سازی حرفه‌ای پروژه با بالاترین استانداردهای کیفی"
+      },
+      {
+        "id": "04",
+        "title": "رشد و بهینه‌سازی",
+        "description": "تحلیل نتایج و بهینه‌سازی مستمر برای دستیابی به بهترین عملکرد"
+      },
+      {
+        "id": "05",
+        "title": "پشتیبانی و همراهی",
+        "description": "همراهی بلندمدت و پشتیبانی فنی برای رشد پایدار برند شما"
+      }
+    ]
+  },
+  "site": {
+    "name": "lobiz",
+    "title": "لیوبیز | آژانس خلاقیت و تبلیغات دیجیتال",
+    "description": "آژانس خلاقیت و تبلیغات دیجیتال لیوبیز - ما به کسب‌وکارها کمک می‌کنیم تا با استراتژی‌های هوشمندانه برند خود را بسازند.",
+    "phone": "+98 902 089 1867",
+    "email": "info@liobiz.com",
+    "address": "مشهد، ایران",
+    "logoUrl": "/images/logo.png",
+    "socials": [
+      {
+        "name": "Instagram",
+        "href": "https://instagram.com"
+      },
+      {
+        "name": "LinkedIn",
+        "href": "https://linkedin.com"
+      },
+      {
+        "name": "Behance",
+        "href": "https://behance.net"
+      },
+      {
+        "name": "Telegram",
+        "href": "https://telegram.org"
+      }
+    ],
+    "footerText": "آژانس خلاقیت و تبلیغات دیجیتال لیوبیز - ما به کسب‌وکارها کمک می‌کنیم تا با استراتژی‌های هوشمندانه برند خود را بسازند."
+  },
+  "theme": {
+    "primaryColor": "#ff6a00",
+    "headingScale": "md"
+  }
 }

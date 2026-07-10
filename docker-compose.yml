@@ -1,0 +1,17 @@
+# Liobiz VPS stack (optional)
+# SQLite is default and recommended for 2CPU/4GB VPS.
+# Use this compose only if you later migrate to Postgres.
+
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - NEXT_PUBLIC_SITE_URL=https://your-domain.com
+    volumes:
+      - ./data:/app/data
+      - ./public/uploads:/app/public/uploads
+    restart: unless-stopped
