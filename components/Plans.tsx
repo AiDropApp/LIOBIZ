@@ -1,27 +1,39 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Check } from "lucide-react";
 import { motion } from "framer-motion";
-import { PLANS } from "@/lib/constants";
+import { defaultLanding, type LandingContent } from "@/lib/cms-defaults";
+import { defaultPlans, type PlanItem } from "@/lib/landing-defaults";
 import usePrefersReducedMotion from "@/hooks/usePrefersReducedMotion";
 
 export default function Plans() {
   const reducedMotion = usePrefersReducedMotion();
+  const [landing, setLanding] = useState<LandingContent>(defaultLanding);
+  const [plans, setPlans] = useState<PlanItem[]>(defaultPlans);
+
+  useEffect(() => {
+    fetch("/api/content", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.landing) setLanding({ ...defaultLanding, ...data.landing });
+        if (Array.isArray(data?.plans)) setPlans(data.plans);
+      })
+      .catch(() => undefined);
+  }, []);
 
   return (
     <section id="plans" className="section-block bg-white">
       <div className="container mx-auto">
         <div className="mb-12 text-center">
-          <span className="section-label">پلن‌های همکاری</span>
-          <h2 className="section-title">پلنی انتخاب کنید که مناسب شماست</h2>
-          <p className="mx-auto mt-4 max-w-2xl text-muted">
-            سه سطح همکاری شفاف؛ از شروع حرفه‌ای تا همراهی جامع برای مقیاس‌پذیری برند.
-          </p>
+          <span className="section-label">{landing.plansLabel}</span>
+          <h2 className="section-title">{landing.plansTitle}</h2>
+          <p className="mx-auto mt-4 max-w-2xl text-muted">{landing.plansIntro}</p>
         </div>
 
         <div className="plans-grid">
-          {PLANS.map((plan, index) => (
+          {plans.map((plan, index) => (
             <motion.article
               key={plan.id}
               className={`plan-card ${plan.featured ? "is-featured" : ""}`}

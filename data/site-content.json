@@ -4,312 +4,430 @@
       "id": 1783664438666,
       "title": "کوروش کمپانی",
       "category": "تبلیغات",
-      "image": "/api/media/portfolio/1783705055617-hdb4gj.jpg"
+      "image": "/api/media/portfolio/1783705055617-hdb4gj.jpg",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 3,
       "title": "کمپین هدیه",
       "category": "تبلیغات",
-      "image": "/api/media/portfolio/1783705061595-dzb6tu.png"
+      "image": "/api/media/portfolio/1783705061595-dzb6tu.png",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 101,
       "title": "فروشگاه آنلاین آروما",
       "category": "طراحی وب‌سایت",
-      "image": "/api/media/portfolio/1783705067618-xwcrly.jpg"
+      "image": "/api/media/portfolio/1783705067618-xwcrly.jpg",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 102,
       "title": "پورتال املاک ویلاژ",
       "category": "طراحی وب‌سایت",
-      "image": "/api/media/portfolio/1783705073571-51rdtn.png"
+      "image": "/api/media/portfolio/1783705073571-51rdtn.png",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 103,
       "title": "سایت کلینیک زیبایی نووا",
       "category": "طراحی وب‌سایت",
-      "image": "/api/media/portfolio/1783705084928-lm57am.png"
+      "image": "/api/media/portfolio/1783705084928-lm57am.png",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 104,
       "title": "پلتفرم آموزش آنلاین مکتب",
       "category": "طراحی وب‌سایت",
-      "image": "/api/media/portfolio/1783705091059-e7r2m7.jpg"
+      "image": "/api/media/portfolio/1783705091059-e7r2m7.jpg",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 105,
       "title": "وب‌سایت رستوران سِفره",
       "category": "طراحی وب‌سایت",
-      "image": "/api/media/portfolio/1783705100383-r4kex8.jpg"
+      "image": "/api/media/portfolio/1783705100383-r4kex8.jpg",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 106,
       "title": "داشبورد فین‌تک پی‌لاین",
       "category": "طراحی وب‌سایت",
-      "image": "/api/media/portfolio/1783705105984-w9yix2.png"
+      "image": "/api/media/portfolio/1783705105984-w9yix2.png",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 107,
       "title": "سایت برند پوشاک لومِن",
       "category": "طراحی وب‌سایت",
-      "image": "/api/media/portfolio/1783705118150-1u9tpd.png"
+      "image": "/api/media/portfolio/1783705118150-1u9tpd.png",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 108,
       "title": "لندینگ استارتاپ نِکسو",
       "category": "طراحی وب‌سایت",
-      "image": "/api/media/portfolio/1783705143875-oyuvcs.png"
+      "image": "/api/media/portfolio/1783705143875-oyuvcs.png",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 201,
       "title": "هویت بصری کافه آرتیسان",
       "category": "برندینگ",
-      "image": "/api/media/portfolio/1783705152148-vmefay.png"
+      "image": "/api/media/portfolio/1783705152148-vmefay.png",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 202,
       "title": "برند عطر سولِیس",
       "category": "برندینگ",
-      "image": "/api/media/portfolio/1783705157713-xzit6l.png"
+      "image": "/api/media/portfolio/1783705157713-xzit6l.png",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 203,
       "title": "پکیجینگ شکلات وِلوت",
       "category": "برندینگ",
-      "image": "/api/media/portfolio/1783705174989-nmnzfb.png"
+      "image": "/api/media/portfolio/1783705174989-nmnzfb.png",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 204,
       "title": "هویت بصری استودیو نور",
       "category": "برندینگ",
-      "image": "/api/media/portfolio/1783705180536-8c5hk8.png"
+      "image": "/api/media/portfolio/1783705180536-8c5hk8.png",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 205,
       "title": "برندینگ کلینیک دنتال پلاس",
       "category": "برندینگ",
-      "image": "/api/media/portfolio/1783705186354-r2wxxc.png"
+      "image": "/api/media/portfolio/1783705186354-r2wxxc.png",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 206,
       "title": "لوگو و هویت فیت‌کلاب",
       "category": "برندینگ",
-      "image": "/api/media/portfolio/1783705192437-jfmlyd.png"
+      "image": "/api/media/portfolio/1783705192437-jfmlyd.png",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 207,
       "title": "برند جواهرات اُرا",
       "category": "برندینگ",
-      "image": "/api/media/portfolio/1783705202431-8ri8vk.png"
+      "image": "/api/media/portfolio/1783705202431-8ri8vk.png",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 208,
       "title": "ری‌برندینگ فروشگاه بوم",
       "category": "برندینگ",
-      "image": "/api/media/portfolio/1783705209291-f2boaz.png"
+      "image": "/api/media/portfolio/1783705209291-f2boaz.png",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 301,
       "title": "مدیریت اینستاگرام فشن‌لاین",
       "category": "شبکه‌های اجتماعی",
-      "image": "/api/media/portfolio/1783705226044-4ur0j4.png"
+      "image": "/api/media/portfolio/1783705226044-4ur0j4.png",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 302,
       "title": "محتوای ورزشی پالس",
       "category": "شبکه‌های اجتماعی",
-      "image": "/api/media/portfolio/1783705232986-ma9e20.png"
+      "image": "/api/media/portfolio/1783705232986-ma9e20.png",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 303,
       "title": "کمپین ریلز کافه موج",
       "category": "شبکه‌های اجتماعی",
-      "image": "/api/media/portfolio/1783705241040-t7m6gt.png"
+      "image": "/api/media/portfolio/1783705241040-t7m6gt.png",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 304,
       "title": "استراتژی سوشال برند کفش وِلو",
       "category": "شبکه‌های اجتماعی",
-      "image": "/api/media/portfolio/1783705250478-apbqny.png"
+      "image": "/api/media/portfolio/1783705250478-apbqny.png",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 305,
       "title": "تولید محتوا برای اسکین‌کِر",
       "category": "شبکه‌های اجتماعی",
-      "image": "/api/media/portfolio/1783705009892-vlqnmm.png"
+      "image": "/api/media/portfolio/1783705009892-vlqnmm.png",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 306,
       "title": "تقویم محتوایی رستوران نارنج",
       "category": "شبکه‌های اجتماعی",
-      "image": "/api/media/portfolio/1783705032772-pxvz6z.jpg"
+      "image": "/api/media/portfolio/1783705032772-pxvz6z.jpg",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 307,
       "title": "کمپین یوتیوب گجت‌هاب",
       "category": "شبکه‌های اجتماعی",
-      "image": "/api/media/portfolio/1783704996108-y14bfi.jpg"
+      "image": "/api/media/portfolio/1783704996108-y14bfi.jpg",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 308,
       "title": "استوری‌های برند تراول‌گو",
       "category": "شبکه‌های اجتماعی",
-      "image": "/api/media/portfolio/1783705002880-v0jvcb.png"
+      "image": "/api/media/portfolio/1783705002880-v0jvcb.png",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 401,
       "title": "بیلبورد شهری برند خودرو",
       "category": "تبلیغات",
-      "image": "/api/media/portfolio/1783704943568-u6qkcz.png"
+      "image": "/api/media/portfolio/1783704943568-u6qkcz.png",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 402,
       "title": "کمپین نوروزی فروشگاه دیجی‌استایل",
       "category": "تبلیغات",
-      "image": "/api/media/portfolio/1783704952644-37pnqa.png"
+      "image": "/api/media/portfolio/1783704952644-37pnqa.png",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 403,
       "title": "تیزر تبلیغاتی اپلیکیشن فود",
       "category": "تبلیغات",
-      "image": "/api/media/portfolio/1783704924469-v6rv85.png"
+      "image": "/api/media/portfolio/1783704924469-v6rv85.png",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 404,
       "title": "کمپین پرینت بانک دیجیتال",
       "category": "تبلیغات",
-      "image": "/api/media/portfolio/1783704933808-74yref.png"
+      "image": "/api/media/portfolio/1783704933808-74yref.png",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 405,
       "title": "کمپین لانچ گوشی هوشمند",
       "category": "تبلیغات",
-      "image": "/api/media/portfolio/1783704915357-03jwyc.png"
+      "image": "/api/media/portfolio/1783704915357-03jwyc.png",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 406,
       "title": "تبلیغات محیطی برند نوشیدنی",
       "category": "تبلیغات",
-      "image": "/api/media/portfolio/1783704903910-xvp2qq.png"
+      "image": "/api/media/portfolio/1783704903910-xvp2qq.png",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 407,
       "title": "کمپین بلک‌فرایدی فروشگاه مد",
       "category": "تبلیغات",
-      "image": "/api/media/portfolio/1783704889233-omzptg.jpg"
+      "image": "/api/media/portfolio/1783704889233-omzptg.jpg",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 408,
       "title": "کمپین آگاهی برند بیمه",
       "category": "تبلیغات",
-      "image": "/api/media/portfolio/1783704897982-8ibolq.jpg"
+      "image": "/api/media/portfolio/1783704897982-8ibolq.jpg",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     }
   ],
   "backstage": [
     {
+      "id": 1784222698387,
+      "caption": "تست",
+      "image": "/images/backstage1.svg",
+      "videoSrc": "https://aidrop.app/video/landing/aidrop/aidrop-model-motion-01.mp4?v=20260716b",
+      "mediaKind": "video",
+      "aspectRatio": "landscape"
+    },
+    {
       "id": 1,
       "image": "/api/media/backstage/1783705275961-6yufwm.png",
-      "caption": "جلسه استراتژی برند"
+      "caption": "جلسه استراتژی برند",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 501,
       "image": "/api/media/backstage/1783705284659-n60qn2.png",
-      "caption": "طوفان فکری تیم خلاقیت"
+      "caption": "طوفان فکری تیم خلاقیت",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 502,
       "image": "/api/media/backstage/1783705291258-ihtsgc.png",
-      "caption": "ورکشاپ هویت بصری"
+      "caption": "ورکشاپ هویت بصری",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 503,
       "image": "/api/media/backstage/1783705300664-lgbf9n.png",
-      "caption": "هماهنگی کمپین با مشتری"
+      "caption": "هماهنگی کمپین با مشتری",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 504,
       "image": "/api/media/backstage/1783705307320-fq7jc2.png",
-      "caption": "بررسی وایرفریم وب‌سایت"
+      "caption": "بررسی وایرفریم وب‌سایت",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 505,
       "image": "/api/media/backstage/1783705315987-pb5xj1.png",
-      "caption": "طراحی رابط کاربری"
+      "caption": "طراحی رابط کاربری",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 506,
       "image": "/api/media/backstage/1783705323238-y6h2ut.jpg",
-      "caption": "جلسه رشد و مارکتینگ"
+      "caption": "جلسه رشد و مارکتینگ",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 507,
       "image": "/api/media/backstage/1783705349138-bmric0.jpg",
-      "caption": "شوتینگ تبلیغاتی استودیو"
+      "caption": "شوتینگ تبلیغاتی استودیو",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 508,
       "image": "/api/media/backstage/1783705363767-dwe8sm.png",
-      "caption": "عکاسی محصول برند"
+      "caption": "عکاسی محصول برند",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 509,
       "image": "/api/media/backstage/1783705369526-t1olpc.png",
-      "caption": "تدوین تیزر کمپین"
+      "caption": "تدوین تیزر کمپین",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 510,
       "image": "/api/media/backstage/1783705374629-k17n1j.png",
-      "caption": "استودیو تولید محتوا"
+      "caption": "استودیو تولید محتوا",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 511,
       "image": "/api/media/backstage/1783705380258-dc1rq3.png",
-      "caption": "پلنینگ سوشال مدیا"
+      "caption": "پلنینگ سوشال مدیا",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 512,
       "image": "/api/media/backstage/1783705386192-trka4x.jpg",
-      "caption": "آنالیز داده و عملکرد"
+      "caption": "آنالیز داده و عملکرد",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 513,
       "image": "/api/media/backstage/1783705393157-22lfqo.png",
-      "caption": "طراحی موکاپ بسته‌بندی"
+      "caption": "طراحی موکاپ بسته‌بندی",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 514,
       "image": "/api/media/backstage/1783705402212-rwoizq.png",
-      "caption": "ریویو طراحی نهایی"
+      "caption": "ریویو طراحی نهایی",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 515,
       "image": "/api/media/backstage/1783705409374-wr6c9d.jpg",
-      "caption": "فضای کار تیم لیوبیز"
+      "caption": "فضای کار تیم لیوبیز",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 516,
       "image": "/api/media/backstage/1783705416370-m5eixd.png",
-      "caption": "ارائه نهایی به مشتری"
+      "caption": "ارائه نهایی به مشتری",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 517,
       "image": "/api/media/backstage/1783705421173-jyy7wn.png",
-      "caption": "جلسه کپی‌رایتینگ کمپین"
+      "caption": "جلسه کپی‌رایتینگ کمپین",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 518,
       "image": "/api/media/backstage/1783705426035-wojr2o.png",
-      "caption": "هماهنگی تیم اجرا"
+      "caption": "هماهنگی تیم اجرا",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 519,
       "image": "/api/media/backstage/1783705432262-53nner.png",
-      "caption": "بررسی پرزنت برند"
+      "caption": "بررسی پرزنت برند",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     },
     {
       "id": 520,
       "image": "/api/media/backstage/1783705438739-e2tek5.png",
-      "caption": "پروتوتایپ تجربه کاربری"
+      "caption": "پروتوتایپ تجربه کاربری",
+      "mediaKind": "image",
+      "aspectRatio": "portrait"
     }
   ],
   "landing": {
@@ -323,14 +441,67 @@
     "heroSecondaryHref": "/#services",
     "heroMediaType": "video",
     "heroMediaUrl": "/videos/header.mp4",
+    "heroStats": [
+      {
+        "value": "98%",
+        "label": "رضایت مشتری",
+        "icon": "heart"
+      },
+      {
+        "value": "5+",
+        "label": "سال تجربه",
+        "icon": "clock"
+      },
+      {
+        "value": "50+",
+        "label": "مشتری فعال",
+        "icon": "users"
+      },
+      {
+        "value": "120+",
+        "label": "پروژه موفق",
+        "icon": "briefcase"
+      }
+    ],
     "aboutLabel": "درباره لیوبیز",
     "aboutTitle": "لیوبیز، شریک رشد کسب‌وکار شما",
     "aboutText1": "ما با ترکیب استراتژی، طراحی و اجرای دیجیتال، مسیر رشد برندها را از ایده تا نتیجه همراهی می‌کنیم؛ شفاف، حرفه‌ای و نتیجه‌محور.",
     "aboutText2": "از هویت بصری و وب‌سایت تا شبکه‌های اجتماعی و کمپین‌های تبلیغاتی، همه چیز در یک موتور برندینگ یکپارچه کنار هم قرار می‌گیرد.",
+    "aboutImage1": "/images/about-liobiz-office.png",
+    "aboutImage2": "/images/about-liobiz-float.png",
+    "aboutBadge": "ارزش ما رشد شماست؛ افتخار ما",
     "servicesLabel": "خدمات",
     "servicesTitle": "هر آنچه برای رشد برند نیاز دارید",
+    "servicesIntro": "از هویت برند تا تبلیغات و محتوا؛ همه خدمات در یک مسیر هماهنگ.",
+    "portfolioLabel": "نمونه کارها",
+    "portfolioTitle": "پروژه‌هایی که به آن‌ها افتخار می‌کنیم",
     "processLabel": "فرآیند همکاری",
-    "processTitle": "مسیر شفاف از ایده تا نتیجه"
+    "processTitle": "مسیر شفاف از ایده تا نتیجه",
+    "processIntro": "",
+    "processLinkText": "جزئیات فرآیند همکاری",
+    "processLinkHref": "/process",
+    "plansLabel": "پلن‌های همکاری",
+    "plansTitle": "پلنی انتخاب کنید که مناسب شماست",
+    "plansIntro": "سه سطح همکاری شفاف؛ از شروع حرفه‌ای تا همراهی جامع برای مقیاس‌پذیری برند.",
+    "backstageLabel": "تیم لیوبیز",
+    "backstageTitle": "پشت صحنهٔ ساخت برندهای ماندگار",
+    "backstageIntro": "لحظه‌های واقعی تیم، جلسات استراتژی، تولید محتوا و اجرای کمپین.",
+    "creativePartnersLabel": "همکاران خلاق",
+    "creativePartnersTitle": "خالقانی که با لیوبیز مرزها را جابه‌جا می‌کنند",
+    "creativePartnersIntro": "از تصویربردار تا موشن‌گر — روی هر پروفایل بزنید تا نمونه کارشان را ببینید.",
+    "faqLabel": "سوالات متداول",
+    "faqTitle": "پاسخ سوالات رایج",
+    "faqIntro": "اگر سوال دیگری دارید، از طریق تماس با ما در ارتباط باشید.",
+    "testimonialsLabel": "گواهی مشتریان",
+    "testimonialsTitle": "وقتی برندها، نتیجه را می‌بینند",
+    "testimonialsIntro": "هر همکاری برای ما یک پروژهٔ رشد و یک داستان موفقیت است؛ نه فقط یک سفارش.",
+    "partnersLabel": "همکاران ما",
+    "partnersTitle": "برندهایی که به ما اعتماد کردند",
+    "footerCtaTitle": "آمادهٔ ساختن برند بعدی هستید؟",
+    "footerCtaText": "یک گفتگوی کوتاه کافی است تا مسیر رشد را طراحی کنیم.",
+    "footerCtaButton": "شروع همکاری",
+    "footerCtaHref": "/contact",
+    "footerCopyright": "لیوبیز. تمامی حقوق محفوظ است."
   },
   "pages": {
     "about": {
@@ -445,5 +616,296 @@
   "theme": {
     "primaryColor": "#ff6a00",
     "headingScale": "md"
-  }
+  },
+  "plans": [
+    {
+      "id": "basic",
+      "name": "پایه",
+      "description": "شروع حرفه‌ای برای کسب‌وکارهای نوپا",
+      "price": "۱۲٫۰۰۰٫۰۰۰",
+      "featured": false,
+      "features": [
+        "مشاوره اولیه استراتژی برند",
+        "طراحی هویت بصری پایه",
+        "مدیریت یک شبکه اجتماعی",
+        "گزارش ماهانه عملکرد",
+        "پشتیبانی ایمیلی"
+      ]
+    },
+    {
+      "id": "pro",
+      "name": "حرفه‌ای",
+      "description": "انتخاب محبوب برندهای در حال رشد",
+      "price": "۲۸٫۰۰۰٫۰۰۰",
+      "featured": true,
+      "features": [
+        "استراتژی کامل برند و محتوا",
+        "هویت بصری جامع + گایدلاین",
+        "مدیریت سه شبکه اجتماعی",
+        "کمپین تبلیغاتی ماهانه",
+        "طراحی لندینگ اختصاصی",
+        "پشتیبانی اولویت‌دار"
+      ]
+    },
+    {
+      "id": "full",
+      "name": "جامع",
+      "description": "همراهی کامل برای برندهای مقیاس‌پذیر",
+      "price": "۴۵٫۰۰۰٫۰۰۰",
+      "featured": false,
+      "features": [
+        "تیم اختصاصی برندینگ و رشد",
+        "طراحی و توسعه وب‌سایت",
+        "مدیریت کامل شبکه‌های اجتماعی",
+        "کمپین‌های چندکاناله",
+        "آنالیز داده و بهینه‌سازی مستمر",
+        "جلسات هفتگی راهبری"
+      ]
+    }
+  ],
+  "faq": [
+    {
+      "q": "فرآیند شروع همکاری چگونه است؟",
+      "a": "پس از یک جلسه کوتاه نیازسنجی، پیشنهاد و زمان‌بندی شفاف ارائه می‌شود و با تأیید شما اجرا آغاز می‌گردد."
+    },
+    {
+      "q": "تحویل پروژه چقدر طول می‌کشد؟",
+      "a": "بسته به نوع خدمت، معمولاً از ۲ تا ۸ هفته متغیر است. زمان دقیق در پیشنهاد اولیه اعلام می‌شود."
+    },
+    {
+      "q": "آیا امکان تغییر پلن در میانه مسیر وجود دارد؟",
+      "a": "بله؛ می‌توانید پلن را ارتقا دهید یا دامنه خدمات را متناسب با رشد برند تنظیم کنید."
+    },
+    {
+      "q": "پشتیبانی بعد از تحویل چگونه است؟",
+      "a": "پس از تحویل، پشتیبانی فنی و مشاوره‌ای طبق پلن انتخابی ادامه دارد تا نتایج پایدار بماند."
+    }
+  ],
+  "testimonials": [
+    {
+      "name": "مریم کاظمی",
+      "role": "مدیر بازاریابی، برند عطر",
+      "quote": "لیوبیز فقط یک آژانس نبود؛ شریک رشد ما شد. هویت برند و کمپین‌هایشان فروش ما را متحول کرد."
+    },
+    {
+      "name": "حسین نادری",
+      "role": "بنیان‌گذار استارتاپ املاک",
+      "quote": "از طراحی سایت تا تبلیغات، همه چیز دقیق، لوکس و نتیجه‌محور بود. همکاری‌ای که ارزش تکرار دارد."
+    },
+    {
+      "name": "الهام شریفی",
+      "role": "مدیرعامل کافه زنجیره‌ای",
+      "quote": "تیم لیوبیز برند ما را از یک کسب‌وکار محلی به یک تجربهٔ به‌یادماندنی تبدیل کرد."
+    }
+  ],
+  "partners": [
+    {
+      "name": "Digikala",
+      "logo": "دیجی‌کالا"
+    },
+    {
+      "name": "Snapp",
+      "logo": "اسنپ!"
+    },
+    {
+      "name": "Melli Bank",
+      "logo": "بانک ملی"
+    },
+    {
+      "name": "ZarinPal",
+      "logo": "زرین‌پال"
+    },
+    {
+      "name": "DigiStyle",
+      "logo": "دیجی‌استایل"
+    },
+    {
+      "name": "AloPeyk",
+      "logo": "الوپیک"
+    }
+  ],
+  "creativePartners": [
+    {
+      "id": "mahsa",
+      "name": "مهسا کریمی",
+      "role": "فیلمبردار سفر — تهران / دبی",
+      "showcase": "فیلم ساعت طلایی کویر",
+      "bio": "داستان‌های عاشقانه سفر را در کویر و ساحل می‌سازد و کمپین‌های ثابت را به سکانس‌های احساسی برای برندهای گردشگری تبدیل می‌کند.",
+      "quote": "با هوش مصنوعی لیوبیز در جریان کارمان، یک عکس کویر به صحنهٔ سینمایی کامل تبدیل می‌شود — با نور، باد و احساس واقعی.",
+      "videoSrc": "/video/landing/aidrop/aidrop-partner-01.mp4",
+      "avatarSrc": "/images/landing/aidrop/aidrop-partner-01.jpg",
+      "mediaKind": "video",
+      "aspectRatio": "landscape"
+    },
+    {
+      "id": "niloufar",
+      "name": "نیلوفر شریفی",
+      "role": "هنرمند تصویری آزمایشی",
+      "showcase": "مطالعات موشن سوررئال",
+      "bio": "فیلم‌های کوتاه رؤیایی می‌سازد که در آن اشیا، دست‌ها و اتفاق‌های تصادفی شخصیت اصلی داستان می‌شوند.",
+      "quote": "ایده‌های عجیب را سریع امتحان می‌کنم. با لیوبیز ده نسخه سوررئال قبل از ناهار تست می‌کنم و همان روز برنده را منتشر می‌کنم.",
+      "videoSrc": "/video/landing/aidrop/aidrop-partner-02.mp4",
+      "avatarSrc": "/images/landing/aidrop/aidrop-partner-02.jpg",
+      "mediaKind": "video",
+      "aspectRatio": "landscape"
+    },
+    {
+      "id": "keyvan",
+      "name": "کیوان بهرامی",
+      "role": "سرپرست VFX و کارگردان کاراکتر",
+      "showcase": "ریل‌های فانتزی و کاراکتر",
+      "bio": "فیلم‌های هوش مصنوعی مبتنی بر کاراکتر را برای آژانس‌ها هدایت می‌کند — از پرتره‌های اسطوره‌ای تا قهرمانان تبلیغاتی.",
+      "quote": "مشتریان هفته‌ها برای یک پاس VFX صبر می‌کردند. حالا شات‌های قهرمان را در چند ساعت تکرار می‌کنم و خروجی هر پلتفرم را همان روز تحویل می‌دهم.",
+      "videoSrc": "/video/landing/aidrop/aidrop-partner-03.mp4",
+      "avatarSrc": "/images/landing/aidrop/aidrop-partner-03.jpg",
+      "mediaKind": "video",
+      "aspectRatio": "landscape"
+    },
+    {
+      "id": "sahar",
+      "name": "سحر جعفری",
+      "role": "آرت‌دایرکتور برند — سه‌بعدی و هویت بصری",
+      "showcase": "هویت برند در حرکت",
+      "bio": "سیستم‌های برند متحرک طراحی می‌کند — لوگو، تایپوگرافی و دنیای محصول برای برندهای مد و سبک زندگی.",
+      "quote": "بورد استاتیک برند هرگز چشم‌انداز را نمی‌فروخت. لیوبیز مفاهیم سه‌بعدی من را به فیلم‌های زندهٔ برند تبدیل می‌کند.",
+      "videoSrc": "/video/landing/aidrop/aidrop-partner-04.mp4",
+      "avatarSrc": "/images/landing/aidrop/aidrop-partner-04.jpg",
+      "mediaKind": "video",
+      "aspectRatio": "landscape"
+    },
+    {
+      "id": "negar",
+      "name": "نگار توکلی",
+      "role": "کارگردان محتوای مد",
+      "showcase": "لوک‌های رانway تا ریل",
+      "bio": "لوک‌بوک و ریل‌های پرانرژی مد با رنگ‌های جسورانه برای بوتیک‌ها و برندهای زیبایی.",
+      "quote": "قبلاً یک عکس محصول یعنی یک پست. با لیوبیز برای هر پلتفرم یک دراپ کامل مد تحویل می‌دهم.",
+      "videoSrc": "/video/landing/aidrop/aidrop-partner-05.mp4",
+      "avatarSrc": "/images/landing/aidrop/aidrop-partner-05.jpg",
+      "mediaKind": "video",
+      "aspectRatio": "landscape"
+    },
+    {
+      "id": "parisa",
+      "name": "پریسا کاظمی",
+      "role": "استراتژیست ویدیوهای کوتاه",
+      "showcase": "سری شب‌شهری شبکه‌های اجتماعی",
+      "bio": "تقویم هفتگی ریلز و شورتز برای کریتورها و کافه‌ها برنامه‌ریزی می‌کند.",
+      "quote": "مشتریانم حجم محتوا می‌خواهند بدون اینکه ارزان به نظر برسد. لیوبیز هر کلیپ را تیز نگه می‌دارد.",
+      "videoSrc": "/video/landing/aidrop/aidrop-partner-06.mp4",
+      "avatarSrc": "/images/landing/aidrop/aidrop-partner-06.jpg",
+      "mediaKind": "video",
+      "aspectRatio": "landscape"
+    },
+    {
+      "id": "sina",
+      "name": "سینا رستمی",
+      "role": "موشن‌دیزایner شهری",
+      "showcase": "تدوین‌های کینتیک شب‌شهری",
+      "bio": "در موشن شب‌زنده‌داری، موسیقی و انرژی خیابان برای رویدادها و برندهای جوان تخصص دارد.",
+      "quote": "کنترل حرکت بالاخره شبیه کارگردانی روی صحنه شده. ده نسخه شهری برای همان دراپ می‌سازم.",
+      "videoSrc": "/video/landing/aidrop/aidrop-partner-07.mp4",
+      "avatarSrc": "/images/landing/aidrop/aidrop-partner-07.jpg",
+      "mediaKind": "video",
+      "aspectRatio": "landscape"
+    },
+    {
+      "id": "elham",
+      "name": "الهام یزدی",
+      "role": "کالریست سینمایی و طراح لوک",
+      "showcase": "ریل‌های مود فیروزه‌ای–کهربایی",
+      "bio": "لوک‌های رنگی امضادار برای موزیک‌ویدیو و فیلم برند می‌سازد — اول فضا، بعد گرید دقیق.",
+      "quote": "افکت‌هایی که شب‌ها برای کامپوزیت می‌ساختم، حالا با لیوبیز FX در دسترس‌اند.",
+      "videoSrc": "/video/landing/aidrop/aidrop-partner-08.mp4",
+      "avatarSrc": "/images/landing/aidrop/aidrop-partner-08.jpg",
+      "mediaKind": "video",
+      "aspectRatio": "landscape"
+    },
+    {
+      "id": "alireza",
+      "name": "علیرضا قاسمی",
+      "role": "کریتور سبک زندگی و UGC",
+      "showcase": "بسته UGC خیابانی",
+      "bio": "محتوای UGC اصیل برای برندهای اسکوتر، مد و F&B می‌سازد — راحت جلوی دوربین، تمیز در خروجی.",
+      "quote": "برندها «واقعی» می‌خواهند اما همچنان پریمیوم. لیوبیز حس UGC را حفظ می‌کند.",
+      "videoSrc": "/video/landing/aidrop/aidrop-partner-09.mp4",
+      "avatarSrc": "/images/landing/aidrop/aidrop-partner-09.jpg",
+      "mediaKind": "video",
+      "aspectRatio": "landscape"
+    },
+    {
+      "id": "amirhossein",
+      "name": "امیرحسین نادری",
+      "role": "فناور خلاق — محصول و هوش مصنوعی",
+      "showcase": "ویدیوهای معرفی محصول",
+      "bio": "دموی محصول و فیلم لانچ با کمک هوش مصنوعی برای استارتاپ‌های SaaS و سخت‌افزار.",
+      "quote": "از وایرفریم تا تریلر لانچ در یک خط تولید. لیوبیز پیش‌نویس داستان را می‌سازد.",
+      "videoSrc": "/video/landing/aidrop/aidrop-partner-10.mp4",
+      "avatarSrc": "/images/landing/aidrop/aidrop-partner-10.jpg",
+      "mediaKind": "video",
+      "aspectRatio": "landscape"
+    }
+  ],
+  "teamStats": [
+    {
+      "label": "پشتیبانی ۲۴/۷",
+      "value": "۲۴/۷",
+      "icon": "headphones"
+    },
+    {
+      "label": "تعهد کامل",
+      "value": "۱۰۰٪",
+      "icon": "shield"
+    },
+    {
+      "label": "تحویل به‌موقع",
+      "value": "۹۸٪",
+      "icon": "clock"
+    },
+    {
+      "label": "رضایت مشتری",
+      "value": "+۹۵٪",
+      "icon": "heart"
+    }
+  ],
+  "footerQuickLinks": [
+    {
+      "label": "خانه",
+      "href": "/"
+    },
+    {
+      "label": "نمونه کارها",
+      "href": "/portfolio"
+    },
+    {
+      "label": "فرآیند همکاری",
+      "href": "/process"
+    },
+    {
+      "label": "درباره ما",
+      "href": "/about"
+    },
+    {
+      "label": "تماس با ما",
+      "href": "/contact"
+    }
+  ],
+  "footerServiceLinks": [
+    {
+      "label": "طراحی هویت بصری",
+      "href": "/services/branding"
+    },
+    {
+      "label": "طراحی وب‌سایت",
+      "href": "/services/web"
+    },
+    {
+      "label": "مدیریت شبکه‌های اجتماعی",
+      "href": "/services/social"
+    },
+    {
+      "label": "تبلیغات و رشد برند",
+      "href": "/services/ads"
+    }
+  ]
 }

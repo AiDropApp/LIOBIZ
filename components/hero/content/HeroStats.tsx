@@ -1,14 +1,25 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Briefcase, Heart, Sparkles, Users } from "lucide-react";
+import {
+  Briefcase,
+  Clock,
+  Heart,
+  Sparkles,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
+import { defaultLanding } from "@/lib/cms-defaults";
+import { defaultHeroStats } from "@/lib/landing-defaults";
 
-const stats = [
-  { value: "120+", label: "پروژه موفق", icon: Briefcase },
-  { value: "98%", label: "رضایت مشتری", icon: Heart },
-  { value: "50+", label: "مشتری فعال", icon: Users },
-  { value: "10+", label: "سال تجربه", icon: Sparkles },
-];
+const iconMap: Record<string, LucideIcon> = {
+  heart: Heart,
+  clock: Clock,
+  users: Users,
+  briefcase: Briefcase,
+  sparkles: Sparkles,
+};
 
 export default function HeroStats({
   reducedMotion = false,
@@ -17,6 +28,22 @@ export default function HeroStats({
   reducedMotion?: boolean;
   delay?: number;
 }) {
+  const [stats, setStats] = useState(defaultHeroStats);
+
+  useEffect(() => {
+    fetch("/api/content", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.landing) {
+          const merged = { ...defaultLanding, ...data.landing };
+          if (Array.isArray(merged.heroStats) && merged.heroStats.length > 0) {
+            setStats(merged.heroStats);
+          }
+        }
+      })
+      .catch(() => undefined);
+  }, []);
+
   return (
     <motion.div
       initial={reducedMotion ? false : { opacity: 0, y: 18 }}
@@ -25,12 +52,12 @@ export default function HeroStats({
       className="hero-stats-bar"
     >
       {stats.map((item) => {
-        const Icon = item.icon;
+        const Icon = iconMap[item.icon] ?? Briefcase;
         return (
           <div key={item.label} className="hero-stats-item">
             <Icon className="mx-auto mb-2 text-primary" size={18} aria-hidden="true" />
-          <div className="text-xl font-extrabold text-primary md:text-2xl">{item.value}</div>
-          <div className="mt-1 text-sm text-white/65">{item.label}</div>
+            <div className="text-xl font-extrabold text-primary md:text-2xl">{item.value}</div>
+            <div className="mt-1 text-sm text-white/65">{item.label}</div>
           </div>
         );
       })}

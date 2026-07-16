@@ -9,9 +9,12 @@ import {
   Heart,
   type LucideIcon,
 } from "lucide-react";
-import ContentImage from "@/components/ContentImage";
+import CmsMedia from "@/components/CmsMedia";
+import { aspectRatioClass, resolveMediaKind } from "@/lib/media-types";
 import usePrefersReducedMotion from "@/hooks/usePrefersReducedMotion";
-import { BACKSTAGE_GALLERY, TEAM_STATS } from "@/lib/constants";
+import { BACKSTAGE_GALLERY } from "@/lib/constants";
+import { defaultLanding, type LandingContent } from "@/lib/cms-defaults";
+import { defaultTeamStats, type TeamStatItem } from "@/lib/landing-defaults";
 import type { BackstageItem } from "@/lib/content-store";
 
 const iconMap: Record<string, LucideIcon> = {
@@ -24,10 +27,12 @@ const iconMap: Record<string, LucideIcon> = {
 const GAP_PX = 14; // keep in sync with CSS gap (0.85rem ≈ 13.6px)
 
 function normalizeGallery(items: BackstageItem[]): BackstageItem[] {
-  const usable = items.filter(
-    (item) => item?.image && !String(item.image).endsWith(".svg"),
-  );
-  return usable.length ? usable : items;
+  const usable = items.filter((item) => {
+    if (!item?.image && !item?.videoSrc) return false;
+    if (resolveMediaKind(item) === "video" && item.videoSrc?.trim()) return true;
+    return Boolean(item.image && !String(item.image).endsWith(".svg"));
+  });
+  return usable.length ? usable : items.filter((item) => item?.image || item?.videoSrc);
 }
 
 function padGallery(items: BackstageItem[], minCount = 12): BackstageItem[] {
@@ -150,13 +155,18 @@ function MarqueeRow({
     >
       {items.map((item, index) => (
         <article key={`${key}-${item.id}-${index}`} className="backstage-slide">
-          <div className="backstage-slide-frame">
-            <ContentImage
-              src={item.image}
+          <div
+            className={`backstage-slide-frame ${aspectRatioClass(item.aspectRatio ?? "portrait")}`}
+          >
+            <CmsMedia
+              image={item.image}
+              videoSrc={item.videoSrc}
+              mediaKind={item.mediaKind}
+              aspectRatio={item.aspectRatio}
               alt={item.caption}
               fill
+              fitParent
               sizes="(max-width: 768px) 55vw, 280px"
-              className="object-cover"
               priority={index < 4}
             />
             <div className="backstage-slide-overlay" />
@@ -189,6 +199,8 @@ function MarqueeRow({
 
 export default function Backstage() {
   const reduced = usePrefersReducedMotion();
+  const [landing, setLanding] = useState<LandingContent>(defaultLanding);
+  const [teamStats, setTeamStats] = useState<TeamStatItem[]>(defaultTeamStats);
   // Seed immediately so marquee paints without waiting for /api/content
   const [gallery, setGallery] = useState<BackstageItem[]>(() =>
     normalizeGallery(BACKSTAGE_GALLERY as BackstageItem[]),
@@ -200,6 +212,8 @@ export default function Backstage() {
       .then((res) => res.json())
       .then((data) => {
         if (cancelled) return;
+        if (data?.landing) setLanding({ ...defaultLanding, ...data.landing });
+        if (Array.isArray(data?.teamStats)) setTeamStats(data.teamStats);
         const items = Array.isArray(data.backstage) ? data.backstage : [];
         const next = normalizeGallery(items);
         if (next.length) setGallery(next);
@@ -224,11 +238,9 @@ export default function Backstage() {
           viewport={{ once: true }}
           className="mb-10 text-center"
         >
-          <span className="section-label">تیم لیوبیز</span>
-          <h2 className="section-title">پشت صحنهٔ ساخت برندهای ماندگار</h2>
-          <p className="mx-auto mt-4 max-w-2xl text-muted">
-            لحظه‌های واقعی تیم، جلسات استراتژی، تولید محتوا و اجرای کمپین.
-          </p>
+          <span className="section-label">{landing.backstageLabel}</span>
+          <h2 className="section-title">{landing.backstageTitle}</h2>
+          <p className="mx-auto mt-4 max-w-2xl text-muted">{landing.backstageIntro}</p>
         </motion.div>
       </div>
 
@@ -241,7 +253,7 @@ export default function Backstage() {
 
       <div className="container mx-auto">
         <div className="team-stats">
-          {TEAM_STATS.map((stat) => {
+          {teamStats.map((stat) => {
             const Icon = iconMap[stat.icon] ?? Headphones;
             return (
               <div key={stat.label} className="team-stat">

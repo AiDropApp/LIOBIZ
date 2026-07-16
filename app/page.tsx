@@ -5,6 +5,7 @@ import Services from "@/components/Services";
 import Portfolio from "@/components/Portfolio";
 import Process from "@/components/Process";
 import Backstage from "@/components/Backstage";
+import CreativePartners from "@/components/CreativePartners";
 import Partners from "@/components/Partners";
 import Testimonials from "@/components/Testimonials";
 import Plans from "@/components/Plans";
@@ -24,8 +25,9 @@ export default function HomePage() {
         <Services />
         <Portfolio />
         <Process />
-        <Plans />
         <Backstage />
+        <Plans />
+        <CreativePartners />
         <FAQ />
         <Testimonials />
         <Partners />

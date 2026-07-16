@@ -10,7 +10,7 @@ function requireAdmin(request: Request) {
   return session;
 }
 
-/** Update CMS sections: landing | pages | site | theme | full */
+/** Update CMS sections from admin landing editor */
 export async function PUT(request: Request) {
   if (!requireAdmin(request)) {
     return NextResponse.json({ message: "دسترسی غیرمجاز" }, { status: 401 });
@@ -49,7 +49,25 @@ export async function PUT(request: Request) {
     theme: body.theme ? { ...current.theme, ...body.theme } : current.theme,
     portfolio: Array.isArray(body.portfolio) ? body.portfolio : current.portfolio,
     backstage: Array.isArray(body.backstage) ? body.backstage : current.backstage,
+    plans: Array.isArray(body.plans) ? body.plans : current.plans,
+    faq: Array.isArray(body.faq) ? body.faq : current.faq,
+    testimonials: Array.isArray(body.testimonials) ? body.testimonials : current.testimonials,
+    partners: Array.isArray(body.partners) ? body.partners : current.partners,
+    creativePartners: Array.isArray(body.creativePartners)
+      ? body.creativePartners
+      : current.creativePartners,
+    teamStats: Array.isArray(body.teamStats) ? body.teamStats : current.teamStats,
+    footerQuickLinks: Array.isArray(body.footerQuickLinks)
+      ? body.footerQuickLinks
+      : current.footerQuickLinks,
+    footerServiceLinks: Array.isArray(body.footerServiceLinks)
+      ? body.footerServiceLinks
+      : current.footerServiceLinks,
   };
+
+  if (body.landing?.heroStats) {
+    next.landing.heroStats = body.landing.heroStats;
+  }
 
   await writeSiteContent(next);
   return NextResponse.json({ ok: true, content: next });

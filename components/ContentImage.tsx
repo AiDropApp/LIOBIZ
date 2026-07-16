@@ -11,6 +11,8 @@ export default function ContentImage({ src, alt, unoptimized, ...rest }: Props) 
   const skipOptimizer =
     src.startsWith("/uploads/") ||
     src.startsWith("/api/media/") ||
+    src.startsWith("http://") ||
+    src.startsWith("https://") ||
     src.endsWith(".svg") ||
     src.startsWith("data:");
 

@@ -1,10 +1,25 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
-import { FAQ_ITEMS } from "@/lib/constants";
+import { defaultLanding, type LandingContent } from "@/lib/cms-defaults";
+import { defaultFaq, type FaqItem } from "@/lib/landing-defaults";
 
 export default function FAQ() {
+  const [landing, setLanding] = useState<LandingContent>(defaultLanding);
+  const [faq, setFaq] = useState<FaqItem[]>(defaultFaq);
+
+  useEffect(() => {
+    fetch("/api/content", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.landing) setLanding({ ...defaultLanding, ...data.landing });
+        if (Array.isArray(data?.faq)) setFaq(data.faq);
+      })
+      .catch(() => undefined);
+  }, []);
+
   return (
     <section id="faq" className="section-block bg-white">
       <div className="container mx-auto">
@@ -14,12 +29,12 @@ export default function FAQ() {
           viewport={{ once: true }}
           className="mb-12 text-center"
         >
-          <span className="section-label">سوالات متداول</span>
-          <h2 className="section-title">پاسخ سوالات پرتکرار شما</h2>
+          <span className="section-label">{landing.faqLabel}</span>
+          <h2 className="section-title">{landing.faqTitle}</h2>
         </motion.div>
 
         <div className="faq-list">
-          {FAQ_ITEMS.map((item, index) => (
+          {faq.map((item, index) => (
             <motion.details
               key={item.q}
               className="faq-item"

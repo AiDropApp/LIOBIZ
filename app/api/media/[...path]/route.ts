@@ -18,7 +18,7 @@ const MIME: Record<string, string> = {
   zip: "application/zip",
 };
 
-const ALLOWED_FOLDERS = ["portfolio", "backstage", "hero", "orders", "uploads"];
+const ALLOWED_FOLDERS = ["portfolio", "backstage", "hero", "about", "creative-partners", "orders", "uploads"];
 
 type Params = { params: Promise<{ path: string[] }> };
 

@@ -3,12 +3,13 @@
 import { useEffect, useState } from "react";
 import { Instagram, Linkedin, Send, Phone, Mail, MapPin } from "lucide-react";
 import Link from "next/link";
+import { SITE, SOCIAL_LINKS } from "@/lib/constants";
+import { defaultLanding, type LandingContent } from "@/lib/cms-defaults";
 import {
-  FOOTER_QUICK_LINKS,
-  FOOTER_SERVICES,
-  SITE,
-  SOCIAL_LINKS,
-} from "@/lib/constants";
+  defaultFooterQuickLinks,
+  defaultFooterServiceLinks,
+  type LinkItem,
+} from "@/lib/landing-defaults";
 
 function SocialIcon({ name }: { name: string }) {
   if (name === "Instagram") return <Instagram size={18} />;
@@ -27,6 +28,9 @@ type SiteInfo = {
 };
 
 export default function Footer() {
+  const [landing, setLanding] = useState<LandingContent>(defaultLanding);
+  const [quickLinks, setQuickLinks] = useState<LinkItem[]>(defaultFooterQuickLinks);
+  const [serviceLinks, setServiceLinks] = useState<LinkItem[]>(defaultFooterServiceLinks);
   const [site, setSite] = useState<SiteInfo>({
     description: SITE.description,
     phone: SITE.phone,
@@ -40,6 +44,9 @@ export default function Footer() {
     fetch("/api/content", { cache: "no-store" })
       .then((r) => r.json())
       .then((data) => {
+        if (data?.landing) setLanding({ ...defaultLanding, ...data.landing });
+        if (Array.isArray(data?.footerQuickLinks)) setQuickLinks(data.footerQuickLinks);
+        if (Array.isArray(data?.footerServiceLinks)) setServiceLinks(data.footerServiceLinks);
         if (data?.site) {
           setSite({
             description: data.site.description || SITE.description,
@@ -67,11 +74,11 @@ export default function Footer() {
         <div className="footer-panel-inner">
           <div className="footer-cta mb-14 flex flex-col items-center gap-5 rounded-[var(--radius-card)] border border-white/10 bg-white/[0.03] px-6 py-8 text-center md:flex-row md:justify-between md:px-8 md:text-right">
             <div>
-              <h3 className="text-2xl font-bold md:text-3xl">آمادهٔ ساختن برند بعدی هستید؟</h3>
-              <p className="mt-2 text-muted">یک گفتگوی کوتاه کافی است تا مسیر رشد را طراحی کنیم.</p>
+              <h3 className="text-2xl font-bold md:text-3xl">{landing.footerCtaTitle}</h3>
+              <p className="mt-2 text-muted">{landing.footerCtaText}</p>
             </div>
-            <Link href="/contact" className="btn-accent px-8">
-              شروع همکاری
+            <Link href={landing.footerCtaHref} className="btn-accent px-8">
+              {landing.footerCtaButton}
             </Link>
           </div>
 
@@ -100,7 +107,7 @@ export default function Footer() {
             <div>
               <h3 className="mb-4 text-lg font-bold">دسترسی سریع</h3>
               <ul className="space-y-3">
-                {FOOTER_QUICK_LINKS.map((link) => (
+                {quickLinks.map((link) => (
                   <li key={link.href}>
                     <Link href={link.href} className="text-muted transition-colors hover:text-white">
                       {link.label}
@@ -113,7 +120,7 @@ export default function Footer() {
             <div>
               <h3 className="mb-4 text-lg font-bold">خدمات</h3>
               <ul className="space-y-3">
-                {FOOTER_SERVICES.map((link) => (
+                {serviceLinks.map((link) => (
                   <li key={link.label}>
                     <Link href={link.href} className="text-muted transition-colors hover:text-white">
                       {link.label}
@@ -156,7 +163,7 @@ export default function Footer() {
           </div>
 
           <div className="mt-12 border-t border-white/5 pt-6 text-center text-sm text-white/40">
-            © {new Date().getFullYear()} لیوبیز. تمامی حقوق محفوظ است.
+            © {new Date().getFullYear()} {landing.footerCopyright}
           </div>
         </div>
       </div>

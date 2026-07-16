@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -10,7 +11,8 @@ import {
   PenLine,
   type LucideIcon,
 } from "lucide-react";
-import { SERVICES } from "@/lib/constants";
+import { defaultLanding, type LandingContent } from "@/lib/cms-defaults";
+import { defaultServices, type ServiceItem } from "@/lib/landing-defaults";
 
 const iconMap: Record<string, LucideIcon> = {
   palette: Palette,
@@ -21,6 +23,19 @@ const iconMap: Record<string, LucideIcon> = {
 };
 
 export default function Services() {
+  const [landing, setLanding] = useState<LandingContent>(defaultLanding);
+  const [services, setServices] = useState<ServiceItem[]>(defaultServices);
+
+  useEffect(() => {
+    fetch("/api/content", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.landing) setLanding({ ...defaultLanding, ...data.landing });
+        if (Array.isArray(data?.pages?.services)) setServices(data.pages.services);
+      })
+      .catch(() => undefined);
+  }, []);
+
   return (
     <section id="services" className="services-strip">
       <div className="container mx-auto">
@@ -30,17 +45,15 @@ export default function Services() {
           viewport={{ once: true }}
           className="mb-12 text-center"
         >
-          <span className="section-label">خدمات ما</span>
+          <span className="section-label">{landing.servicesLabel}</span>
           <h2 className="section-title text-[1.7rem] md:text-3xl lg:text-[2.2rem]">
-            راهکارهای جامع برای رشد کسب‌وکار شما
+            {landing.servicesTitle}
           </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-muted">
-            از هویت برند تا تبلیغات و محتوا؛ همه خدمات در یک مسیر هماهنگ.
-          </p>
+          <p className="mx-auto mt-4 max-w-2xl text-muted">{landing.servicesIntro}</p>
         </motion.div>
 
         <div className="services-strip-grid">
-          {SERVICES.map((service, index) => {
+          {services.map((service, index) => {
             const Icon = iconMap[service.icon] ?? Palette;
             return (
               <motion.div

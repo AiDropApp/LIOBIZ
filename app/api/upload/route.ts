@@ -31,12 +31,29 @@ export async function POST(request: Request) {
     file.name.endsWith(".pdf") ||
     file.name.endsWith(".zip");
 
-  if (kind === "hero" || kind === "video") {
+  if (kind === "hero" || kind === "video" || kind === "creative-partners") {
     if (!isVideo && !isImage) {
-      return NextResponse.json({ message: "برای هیرو فقط تصویر یا ویدیو مجاز است." }, { status: 400 });
+      return NextResponse.json({ message: "فقط تصویر یا ویدیو مجاز است." }, { status: 400 });
     }
     if (file.size > 40 * 1024 * 1024) {
-      return NextResponse.json({ message: "حداکثر حجم فایل هیرو ۴۰ مگابایت است." }, { status: 400 });
+      return NextResponse.json({ message: "حداکثر حجم فایل ۴۰ مگابایت است." }, { status: 400 });
+    }
+  } else if (kind === "about") {
+    if (!isImage) {
+      return NextResponse.json({ message: "فقط تصویر مجاز است." }, { status: 400 });
+    }
+    if (file.size > 8 * 1024 * 1024) {
+      return NextResponse.json({ message: "حداکثر حجم تصویر ۸ مگابایت است." }, { status: 400 });
+    }
+  } else if (kind === "portfolio" || kind === "backstage") {
+    if (!isVideo && !isImage) {
+      return NextResponse.json({ message: "فقط تصویر یا ویدیو مجاز است." }, { status: 400 });
+    }
+    const max = isVideo ? 40 * 1024 * 1024 : 8 * 1024 * 1024;
+    if (file.size > max) {
+      return NextResponse.json({
+        message: isVideo ? "حداکثر حجم ویدیو ۴۰ مگابایت است." : "حداکثر حجم تصویر ۸ مگابایت است.",
+      }, { status: 400 });
     }
   } else if (kind === "delivery" || kind === "request") {
     if (!isImage && !isDoc && !isVideo) {
@@ -68,9 +85,13 @@ export async function POST(request: Request) {
         ? "portfolio"
         : kind === "hero" || kind === "video"
           ? "hero"
-          : kind === "delivery" || kind === "request"
-            ? "orders"
-            : "uploads";
+          : kind === "about"
+            ? "about"
+            : kind === "creative-partners"
+              ? "creative-partners"
+              : kind === "delivery" || kind === "request"
+                ? "orders"
+                : "uploads";
 
   const dir = path.join(process.cwd(), "public", "uploads", folder);
   await fs.mkdir(dir, { recursive: true });

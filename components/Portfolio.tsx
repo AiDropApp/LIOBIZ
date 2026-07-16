@@ -3,9 +3,10 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import ContentImage from "@/components/ContentImage";
+import CmsMedia from "@/components/CmsMedia";
 import PortfolioDetailModal from "@/components/PortfolioDetailModal";
 import { PORTFOLIO_FILTERS } from "@/lib/constants";
+import { defaultLanding, type LandingContent } from "@/lib/cms-defaults";
 import type { PortfolioItem } from "@/lib/content-store";
 
 const LANDING_LIMIT = 8;
@@ -14,11 +15,15 @@ export default function Portfolio() {
   const [filter, setFilter] = useState("همه");
   const [items, setItems] = useState<PortfolioItem[]>([]);
   const [selected, setSelected] = useState<PortfolioItem | null>(null);
+  const [landing, setLanding] = useState<LandingContent>(defaultLanding);
 
   useEffect(() => {
     fetch("/api/content", { cache: "no-store" })
       .then((res) => res.json())
-      .then((data) => setItems(Array.isArray(data.portfolio) ? data.portfolio : []))
+      .then((data) => {
+        setItems(Array.isArray(data.portfolio) ? data.portfolio : []);
+        if (data?.landing) setLanding({ ...defaultLanding, ...data.landing });
+      })
       .catch(() => setItems([]));
   }, []);
 
@@ -37,8 +42,8 @@ export default function Portfolio() {
           viewport={{ once: true }}
           className="mb-10 text-center"
         >
-          <span className="section-label">نمونه کارها</span>
-          <h2 className="section-title">پروژه‌هایی که به آن‌ها افتخار می‌کنیم</h2>
+          <span className="section-label">{landing.portfolioLabel}</span>
+          <h2 className="section-title">{landing.portfolioTitle}</h2>
         </motion.div>
 
         <div className="mb-8 flex flex-wrap items-center justify-center gap-2.5">
@@ -72,13 +77,16 @@ export default function Portfolio() {
                   onClick={() => setSelected(item)}
                   aria-label={`مشاهده جزئیات ${item.title}`}
                 >
-                  <div className="relative aspect-[4/5] overflow-hidden">
-                    <ContentImage
-                      src={item.image}
+                  <div className="relative">
+                    <CmsMedia
+                      image={item.image}
+                      videoSrc={item.videoSrc}
+                      mediaKind={item.mediaKind}
+                      aspectRatio={item.aspectRatio}
                       alt={item.title}
                       fill
                       sizes="(max-width: 768px) 50vw, 25vw"
-                      className="object-cover transition-transform duration-700 group-hover:scale-105"
+                      className="transition-transform duration-700 group-hover:scale-105"
                     />
                     <div className="portfolio-card-overlay" />
                     <div className="portfolio-card-meta">

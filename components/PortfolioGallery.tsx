@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import ContentImage from "@/components/ContentImage";
+import CmsMedia from "@/components/CmsMedia";
 import PortfolioDetailModal from "@/components/PortfolioDetailModal";
 import { PORTFOLIO_FILTERS } from "@/lib/constants";
 import type { PortfolioItem } from "@/lib/content-store";
@@ -55,13 +55,16 @@ export default function PortfolioGallery({ compact = false }: { compact?: boolea
                 onClick={() => setSelected(item)}
                 aria-label={`مشاهده جزئیات ${item.title}`}
               >
-                <div className="relative aspect-[3/4] overflow-hidden">
-                  <ContentImage
-                    src={item.image}
+                <div className="relative">
+                  <CmsMedia
+                    image={item.image}
+                    videoSrc={item.videoSrc}
+                    mediaKind={item.mediaKind}
+                    aspectRatio={item.aspectRatio ?? "portrait"}
                     alt={item.title}
                     fill
                     sizes="(max-width: 768px) 50vw, 25vw"
-                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    className="transition-transform duration-700 group-hover:scale-105"
                   />
                   <div className="portfolio-card-overlay" />
                   <div className="absolute inset-x-0 bottom-0 p-3.5 md:p-4">

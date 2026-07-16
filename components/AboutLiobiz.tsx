@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import ContentImage from "@/components/ContentImage";
 import { defaultLanding, type LandingContent } from "@/lib/cms-defaults";
 
 export default function AboutLiobiz() {
@@ -51,8 +51,8 @@ export default function AboutLiobiz() {
             className="about-liobiz-visual order-1 lg:order-2"
           >
             <div className="about-liobiz-main">
-              <Image
-                src="/images/about-liobiz-office.png"
+              <ContentImage
+                src={landing.aboutImage1}
                 alt="فضای کار لیوبیز"
                 fill
                 className="object-cover"
@@ -61,15 +61,15 @@ export default function AboutLiobiz() {
               />
             </div>
             <div className="about-liobiz-float">
-              <Image
-                src="/images/about-liobiz-float.png"
+              <ContentImage
+                src={landing.aboutImage2}
                 alt="جلسه تیم لیوبیز"
                 fill
                 className="object-cover"
                 sizes="280px"
               />
             </div>
-            <div className="about-liobiz-badge">ارزش ما رشد شماست؛ افتخار ما</div>
+            <div className="about-liobiz-badge">{landing.aboutBadge}</div>
           </motion.div>
         </div>
       </div>

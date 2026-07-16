@@ -3,21 +3,18 @@
 import { useEffect, useState } from "react";
 import {
   LayoutDashboard,
-  Palette,
-  Images,
+  Layout,
   ShoppingBag,
   MessageSquare,
   Users,
   Mail,
 } from "lucide-react";
 import DashboardShell from "@/components/dashboard/DashboardShell";
-import AdminEditor from "@/components/admin/AdminEditor";
-import AdminCmsEditor from "@/components/admin/AdminCmsEditor";
+import AdminLandingEditor from "@/components/admin/AdminLandingEditor";
 
 type Tab =
   | "overview"
-  | "cms"
-  | "content"
+  | "landing"
   | "users"
   | "orders"
   | "tickets"
@@ -81,8 +78,7 @@ type TicketRow = {
 
 const NAV = [
   { id: "overview", label: "نمای کلی", icon: LayoutDashboard },
-  { id: "cms", label: "صفحات و ظاهر", icon: Palette },
-  { id: "content", label: "نمونه کار / بک‌استیج", icon: Images },
+  { id: "landing", label: "مدیریت لندینگ", icon: Layout },
   { id: "orders", label: "سفارش‌ها", icon: ShoppingBag },
   { id: "tickets", label: "تیکت‌ها", icon: MessageSquare },
   { id: "users", label: "کاربران", icon: Users },
@@ -307,8 +303,7 @@ export default function AdminPanel() {
         </section>
       )}
 
-      {tab === "cms" && <AdminCmsEditor />}
-      {tab === "content" && <AdminEditor embedded />}
+      {tab === "landing" && <AdminLandingEditor />}
 
       {tab === "orders" && (
         <section>

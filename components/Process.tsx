@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   Search,
@@ -10,7 +11,8 @@ import {
   TrendingUp,
   type LucideIcon,
 } from "lucide-react";
-import { PROCESS_STEPS } from "@/lib/constants";
+import { defaultLanding, type LandingContent } from "@/lib/cms-defaults";
+import { defaultProcessSteps, type ProcessStepItem } from "@/lib/landing-defaults";
 
 const iconMap: Record<string, LucideIcon> = {
   search: Search,
@@ -22,6 +24,19 @@ const iconMap: Record<string, LucideIcon> = {
 };
 
 export default function Process() {
+  const [landing, setLanding] = useState<LandingContent>(defaultLanding);
+  const [steps, setSteps] = useState<ProcessStepItem[]>(defaultProcessSteps);
+
+  useEffect(() => {
+    fetch("/api/content", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.landing) setLanding({ ...defaultLanding, ...data.landing });
+        if (Array.isArray(data?.pages?.processSteps)) setSteps(data.pages.processSteps);
+      })
+      .catch(() => undefined);
+  }, []);
+
   return (
     <section id="process" className="section-block bg-white">
       <div className="container mx-auto">
@@ -31,18 +46,18 @@ export default function Process() {
           viewport={{ once: true }}
           className="mb-14 text-center"
         >
-          <span className="section-label">فرآیند همکاری</span>
-          <h2 className="section-title">از ایده تا رشد، در کنار شما هستیم</h2>
+          <span className="section-label">{landing.processLabel}</span>
+          <h2 className="section-title">{landing.processTitle}</h2>
           <a
-            href="/process"
+            href={landing.processLinkHref}
             className="mt-4 inline-flex text-sm text-primary transition-colors hover:text-primary-dark"
           >
-            جزئیات فرآیند همکاری
+            {landing.processLinkText}
           </a>
         </motion.div>
 
         <div className="process-rail">
-          {PROCESS_STEPS.map((step, index) => {
+          {steps.map((step, index) => {
             const Icon = iconMap[step.icon] ?? Search;
             return (
               <motion.div

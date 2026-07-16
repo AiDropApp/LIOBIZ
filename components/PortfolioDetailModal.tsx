@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
-import ContentImage from "@/components/ContentImage";
+import CmsMedia from "@/components/CmsMedia";
 import type { PortfolioItem } from "@/lib/content-store";
 
 function portfolioMeta(item: PortfolioItem) {
@@ -82,10 +82,14 @@ export default function PortfolioDetailModal({
 
             <div className="portfolio-detail-grid">
               <div className="portfolio-detail-media">
-                <ContentImage
-                  src={item.image}
+                <CmsMedia
+                  image={item.image}
+                  videoSrc={item.videoSrc}
+                  mediaKind={item.mediaKind}
+                  aspectRatio={item.aspectRatio ?? "portrait"}
                   alt={item.title}
                   fill
+                  fitParent
                   sizes="(max-width: 1024px) 100vw, 55vw"
                   className="object-contain"
                   priority
