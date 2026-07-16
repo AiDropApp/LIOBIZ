@@ -55,7 +55,7 @@ export default function PortfolioGallery({ compact = false }: { compact?: boolea
                 onClick={() => setSelected(item)}
                 aria-label={`مشاهده جزئیات ${item.title}`}
               >
-                <div className="relative">
+                <div className="portfolio-card-media">
                   <CmsMedia
                     image={item.image}
                     videoSrc={item.videoSrc}
@@ -63,13 +63,14 @@ export default function PortfolioGallery({ compact = false }: { compact?: boolea
                     aspectRatio={item.aspectRatio ?? "portrait"}
                     alt={item.title}
                     fill
+                    fitParent
                     sizes="(max-width: 768px) 50vw, 25vw"
                     className="transition-transform duration-700 group-hover:scale-105"
                   />
                   <div className="portfolio-card-overlay" />
-                  <div className="absolute inset-x-0 bottom-0 p-3.5 md:p-4">
-                    <p className="mb-1 text-xs text-primary-soft md:text-sm">{item.category}</p>
-                    <h3 className="text-base font-bold text-white md:text-lg">{item.title}</h3>
+                  <div className="portfolio-card-meta">
+                    <p>{item.category}</p>
+                    <h3>{item.title}</h3>
                   </div>
                 </div>
               </button>

@@ -14,8 +14,18 @@ export default function Header() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
+  const [logoUrl, setLogoUrl] = useState("/images/logo.png");
   const servicesRef = useRef<HTMLDivElement>(null);
   const reducedMotion = usePrefersReducedMotion();
+
+  useEffect(() => {
+    fetch("/api/content", { cache: "no-store" })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.site?.logoUrl) setLogoUrl(data.site.logoUrl);
+      })
+      .catch(() => undefined);
+  }, []);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -85,7 +95,7 @@ export default function Header() {
       >
         <div className="header-bar">
           <motion.div className="header-brand" {...fade(0.05)}>
-            <Logo height={72} />
+            <Logo height={72} src={logoUrl} />
           </motion.div>
 
           <motion.nav

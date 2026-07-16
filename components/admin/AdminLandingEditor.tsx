@@ -140,16 +140,21 @@ export default function AdminLandingEditor() {
       {toast && <div className="admin-toast">{toast}</div>}
 
       <nav className="landing-section-nav" aria-label="بخش‌های لندینگ">
-        {SECTIONS.map((s) => (
-          <button
-            key={s.id}
-            type="button"
-            className={`landing-nav-chip${open === s.id ? " is-active" : ""}`}
-            onClick={() => setOpen(s.id)}
-          >
-            <span>{s.emoji}</span> {s.title}
-          </button>
-        ))}
+        <div className="landing-section-nav-track">
+          {SECTIONS.map((s) => (
+            <button
+              key={s.id}
+              type="button"
+              className={`landing-nav-chip${open === s.id ? " is-active" : ""}`}
+              onClick={() => setOpen(s.id)}
+            >
+              <span className="landing-nav-emoji" aria-hidden="true">
+                {s.emoji}
+              </span>
+              <span className="landing-nav-label">{s.title}</span>
+            </button>
+          ))}
+        </div>
       </nav>
 
       <div className="landing-sections-stack">

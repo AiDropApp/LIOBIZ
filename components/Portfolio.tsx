@@ -77,7 +77,7 @@ export default function Portfolio() {
                   onClick={() => setSelected(item)}
                   aria-label={`مشاهده جزئیات ${item.title}`}
                 >
-                  <div className="relative">
+                  <div className="portfolio-card-media">
                     <CmsMedia
                       image={item.image}
                       videoSrc={item.videoSrc}
@@ -85,6 +85,7 @@ export default function Portfolio() {
                       aspectRatio={item.aspectRatio}
                       alt={item.title}
                       fill
+                      fitParent
                       sizes="(max-width: 768px) 50vw, 25vw"
                       className="transition-transform duration-700 group-hover:scale-105"
                     />

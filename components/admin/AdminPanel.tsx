@@ -8,9 +8,18 @@ import {
   MessageSquare,
   Users,
   Mail,
+  UserPlus,
+  Inbox,
+  Ticket,
 } from "lucide-react";
 import DashboardShell from "@/components/dashboard/DashboardShell";
 import AdminLandingEditor from "@/components/admin/AdminLandingEditor";
+import {
+  ORDER_STATUS_LABELS,
+  TICKET_STATUS_LABELS,
+  orderBadgeClass,
+  ticketBadgeClass,
+} from "@/lib/dashboard-ui";
 
 type Tab =
   | "overview"
@@ -85,19 +94,11 @@ const NAV = [
   { id: "messages", label: "پیام‌های تماس", icon: Mail },
 ];
 
-const ORDER_STATUS: Record<string, string> = {
-  new: "جدید",
-  review: "بررسی",
-  in_progress: "در حال انجام",
-  completed: "تکمیل",
-  cancelled: "لغو",
-};
+const ORDER_STATUS = ORDER_STATUS_LABELS;
+const TICKET_STATUS = TICKET_STATUS_LABELS;
 
-const TICKET_STATUS: Record<string, string> = {
-  open: "باز",
-  answered: "پاسخ‌داده‌شده",
-  closed: "بسته",
-};
+type OrderFilter = "all" | keyof typeof ORDER_STATUS;
+type MessageFilter = "all" | ContactRow["status"];
 
 export default function AdminPanel() {
   const [tab, setTab] = useState<Tab>("overview");
@@ -108,6 +109,9 @@ export default function AdminPanel() {
   const [tickets, setTickets] = useState<TicketRow[]>([]);
   const [reply, setReply] = useState<Record<number, string>>({});
   const [toast, setToast] = useState("");
+  const [orderFilter, setOrderFilter] = useState<OrderFilter>("all");
+  const [messageFilter, setMessageFilter] = useState<MessageFilter>("all");
+  const [userQuery, setUserQuery] = useState("");
 
   const flash = (text: string) => {
     setToast(text);
@@ -258,47 +262,188 @@ export default function AdminPanel() {
     loadTickets();
   };
 
+  const newOrders = overview?.stats.newOrders ?? orders.filter((o) => o.status === "new").length;
+  const openTickets = overview?.stats.openTickets ?? tickets.filter((t) => t.status === "open").length;
+  const newMessages = overview?.stats.newMessages ?? messages.filter((m) => m.status === "new").length;
+
+  const navWithBadges = NAV.map((item) => {
+    if (item.id === "orders") return { ...item, badge: newOrders };
+    if (item.id === "tickets") return { ...item, badge: openTickets };
+    if (item.id === "messages") return { ...item, badge: newMessages };
+    return item;
+  });
+
+  const filteredOrders =
+    orderFilter === "all" ? orders : orders.filter((order) => order.status === orderFilter);
+
+  const filteredMessages =
+    messageFilter === "all" ? messages : messages.filter((item) => item.status === messageFilter);
+
+  const filteredUsers = users.filter((user) => {
+    const q = userQuery.trim().toLowerCase();
+    if (!q) return true;
+    return (
+      user.name.toLowerCase().includes(q) ||
+      user.email.toLowerCase().includes(q) ||
+      (user.phone || "").includes(q)
+    );
+  });
+
+  const recentOrders = [...orders].slice(0, 4);
+  const recentMessages = [...messages].slice(0, 4);
+
   return (
     <DashboardShell
       title="پنل ادمین"
       subtitle="مدیریت محتوا، کاربران، سفارش‌ها و تیکت‌ها"
-      nav={NAV}
+      nav={navWithBadges}
       active={tab}
       onNavigate={(id) => setTab(id as Tab)}
+      variant="admin"
     >
       {toast && <div className="admin-toast">{toast}</div>}
 
       {tab === "overview" && (
         <section>
-          <div className="dash-section-head">
-            <h2>نمای کلی</h2>
-            <p>خلاصه وضعیت پنل لیوبیز</p>
+          <div className="dash-hero">
+            <h2>سلام، به پنل مدیریت لیوبیز خوش آمدید</h2>
+            <p>
+              از اینجا می‌توانید لندینگ، سفارش‌ها، تیکت‌ها و پیام‌های تماس را مدیریت کنید. وضعیت
+              امروز را در یک نگاه ببینید.
+            </p>
+            <div className="dash-hero-meta">
+              <span className="dash-hero-chip">{overview?.stats.users ?? users.length} کاربر</span>
+              <span className="dash-hero-chip">{newOrders} سفارش جدید</span>
+              <span className="dash-hero-chip">{openTickets} تیکت باز</span>
+            </div>
           </div>
+
           <div className="dash-stats">
-            <article className="lux-card">
+            <article className="dash-stat-card">
+              <span className="dash-stat-icon">
+                <Users size={18} />
+              </span>
               <strong>{overview?.stats.users ?? "—"}</strong>
               <span>کاربر</span>
             </article>
-            <article className="lux-card">
-              <strong>{overview?.stats.newOrders ?? orders.filter((o) => o.status === "new").length}</strong>
+            <article className="dash-stat-card">
+              <span className="dash-stat-icon">
+                <ShoppingBag size={18} />
+              </span>
+              <strong>{newOrders}</strong>
               <span>سفارش جدید</span>
             </article>
-            <article className="lux-card">
-              <strong>{overview?.stats.newMessages ?? "—"}</strong>
+            <article className="dash-stat-card">
+              <span className="dash-stat-icon">
+                <Inbox size={18} />
+              </span>
+              <strong>{newMessages}</strong>
               <span>پیام جدید</span>
             </article>
-            <article className="lux-card">
-              <strong>{overview?.stats.openTickets ?? tickets.filter((t) => t.status === "open").length}</strong>
+            <article className="dash-stat-card">
+              <span className="dash-stat-icon">
+                <Ticket size={18} />
+              </span>
+              <strong>{openTickets}</strong>
               <span>تیکت باز</span>
             </article>
-            <article className="lux-card">
+            <article className="dash-stat-card">
+              <span className="dash-stat-icon">
+                <Layout size={18} />
+              </span>
               <strong>{overview?.stats.portfolio ?? "—"}</strong>
               <span>نمونه کار</span>
             </article>
-            <article className="lux-card">
+            <article className="dash-stat-card">
+              <span className="dash-stat-icon">
+                <LayoutDashboard size={18} />
+              </span>
               <strong>{overview?.stats.backstage ?? "—"}</strong>
               <span>بک‌استیج</span>
             </article>
+          </div>
+
+          <div className="dash-quick-grid">
+            <button type="button" className="dash-quick-card" onClick={() => setTab("landing")}>
+              <span className="dash-quick-card-icon">
+                <Layout size={18} />
+              </span>
+              <span>
+                <strong>مدیریت لندینگ</strong>
+                <small>ویرایش هیرو، پلن‌ها، FAQ و بیشتر</small>
+              </span>
+            </button>
+            <button type="button" className="dash-quick-card" onClick={() => setTab("orders")}>
+              <span className="dash-quick-card-icon">
+                <ShoppingBag size={18} />
+              </span>
+              <span>
+                <strong>سفارش‌ها</strong>
+                <small>تغییر وضعیت و آپلود فایل تحویل</small>
+              </span>
+            </button>
+            <button type="button" className="dash-quick-card" onClick={() => setTab("tickets")}>
+              <span className="dash-quick-card-icon">
+                <MessageSquare size={18} />
+              </span>
+              <span>
+                <strong>تیکت‌ها</strong>
+                <small>پاسخ به گفتگوهای کاربران</small>
+              </span>
+            </button>
+          </div>
+
+          <div className="dash-split-grid mt-5">
+            <div className="lux-card">
+              <div className="dash-panel-title">
+                <h3>آخرین سفارش‌ها</h3>
+                <button type="button" className="btn-outline" onClick={() => setTab("orders")}>
+                  همه
+                </button>
+              </div>
+              <div className="dash-mini-list">
+                {recentOrders.length === 0 ? (
+                  <p className="text-muted text-sm">سفارشی ثبت نشده.</p>
+                ) : (
+                  recentOrders.map((order) => (
+                    <div key={order.id} className="dash-mini-item">
+                      <div>
+                        <strong>{order.title}</strong>
+                        <span>{order.user?.name || "کاربر"}</span>
+                      </div>
+                      <span className={orderBadgeClass(order.status)}>
+                        {ORDER_STATUS[order.status] || order.status}
+                      </span>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+            <div className="lux-card">
+              <div className="dash-panel-title">
+                <h3>آخرین پیام‌های تماس</h3>
+                <button type="button" className="btn-outline" onClick={() => setTab("messages")}>
+                  همه
+                </button>
+              </div>
+              <div className="dash-mini-list">
+                {recentMessages.length === 0 ? (
+                  <p className="text-muted text-sm">پیامی ثبت نشده.</p>
+                ) : (
+                  recentMessages.map((item) => (
+                    <div key={item.id} className="dash-mini-item">
+                      <div>
+                        <strong>{item.name}</strong>
+                        <span>{item.message.length > 48 ? `${item.message.slice(0, 48)}…` : item.message}</span>
+                      </div>
+                      <span className={`dash-badge status-${item.status}`}>
+                        {item.status === "new" ? "جدید" : item.status === "read" ? "خوانده" : "بسته"}
+                      </span>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
           </div>
         </section>
       )}
@@ -309,13 +454,38 @@ export default function AdminPanel() {
         <section>
           <div className="dash-section-head">
             <h2>سفارش‌ها</h2>
-            <p>درخواست‌های همکاری کاربران</p>
+            <p>درخواست‌های همکاری کاربران — تغییر وضعیت و تحویل فایل</p>
+          </div>
+          <div className="dash-filter-bar">
+            <button
+              type="button"
+              className={`dash-filter-chip ${orderFilter === "all" ? "is-active" : ""}`}
+              onClick={() => setOrderFilter("all")}
+            >
+              همه ({orders.length})
+            </button>
+            {Object.entries(ORDER_STATUS).map(([key, label]) => (
+              <button
+                key={key}
+                type="button"
+                className={`dash-filter-chip ${orderFilter === key ? "is-active" : ""}`}
+                onClick={() => setOrderFilter(key as OrderFilter)}
+              >
+                {label} ({orders.filter((o) => o.status === key).length})
+              </button>
+            ))}
           </div>
           <div className="dash-list">
-            {orders.length === 0 ? (
-              <div className="lux-card text-muted">سفارشی ثبت نشده است.</div>
+            {filteredOrders.length === 0 ? (
+              <div className="dash-empty">
+                <span className="dash-empty-icon">
+                  <ShoppingBag size={22} />
+                </span>
+                <h3>سفارشی یافت نشد</h3>
+                <p>با فیلتر دیگری جستجو کنید یا منتظر ثبت سفارش جدید بمانید.</p>
+              </div>
             ) : (
-              orders.map((order) => (
+              filteredOrders.map((order) => (
                 <article key={order.id} className="lux-card dash-message">
                   <div className="dash-message-top">
                     <div>
@@ -325,20 +495,27 @@ export default function AdminPanel() {
                         {new Date(order.createdAt).toLocaleDateString("fa-IR")}
                       </p>
                     </div>
-                    <span className="dash-badge">{ORDER_STATUS[order.status] || order.status}</span>
+                    <span className={orderBadgeClass(order.status)}>
+                      {ORDER_STATUS[order.status] || order.status}
+                    </span>
                   </div>
                   <p className="dash-message-body">{order.description}</p>
-                  <div className="dash-message-actions flex-wrap">
-                    {Object.keys(ORDER_STATUS).map((status) => (
-                      <button
-                        key={status}
-                        type="button"
-                        className="btn-outline"
-                        onClick={() => updateOrder(order.id, status)}
-                      >
-                        {ORDER_STATUS[status]}
-                      </button>
-                    ))}
+                  <div className="dash-order-meta">
+                    <span>{order.user?.email || "—"}</span>
+                    <span>#{order.id}</span>
+                  </div>
+                  <div className="dash-order-actions">
+                    <select
+                      value={order.status}
+                      onChange={(e) => updateOrder(order.id, e.target.value)}
+                      aria-label="تغییر وضعیت سفارش"
+                    >
+                      {Object.entries(ORDER_STATUS).map(([status, label]) => (
+                        <option key={status} value={status}>
+                          {label}
+                        </option>
+                      ))}
+                    </select>
                     <label className="btn-primary cursor-pointer">
                       آپلود فایل تحویل
                       <input
@@ -373,31 +550,45 @@ export default function AdminPanel() {
         <section>
           <div className="dash-section-head">
             <h2>تیکت‌ها</h2>
-            <p>گفتگو با کاربران</p>
+            <p>گفتگو با کاربران — پاسخ‌ها به‌صورت چت نمایش داده می‌شوند</p>
           </div>
           <div className="dash-list">
             {tickets.length === 0 ? (
-              <div className="lux-card text-muted">تیکتی نیست.</div>
+              <div className="dash-empty">
+                <span className="dash-empty-icon">
+                  <MessageSquare size={22} />
+                </span>
+                <h3>تیکتی ثبت نشده</h3>
+                <p>وقتی کاربران تیکت بزنند، اینجا ظاهر می‌شود.</p>
+              </div>
             ) : (
               tickets.map((ticket) => (
                 <article key={ticket.id} className="lux-card dash-message">
                   <div className="dash-message-top">
                     <div>
                       <h3>{ticket.subject}</h3>
-                      <p>{ticket.user?.name || "کاربر"}</p>
+                      <p>{ticket.user?.name || "کاربر"} · {ticket.user?.email}</p>
                     </div>
-                    <span className="dash-badge">{TICKET_STATUS[ticket.status] || ticket.status}</span>
+                    <span className={ticketBadgeClass(ticket.status)}>
+                      {TICKET_STATUS[ticket.status] || ticket.status}
+                    </span>
                   </div>
-                  <div className="space-y-2 text-sm">
+                  <div className="dash-chat">
                     {(ticket.messages || []).map((m) => (
-                      <p key={m.id} className="rounded-lg bg-black/5 p-2">
-                        <strong>{m.senderRole === "admin" ? "ادمین" : "کاربر"}:</strong> {m.body}
-                      </p>
+                      <div
+                        key={m.id}
+                        className={`dash-chat-bubble ${m.senderRole === "admin" ? "is-admin" : "is-user"}`}
+                      >
+                        <span className="dash-chat-meta">
+                          {m.senderRole === "admin" ? "ادمین" : "کاربر"} ·{" "}
+                          {new Date(m.createdAt).toLocaleString("fa-IR")}
+                        </span>
+                        {m.body}
+                      </div>
                     ))}
                   </div>
-                  <div className="mt-3 flex gap-2">
+                  <div className="dash-reply-row">
                     <input
-                      className="flex-1 rounded-lg border px-3 py-2"
                       placeholder="پاسخ ادمین..."
                       value={reply[ticket.id] || ""}
                       onChange={(e) => setReply((v) => ({ ...v, [ticket.id]: e.target.value }))}
@@ -419,9 +610,24 @@ export default function AdminPanel() {
             <h2>کاربران</h2>
             <p>مسدودسازی، فعال‌سازی و حذف کاربران</p>
           </div>
+          <div className="dash-toolbar">
+            <input
+              className="dash-search"
+              placeholder="جستجو بر اساس نام، ایمیل یا تلفن..."
+              value={userQuery}
+              onChange={(e) => setUserQuery(e.target.value)}
+            />
+            <span className="text-muted text-sm">{filteredUsers.length} کاربر</span>
+          </div>
           <div className="dash-table lux-card">
-            {users.length === 0 ? (
-              <p className="text-muted">هنوز کاربری ثبت‌نام نکرده است.</p>
+            {filteredUsers.length === 0 ? (
+              <div className="dash-empty">
+                <span className="dash-empty-icon">
+                  <UserPlus size={22} />
+                </span>
+                <h3>کاربری یافت نشد</h3>
+                <p>هنوز کسی ثبت‌نام نکرده یا نتیجه‌ای برای جستجو نیست.</p>
+              </div>
             ) : (
               <table>
                 <thead>
@@ -434,12 +640,16 @@ export default function AdminPanel() {
                   </tr>
                 </thead>
                 <tbody>
-                  {users.map((user) => (
+                  {filteredUsers.map((user) => (
                     <tr key={user.id}>
                       <td>{user.name}</td>
                       <td dir="ltr">{user.email}</td>
                       <td dir="ltr">{user.phone || "—"}</td>
-                      <td>{user.blocked ? "مسدود" : "فعال"}</td>
+                      <td>
+                        <span className={`dash-badge ${user.blocked ? "order-cancelled" : "order-completed"}`}>
+                          {user.blocked ? "مسدود" : "فعال"}
+                        </span>
+                      </td>
                       <td className="space-x-2 space-x-reverse">
                         <button
                           type="button"
@@ -467,17 +677,46 @@ export default function AdminPanel() {
             <h2>پیام‌های تماس</h2>
             <p>درخواست‌هایی که از صفحه تماس ارسال شده‌اند</p>
           </div>
+          <div className="dash-filter-bar">
+            {(
+              [
+                ["all", "همه"],
+                ["new", "جدید"],
+                ["read", "خوانده‌شده"],
+                ["closed", "بسته"],
+              ] as const
+            ).map(([key, label]) => (
+              <button
+                key={key}
+                type="button"
+                className={`dash-filter-chip ${messageFilter === key ? "is-active" : ""}`}
+                onClick={() => setMessageFilter(key)}
+              >
+                {label}
+                {key === "all"
+                  ? ` (${messages.length})`
+                  : ` (${messages.filter((m) => m.status === key).length})`}
+              </button>
+            ))}
+          </div>
           <div className="dash-list">
-            {messages.length === 0 ? (
-              <div className="lux-card text-muted">پیامی ثبت نشده است.</div>
+            {filteredMessages.length === 0 ? (
+              <div className="dash-empty">
+                <span className="dash-empty-icon">
+                  <Mail size={22} />
+                </span>
+                <h3>پیامی یافت نشد</h3>
+                <p>پیام‌های فرم تماس اینجا نمایش داده می‌شوند.</p>
+              </div>
             ) : (
-              messages.map((item) => (
+              filteredMessages.map((item) => (
                 <article key={item.id} className="lux-card dash-message">
                   <div className="dash-message-top">
                     <div>
                       <h3>{item.name}</h3>
                       <p dir="ltr">
-                        {item.email} · {item.phone}
+                        {item.email} · {item.phone} ·{" "}
+                        {new Date(item.createdAt).toLocaleDateString("fa-IR")}
                       </p>
                     </div>
                     <span className={`dash-badge status-${item.status}`}>

@@ -12,6 +12,14 @@ import {
 } from "lucide-react";
 import DashboardShell from "@/components/dashboard/DashboardShell";
 import { SERVICES } from "@/lib/constants";
+import {
+  ORDER_STATUS_CLIENT,
+  TICKET_STATUS_LABELS,
+  ORDER_FLOW,
+  orderBadgeClass,
+  ticketBadgeClass,
+  orderProgressIndex,
+} from "@/lib/dashboard-ui";
 
 type Tab = "home" | "profile" | "orders" | "tickets" | "files" | "notifications";
 
@@ -60,19 +68,8 @@ const NAV = [
   { id: "profile", label: "پروفایل", icon: UserRound },
 ];
 
-const ORDER_STATUS: Record<string, string> = {
-  new: "جدید",
-  review: "در حال بررسی",
-  in_progress: "در حال انجام",
-  completed: "تکمیل‌شده",
-  cancelled: "لغو شده",
-};
-
-const TICKET_STATUS: Record<string, string> = {
-  open: "باز",
-  answered: "پاسخ‌داده‌شده",
-  closed: "بسته",
-};
+const ORDER_STATUS = ORDER_STATUS_CLIENT;
+const TICKET_STATUS = TICKET_STATUS_LABELS;
 
 export default function ClientDashboard() {
   const router = useRouter();
@@ -235,38 +232,65 @@ export default function ClientDashboard() {
     return <div className="dash-loading">در حال بارگذاری پنل...</div>;
   }
 
+  const unreadNotifs = notifications.filter((n) => !n.read).length;
+  const activeTickets = tickets.filter((t) => t.status !== "closed").length;
+
+  const navWithBadges = NAV.map((item) => {
+    if (item.id === "notifications") return { ...item, badge: unreadNotifs };
+    if (item.id === "tickets") return { ...item, badge: activeTickets };
+    return item;
+  });
+
   return (
     <DashboardShell
       title="پنل کاربری"
       subtitle={user ? `سلام ${user.name}` : "حساب مشتری لیوبیز"}
-      nav={NAV}
+      nav={navWithBadges}
       active={tab}
       onNavigate={(id) => setTab(id as Tab)}
+      variant="client"
     >
       {toast && <div className="admin-toast">{toast}</div>}
 
       {tab === "home" && (
         <section>
-          <div className="dash-section-head">
-            <h2>خانه</h2>
-            <p>خلاصه وضعیت حساب شما</p>
+          <div className="dash-hero">
+            <h2>{user ? `سلام ${user.name}، خوش آمدید` : "پنل کاربری لیوبیز"}</h2>
+            <p>
+              از اینجا سفارش جدید ثبت کنید، وضعیت پروژه‌ها را ببینید و با پشتیبانی گفتگو کنید.
+            </p>
+            <div className="dash-hero-meta">
+              <span className="dash-hero-chip">{orders.length} سفارش</span>
+              <span className="dash-hero-chip">{activeTickets} تیکت فعال</span>
+              <span className="dash-hero-chip">{unreadNotifs} اعلان جدید</span>
+            </div>
           </div>
           <div className="dash-stats">
-            <article className="lux-card">
+            <article className="dash-stat-card">
+              <span className="dash-stat-icon">
+                <ShoppingBag size={18} />
+              </span>
               <strong>{orders.length}</strong>
               <span>سفارش</span>
             </article>
-            <article className="lux-card">
-              <strong>{tickets.filter((t) => t.status !== "closed").length}</strong>
+            <article className="dash-stat-card">
+              <span className="dash-stat-icon">
+                <MessageSquare size={18} />
+              </span>
+              <strong>{activeTickets}</strong>
               <span>تیکت فعال</span>
             </article>
-            <article className="lux-card">
-              <strong>{notifications.filter((n) => !n.read).length}</strong>
+            <article className="dash-stat-card">
+              <span className="dash-stat-icon">
+                <Bell size={18} />
+              </span>
+              <strong>{unreadNotifs}</strong>
               <span>اعلان خوانده‌نشده</span>
             </article>
           </div>
           <div className="lux-card mt-5">
             <h3 className="mb-2 text-lg font-bold">ثبت سفارش جدید</h3>
+            <p className="mb-4 text-sm text-muted">نیاز پروژه خود را توضیح دهید تا تیم لیوبیز بررسی کند.</p>
             <form className="contact-form" onSubmit={createOrder}>
               <input
                 placeholder="عنوان پروژه"
@@ -312,22 +336,48 @@ export default function ClientDashboard() {
           </div>
           <div className="dash-list">
             {orders.length === 0 ? (
-              <div className="lux-card text-muted">هنوز سفارشی ندارید.</div>
+              <div className="dash-empty">
+                <span className="dash-empty-icon">
+                  <ShoppingBag size={22} />
+                </span>
+                <h3>هنوز سفارشی ندارید</h3>
+                <p>از تب خانه یک درخواست همکاری جدید ثبت کنید.</p>
+                <button type="button" className="btn-primary mt-2" onClick={() => setTab("home")}>
+                  ثبت سفارش
+                </button>
+              </div>
             ) : (
-              orders.map((order) => (
-                <article key={order.id} className="lux-card dash-message">
-                  <div className="dash-message-top">
-                    <div>
-                      <h3>{order.title}</h3>
-                      <p>
-                        {order.service} · {new Date(order.createdAt).toLocaleDateString("fa-IR")}
-                      </p>
+              orders.map((order) => {
+                const progress = orderProgressIndex(order.status);
+                return (
+                  <article key={order.id} className="lux-card dash-message">
+                    <div className="dash-message-top">
+                      <div>
+                        <h3>{order.title}</h3>
+                        <p>
+                          {order.service} · {new Date(order.createdAt).toLocaleDateString("fa-IR")}
+                        </p>
+                      </div>
+                      <span className={orderBadgeClass(order.status)}>
+                        {ORDER_STATUS[order.status] || order.status}
+                      </span>
                     </div>
-                    <span className="dash-badge">{ORDER_STATUS[order.status] || order.status}</span>
-                  </div>
-                  <p className="dash-message-body">{order.description}</p>
-                </article>
-              ))
+                    <p className="dash-message-body">{order.description}</p>
+                    {order.status !== "cancelled" && (
+                      <div className="dash-progress" aria-label="پیشرفت سفارش">
+                        {ORDER_FLOW.map((step, index) => (
+                          <span
+                            key={step}
+                            className={`dash-progress-step ${
+                              index < progress ? "is-done" : index === progress ? "is-current" : ""
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </article>
+                );
+              })
             )}
           </div>
         </section>
@@ -358,32 +408,50 @@ export default function ClientDashboard() {
             </button>
           </form>
           <div className="dash-list">
-            {tickets.map((ticket) => (
-              <article key={ticket.id} className="lux-card dash-message">
-                <div className="dash-message-top">
-                  <h3>{ticket.subject}</h3>
-                  <span className="dash-badge">{TICKET_STATUS[ticket.status] || ticket.status}</span>
-                </div>
-                <div className="space-y-2 text-sm">
-                  {(ticket.messages || []).map((m) => (
-                    <p key={m.id} className="rounded-lg bg-black/5 p-2">
-                      <strong>{m.senderRole === "admin" ? "پشتیبانی" : "شما"}:</strong> {m.body}
-                    </p>
-                  ))}
-                </div>
-                <div className="mt-3 flex gap-2">
-                  <input
-                    className="flex-1 rounded-lg border px-3 py-2"
-                    placeholder="پاسخ شما..."
-                    value={reply[ticket.id] || ""}
-                    onChange={(e) => setReply((v) => ({ ...v, [ticket.id]: e.target.value }))}
-                  />
-                  <button type="button" className="btn-primary" onClick={() => replyTicket(ticket.id)}>
-                    ارسال
-                  </button>
-                </div>
-              </article>
-            ))}
+            {tickets.length === 0 ? (
+              <div className="dash-empty">
+                <span className="dash-empty-icon">
+                  <MessageSquare size={22} />
+                </span>
+                <h3>تیکتی ثبت نشده</h3>
+                <p>برای سوال یا پیگیری، یک تیکت جدید بسازید.</p>
+              </div>
+            ) : (
+              tickets.map((ticket) => (
+                <article key={ticket.id} className="lux-card dash-message">
+                  <div className="dash-message-top">
+                    <h3>{ticket.subject}</h3>
+                    <span className={ticketBadgeClass(ticket.status)}>
+                      {TICKET_STATUS[ticket.status] || ticket.status}
+                    </span>
+                  </div>
+                  <div className="dash-chat">
+                    {(ticket.messages || []).map((m) => (
+                      <div
+                        key={m.id}
+                        className={`dash-chat-bubble ${m.senderRole === "admin" ? "is-admin" : "is-user"}`}
+                      >
+                        <span className="dash-chat-meta">
+                          {m.senderRole === "admin" ? "پشتیبانی" : "شما"} ·{" "}
+                          {new Date(m.createdAt).toLocaleString("fa-IR")}
+                        </span>
+                        {m.body}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="dash-reply-row">
+                    <input
+                      placeholder="پاسخ شما..."
+                      value={reply[ticket.id] || ""}
+                      onChange={(e) => setReply((v) => ({ ...v, [ticket.id]: e.target.value }))}
+                    />
+                    <button type="button" className="btn-primary" onClick={() => replyTicket(ticket.id)}>
+                      ارسال
+                    </button>
+                  </div>
+                </article>
+              ))
+            )}
           </div>
         </section>
       )}
@@ -396,12 +464,25 @@ export default function ClientDashboard() {
           </div>
           <div className="dash-list">
             {allFiles.length === 0 ? (
-              <div className="lux-card text-muted">فایلی موجود نیست.</div>
+              <div className="dash-empty">
+                <span className="dash-empty-icon">
+                  <FolderOpen size={22} />
+                </span>
+                <h3>فایلی موجود نیست</h3>
+                <p>پس از تکمیل سفارش، فایل‌های تحویل اینجا قرار می‌گیرند.</p>
+              </div>
             ) : (
               allFiles.map((f) => (
                 <article key={f.id} className="lux-card dash-message">
-                  <h3>{f.fileName}</h3>
-                  <p className="text-muted">سفارش: {f.orderTitle}</p>
+                  <div className="dash-file-card">
+                    <span className="dash-file-icon">
+                      <FolderOpen size={18} />
+                    </span>
+                    <div>
+                      <h3>{f.fileName}</h3>
+                      <p className="text-muted">سفارش: {f.orderTitle}</p>
+                    </div>
+                  </div>
                   <a href={f.fileUrl} className="btn-primary mt-3 inline-flex" target="_blank" rel="noreferrer">
                     دانلود
                   </a>
@@ -425,13 +506,24 @@ export default function ClientDashboard() {
           </div>
           <div className="dash-list">
             {notifications.length === 0 ? (
-              <div className="lux-card text-muted">اعلانی نیست.</div>
+              <div className="dash-empty">
+                <span className="dash-empty-icon">
+                  <Bell size={22} />
+                </span>
+                <h3>اعلانی نیست</h3>
+                <p>به‌روزرسانی‌های سفارش و تیکت اینجا نمایش داده می‌شود.</p>
+              </div>
             ) : (
               notifications.map((n) => (
                 <article
                   key={n.id}
-                  className={`lux-card dash-message ${n.read ? "opacity-70" : ""}`}
+                  className={`lux-card dash-message ${n.read ? "opacity-70" : "dash-notif-unread"}`}
                   onClick={() => markNotif(n.id)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") markNotif(n.id);
+                  }}
                 >
                   <h3>{n.title}</h3>
                   <p className="dash-message-body">{n.body}</p>
@@ -450,6 +542,9 @@ export default function ClientDashboard() {
             <p>اطلاعات حساب خود را به‌روز کنید</p>
           </div>
           <form className="lux-card contact-form max-w-xl" onSubmit={saveProfile}>
+            <div className="dash-profile-avatar" aria-hidden="true">
+              {(user?.name || "؟").charAt(0)}
+            </div>
             <label className="contact-field">
               <span>نام</span>
               <input value={name} onChange={(e) => setName(e.target.value)} required />

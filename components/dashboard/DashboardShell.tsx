@@ -10,6 +10,7 @@ export type DashNavItem = {
   id: string;
   label: string;
   icon?: LucideIcon;
+  badge?: number;
 };
 
 export default function DashboardShell({
@@ -20,6 +21,7 @@ export default function DashboardShell({
   onNavigate,
   children,
   homeHref = "/",
+  variant = "client",
 }: {
   title: string;
   subtitle: string;
@@ -28,6 +30,7 @@ export default function DashboardShell({
   onNavigate: (id: string) => void;
   children: ReactNode;
   homeHref?: string;
+  variant?: "admin" | "client";
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -69,6 +72,11 @@ export default function DashboardShell({
               </span>
             ) : null}
             <span>{item.label}</span>
+            {item.badge && item.badge > 0 ? (
+              <span className="dash-nav-badge" aria-label={`${item.badge} مورد جدید`}>
+                {item.badge > 99 ? "99+" : item.badge}
+              </span>
+            ) : null}
           </button>
         );
       })}
@@ -76,8 +84,8 @@ export default function DashboardShell({
   );
 
   return (
-    <div className="dash-page">
-      <div className="dash-topbar lg:hidden">
+    <div className={`dash-page dash-page--${variant}`}>
+      <div className="dash-topbar">
         <Logo height={40} />
         <div className="dash-topbar-copy">
           <strong>{title}</strong>
@@ -96,7 +104,7 @@ export default function DashboardShell({
       {open && (
         <button
           type="button"
-          className="dash-drawer-backdrop lg:hidden"
+          className="dash-drawer-backdrop"
           aria-label="بستن منو"
           onClick={() => setOpen(false)}
         />
@@ -104,15 +112,10 @@ export default function DashboardShell({
 
       <div className="dash-shell">
         <aside className={`dash-sidebar lux-card ${open ? "is-open" : ""}`}>
-          <div className="dash-sidebar-brand hidden lg:block">
-            <Logo width={120} />
-            <div className="dash-sidebar-copy">
-              <h1>{title}</h1>
-              <p>{subtitle}</p>
+          <div className="dash-sidebar-brand">
+            <div className="dash-sidebar-logo">
+              <Logo width={120} />
             </div>
-          </div>
-
-          <div className="dash-sidebar-brand lg:hidden">
             <div className="dash-sidebar-copy">
               <h1>{title}</h1>
               <p>{subtitle}</p>

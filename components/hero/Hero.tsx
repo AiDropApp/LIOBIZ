@@ -22,8 +22,12 @@ export default function Hero() {
       .catch(() => undefined);
   }, []);
 
-  const media = landing.heroMediaUrl || "/videos/header.mp4";
-  const isVideo = landing.heroMediaType === "video" || media.endsWith(".mp4") || media.endsWith(".webm");
+  // Old Clarimol demo video breaks the hero; always fall back to brand artwork.
+  const rawMedia = landing.heroMediaUrl || "/images/hero-lion.png";
+  const media = rawMedia.includes("/videos/header.mp4") ? "/images/hero-lion.png" : rawMedia;
+  const isVideo =
+    media !== "/images/hero-lion.png" &&
+    (landing.heroMediaType === "video" || media.endsWith(".mp4") || media.endsWith(".webm"));
 
   return (
     <section id="home" className="hero-section">

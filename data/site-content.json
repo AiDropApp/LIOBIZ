@@ -440,7 +440,7 @@
     "heroSecondaryCta": "مشاهده خدمات",
     "heroSecondaryHref": "/#services",
     "heroMediaType": "video",
-    "heroMediaUrl": "/videos/header.mp4",
+    "heroMediaUrl": "/api/media/hero/1784228574373-wacbo0.mp4",
     "heroStats": [
       {
         "value": "98%",
