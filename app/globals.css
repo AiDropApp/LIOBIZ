@@ -1777,6 +1777,12 @@ main > section:not(.hero-section):not(.backstage-section):not(.portfolio-section
   grid-template-columns: 1fr;
 }
 
+@media (min-width: 700px) and (max-width: 899px) {
+  .plans-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (min-width: 900px) {
   .plans-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -2645,5 +2651,186 @@ main > section:not(.hero-section):not(.backstage-section):not(.portfolio-section
 
   .plan-card.is-featured:hover {
     transform: translateY(-12px) scale(1.02);
+  }
+}
+
+/* ===== Global responsive hardening ===== */
+html,
+body {
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  touch-action: manipulation;
+}
+
+@media (max-width: 767px) {
+  .section-block {
+    padding-block: 3.5rem;
+  }
+
+  .section-title {
+    font-size: clamp(1.45rem, 6.2vw, 1.9rem) !important;
+    line-height: 1.35 !important;
+  }
+
+  .hero-panel {
+    min-height: 100svh;
+  }
+
+  .hero-panel-inner {
+    padding: calc(var(--header-h) + 0.75rem) 0 8.5rem;
+  }
+
+  .hero-heading {
+    font-size: clamp(1.7rem, 8vw, 2.35rem) !important;
+  }
+
+  .hero-desc {
+    margin-inline: auto;
+    font-size: 0.92rem !important;
+  }
+
+  .hero-cta-row {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+  }
+
+  .hero-cta-row .btn-primary,
+  .hero-cta-row .btn-outline,
+  .hero-cta-row a {
+    flex: 1 1 140px;
+    justify-content: center;
+    min-height: 2.75rem;
+  }
+
+  .hero-stats-bridge {
+    bottom: 12px;
+    width: min(100% - 1.5rem, var(--page-max));
+  }
+
+  .portfolio-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.7rem;
+  }
+
+  .portfolio-card-meta {
+    padding: 0.7rem 0.75rem;
+  }
+
+  .portfolio-card-meta h3 {
+    font-size: 0.86rem;
+  }
+
+  .nav-dropdown {
+    width: min(92vw, 320px);
+  }
+
+  .header-bar {
+    gap: 0.55rem;
+    padding-inline: 0.85rem;
+  }
+
+  .header-menu-btn,
+  .header-login-btn {
+    min-width: 2.5rem;
+    min-height: 2.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .portfolio-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.55rem;
+  }
+
+  .filter-chip {
+    font-size: 0.78rem;
+    padding: 0.4rem 0.7rem;
+  }
+
+  .about-liobiz-visual {
+    min-height: 320px;
+    padding: 1.25rem 0 1rem 1rem;
+  }
+
+  .about-liobiz-main {
+    margin-inline-start: 8%;
+    max-height: 380px;
+  }
+
+  .about-liobiz-float {
+    width: min(46%, 160px);
+  }
+}
+
+/* Tablet */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .portfolio-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .hero-copy {
+    max-width: 28rem;
+  }
+
+  .dash-shell {
+    padding: 1rem 1.15rem 2rem;
+  }
+}
+
+/* Large desktop / TV */
+@media (min-width: 1440px) {
+  :root {
+    --page-gutter: 2rem;
+    --section-y: 6rem;
+    --section-y-lg: 7.5rem;
+  }
+
+  .dash-shell {
+    max-width: 1600px;
+  }
+}
+
+@media (min-width: 1920px) {
+  :root {
+    --page-max: 100rem;
+  }
+
+  .hero-heading {
+    font-size: clamp(2.6rem, 3.2vw, 3.4rem) !important;
+  }
+
+  .section-title {
+    font-size: clamp(2.1rem, 2.2vw, 2.75rem) !important;
+  }
+}
+
+/* Prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .portfolio-card,
+  .dash-stats article,
+  .lux-card {
+    transition: none !important;
+  }
+}
+
+/* Standalone PWA chrome */
+@media (display-mode: standalone) {
+  body {
+    padding-top: env(safe-area-inset-top);
   }
 }

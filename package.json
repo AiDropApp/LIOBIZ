@@ -9,7 +9,8 @@
     "lint": "next lint",
     "db:seed": "tsx scripts/seed-db.ts",
     "screenshots": "node scripts/capture-screenshots.mjs",
-    "screenshots:audit": "node scripts/capture-ui-audit.mjs"
+    "screenshots:audit": "node scripts/capture-ui-audit.mjs",
+    "pwa:icons": "node scripts/generate-pwa-icons.mjs"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

@@ -89,6 +89,21 @@
 }
 
 @media (max-width: 720px) {
+  .cp-avatars {
+    gap: 0.35rem;
+    margin-bottom: 1.75rem;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    justify-content: flex-start;
+    padding: 0.25rem 0.75rem 0.5rem;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .cp-avatars::-webkit-scrollbar {
+    display: none;
+  }
+
   .cp-avatar {
     width: 48px;
     height: 48px;
@@ -97,6 +112,14 @@
   .cp-avatar--active {
     width: 60px;
     height: 60px;
+  }
+
+  .cp-video-wrap {
+    min-height: 200px;
+  }
+
+  .cp-copy__name {
+    font-size: 1.45rem;
   }
 }
 

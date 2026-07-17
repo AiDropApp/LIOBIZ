@@ -1521,3 +1521,118 @@
 .dash-page--client .dash-stat-card strong {
   color: #2563eb;
 }
+
+/* Dashboard responsive hardening */
+@media (max-width: 767px) {
+  .dash-shell {
+    padding: 0.75rem 0.75rem 1.5rem;
+  }
+
+  .dash-hero {
+    padding: 1.1rem 1rem;
+    border-radius: 0.95rem;
+  }
+
+  .dash-hero h2 {
+    font-size: 1.1rem;
+  }
+
+  .dash-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.65rem;
+  }
+
+  .dash-stat-card {
+    padding: 0.85rem 0.55rem;
+  }
+
+  .dash-stat-card strong {
+    font-size: 1.25rem;
+  }
+
+  .dash-quick-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dash-filter-bar {
+    gap: 0.35rem;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 0.25rem;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .dash-filter-chip {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  .dash-reply-row {
+    flex-direction: column;
+  }
+
+  .dash-reply-row .btn-primary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .landing-section-nav {
+    top: 0.5rem;
+  }
+
+  .landing-section-nav-track {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 0.45rem;
+    gap: 0.35rem;
+  }
+
+  .landing-nav-chip {
+    flex: 0 0 auto;
+    padding: 0.45rem 0.7rem;
+  }
+
+  .landing-nav-label {
+    font-size: 0.76rem;
+  }
+
+  .dash-order-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .dash-order-actions select,
+  .dash-order-actions .btn-primary,
+  .dash-order-actions label.btn-primary {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .dash-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .dash-sidebar {
+    width: min(70vw, 22rem);
+  }
+}
+
+@media (min-width: 1440px) {
+  .dash-shell {
+    max-width: 1600px;
+    grid-template-columns: 300px minmax(0, 1fr);
+  }
+}
+
+@media (display-mode: standalone) {
+  .dash-topbar {
+    padding-top: max(0.75rem, env(safe-area-inset-top));
+  }
+
+  .dash-sidebar.is-open {
+    padding-top: max(1.1rem, env(safe-area-inset-top));
+  }
+}

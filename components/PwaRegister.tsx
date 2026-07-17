@@ -1,26 +1,39 @@
 "use client";
 
 import { useEffect } from "react";
+import { PwaInstallPrompt } from "@/components/PwaInstallPrompt";
 
 export default function PwaRegister() {
   useEffect(() => {
     if (!("serviceWorker" in navigator)) return;
 
-    const cleanup = async () => {
+    let cancelled = false;
+
+    const register = async () => {
       try {
-        const regs = await navigator.serviceWorker.getRegistrations();
-        await Promise.all(regs.map((reg) => reg.unregister()));
-        if ("caches" in window) {
-          const keys = await caches.keys();
-          await Promise.all(keys.map((key) => caches.delete(key)));
+        const reg = await navigator.serviceWorker.register("/sw.js", { scope: "/" });
+        await navigator.serviceWorker.ready;
+
+        // First visit: SW installed but not yet controlling — one soft reload unlocks installability.
+        if (!navigator.serviceWorker.controller && !sessionStorage.getItem("liobiz-sw-reloaded")) {
+          sessionStorage.setItem("liobiz-sw-reloaded", "1");
+          window.location.reload();
+          return;
         }
-      } catch {
-        // ignore
+
+        if (reg.waiting) {
+          reg.waiting.postMessage({ type: "SKIP_WAITING" });
+        }
+      } catch (err) {
+        if (!cancelled) console.warn("[PWA] SW register failed", err);
       }
     };
 
-    cleanup();
+    register();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  return null;
+  return <PwaInstallPrompt lang="fa" />;
 }
