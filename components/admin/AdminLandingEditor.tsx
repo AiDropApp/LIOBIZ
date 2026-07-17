@@ -303,7 +303,9 @@ export default function AdminLandingEditor() {
           >
             <Field label="برچسب" value={landing.portfolioLabel} onChange={(v) => patchLanding("portfolioLabel", v)} />
             <Field label="تیتر" value={landing.portfolioTitle} onChange={(v) => patchLanding("portfolioTitle", v)} />
-            <p className="landing-section-hint">{content.portfolio.length} کارت — فرم افزودن بالا، لیست جمع‌شونده برای ویرایش</p>
+            <p className="landing-section-hint">
+              {content.portfolioCategories?.length || 0} تب · {content.portfolio.length} کارت — تب‌ها و نمونه‌کارها را پایین مدیریت کنید
+            </p>
             <div className="admin-editor-shell">
               <AdminEditor embedded compact sectionOnly="portfolio" onContentChange={setContent} />
             </div>

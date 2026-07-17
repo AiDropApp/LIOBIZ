@@ -88,10 +88,9 @@ export default function PortfolioDetailModal({
                   mediaKind={item.mediaKind}
                   aspectRatio={item.aspectRatio ?? "portrait"}
                   alt={item.title}
-                  fill
-                  fitParent
-                  sizes="(max-width: 1024px) 100vw, 55vw"
-                  className="object-contain"
+                  natural
+                  controls
+                  objectFit="contain"
                   priority
                 />
               </div>

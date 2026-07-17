@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { isGoogleDriveUrl, isVideoUrl, toPlayableVideoUrl } from "@/lib/media-types";
 
 type Props = {
   label: string;
@@ -38,13 +39,15 @@ export default function MediaUrlField({
     }
   };
 
+  const showVideo = isVideoUrl(value);
+
   return (
     <div className="landing-media-field">
       <label className="contact-field">
         <span>{label}</span>
         <input
           dir="ltr"
-          placeholder="https://... یا /api/media/..."
+          placeholder="https://... یا لینک Google Drive یا /api/media/..."
           value={value}
           onChange={(e) => onChange(e.target.value)}
         />
@@ -65,8 +68,18 @@ export default function MediaUrlField({
       </label>
       {value && (
         <div className="landing-media-preview">
-          {/\.(mp4|webm)(\?|$)/i.test(value) ? (
-            <video src={value} muted playsInline controls className="max-h-32 rounded-lg" />
+          {showVideo ? (
+            isGoogleDriveUrl(value) ? (
+              <iframe
+                src={toPlayableVideoUrl(value)}
+                title="پیش‌نمایش ویدیو"
+                className="landing-media-preview-frame"
+                allow="autoplay; encrypted-media; fullscreen"
+                allowFullScreen
+              />
+            ) : (
+              <video src={toPlayableVideoUrl(value)} muted playsInline controls className="max-h-32 rounded-lg" />
+            )
           ) : (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={value} alt="" className="max-h-32 rounded-lg object-cover" />

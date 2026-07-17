@@ -1,21 +1,27 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import ContentImage from "@/components/ContentImage";
-import CmsMedia from "@/components/CmsMedia";
 import MediaItemFields from "@/components/admin/landing/MediaItemFields";
 import LandingItemCard from "@/components/admin/landing/LandingItemCard";
-import { PORTFOLIO_FILTERS } from "@/lib/constants";
-import { resolveMediaKind, type MediaAspect, type MediaKind } from "@/lib/media-types";
+import {
+  isGoogleDriveUrl,
+  resolveMediaKind,
+  toGoogleDriveThumbnailUrl,
+  toPlayableVideoUrl,
+  type MediaAspect,
+  type MediaKind,
+} from "@/lib/media-types";
 import type { BackstageItem, PortfolioItem, SiteContent } from "@/lib/content-store";
+import { sortCategories } from "@/lib/portfolio";
 
 type Tab = "portfolio" | "backstage";
 
 type PortfolioForm = {
   title: string;
-  category: string;
+  categoryId: string;
   image: string;
   videoSrc: string;
   mediaKind: MediaKind;
@@ -33,9 +39,9 @@ type BackstageForm = {
   aspectRatio: MediaAspect;
 };
 
-const emptyPortfolio: PortfolioForm = {
+const emptyPortfolio = (categoryId = ""): PortfolioForm => ({
   title: "",
-  category: "برندینگ",
+  categoryId,
   image: "",
   videoSrc: "",
   mediaKind: "image",
@@ -43,7 +49,7 @@ const emptyPortfolio: PortfolioForm = {
   description: "",
   client: "",
   year: "",
-};
+});
 
 const emptyBackstage: BackstageForm = {
   caption: "",
@@ -69,14 +75,22 @@ export default function AdminEditor({
   const [content, setContent] = useState<SiteContent | null>(null);
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
-  const [portfolioForm, setPortfolioForm] = useState(emptyPortfolio);
+  const [newTabName, setNewTabName] = useState("");
+  const [portfolioForm, setPortfolioForm] = useState(emptyPortfolio());
   const [backstageForm, setBackstageForm] = useState(emptyBackstage);
+
+  const categories = useMemo(
+    () => sortCategories(content?.portfolioCategories || []),
+    [content?.portfolioCategories],
+  );
 
   const load = async () => {
     const res = await fetch("/api/content", { cache: "no-store" });
     const data = (await res.json()) as SiteContent;
     setContent(data);
     onContentChange?.(data);
+    const firstId = sortCategories(data.portfolioCategories || [])[0]?.id || "";
+    setPortfolioForm((prev) => (prev.categoryId ? prev : emptyPortfolio(firstId)));
   };
 
   useEffect(() => {
@@ -88,10 +102,91 @@ export default function AdminEditor({
     setTimeout(() => setMessage(""), 2500);
   };
 
+  const applyContent = (next: SiteContent) => {
+    setContent(next);
+    onContentChange?.(next);
+  };
+
+  const addCategoryTab = async () => {
+    const name = newTabName.trim();
+    if (!name) {
+      refreshMessage("نام تب را بنویسید.");
+      return;
+    }
+    setBusy(true);
+    try {
+      const res = await fetch("/api/content/manage", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "portfolio-category", name }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      applyContent(data.content);
+      const firstId = sortCategories(data.content.portfolioCategories || [])[0]?.id || "";
+      setPortfolioForm((v) => ({ ...v, categoryId: v.categoryId || firstId }));
+      setNewTabName("");
+      refreshMessage("تب اضافه شد.");
+    } catch (error) {
+      refreshMessage(error instanceof Error ? error.message : "خطا");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const saveCategoryTab = async (id: string, name: string) => {
+    const trimmed = name.trim();
+    if (!trimmed) return;
+    setBusy(true);
+    try {
+      const res = await fetch("/api/content/manage", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "portfolio-category", id, name: trimmed }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      applyContent(data.content);
+      refreshMessage("تب ذخیره شد.");
+    } catch (error) {
+      refreshMessage(error instanceof Error ? error.message : "خطا");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const removeCategoryTab = async (id: string) => {
+    if (!confirm("این تب حذف شود؟ فقط وقتی خالی باشد ممکن است.")) return;
+    setBusy(true);
+    try {
+      const res = await fetch("/api/content/manage", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "portfolio-category", id }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+      applyContent(data.content);
+      refreshMessage("تب حذف شد.");
+    } catch (error) {
+      refreshMessage(error instanceof Error ? error.message : "خطا");
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const addPortfolio = async () => {
     const needsVideo = portfolioForm.mediaKind === "video";
-    if (!portfolioForm.title.trim() || (!portfolioForm.image && !needsVideo) || (needsVideo && !portfolioForm.videoSrc)) {
-      refreshMessage("عنوان و مدia (تصویر یا ویدیو) الزامی است.");
+    if (!portfolioForm.categoryId) {
+      refreshMessage("ابتدا یک تب/دسته بسازید.");
+      return;
+    }
+    if (
+      !portfolioForm.title.trim() ||
+      !portfolioForm.image.trim() ||
+      (needsVideo && !portfolioForm.videoSrc.trim())
+    ) {
+      refreshMessage("عنوان و کاور الزامی است؛ برای ویدیو لینک/فایل ویدیو هم لازم است.");
       return;
     }
     setBusy(true);
@@ -103,9 +198,8 @@ export default function AdminEditor({
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message);
-      setContent(data.content);
-      onContentChange?.(data.content);
-      setPortfolioForm(emptyPortfolio);
+      applyContent(data.content);
+      setPortfolioForm(emptyPortfolio(portfolioForm.categoryId));
       refreshMessage("نمونه کار اضافه شد.");
     } catch (error) {
       refreshMessage(error instanceof Error ? error.message : "خطا");
@@ -116,8 +210,12 @@ export default function AdminEditor({
 
   const addBackstage = async () => {
     const needsVideo = backstageForm.mediaKind === "video";
-    if (!backstageForm.caption.trim() || (!backstageForm.image && !needsVideo) || (needsVideo && !backstageForm.videoSrc)) {
-      refreshMessage("عنوان و مدia (تصویر یا ویدیو) الزامی است.");
+    if (
+      !backstageForm.caption.trim() ||
+      (!backstageForm.image && !needsVideo) ||
+      (needsVideo && !backstageForm.videoSrc)
+    ) {
+      refreshMessage("عنوان و مدیا (تصویر یا ویدیو) الزامی است.");
       return;
     }
     setBusy(true);
@@ -129,8 +227,7 @@ export default function AdminEditor({
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message);
-      setContent(data.content);
-      onContentChange?.(data.content);
+      applyContent(data.content);
       setBackstageForm(emptyBackstage);
       refreshMessage("آیتم بک‌استیج اضافه شد.");
     } catch (error) {
@@ -140,23 +237,17 @@ export default function AdminEditor({
     }
   };
 
-  const persistItem = async (type: Tab, item: PortfolioItem | BackstageItem) => {
-    const res = await fetch("/api/content/manage", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ type, ...item }),
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || "ذخیره ناموفق بود");
-    setContent(data.content as SiteContent);
-    onContentChange?.(data.content as SiteContent);
-    return data.content as SiteContent;
-  };
-
   const updateItem = async (type: Tab, item: PortfolioItem | BackstageItem) => {
     setBusy(true);
     try {
-      await persistItem(type, item);
+      const res = await fetch("/api/content/manage", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type, ...item }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "ذخیره ناموفق بود");
+      applyContent(data.content);
       refreshMessage("ذخیره شد.");
     } catch (error) {
       refreshMessage(error instanceof Error ? error.message : "خطا");
@@ -176,14 +267,33 @@ export default function AdminEditor({
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message);
-      setContent(data.content);
-      onContentChange?.(data.content);
+      applyContent(data.content);
       refreshMessage("حذف شد.");
     } catch (error) {
       refreshMessage(error instanceof Error ? error.message : "خطا");
     } finally {
       setBusy(false);
     }
+  };
+
+  const patchPortfolio = (id: number, patch: Partial<PortfolioItem>) => {
+    setContent((prev) => {
+      if (!prev) return prev;
+      const next = {
+        ...prev,
+        portfolio: prev.portfolio.map((p) => {
+          if (p.id !== id) return p;
+          const merged = { ...p, ...patch };
+          if (patch.categoryId) {
+            const cat = categories.find((c) => c.id === patch.categoryId);
+            if (cat) merged.category = cat.name;
+          }
+          return merged;
+        }),
+      };
+      onContentChange?.(next);
+      return next;
+    });
   };
 
   const logout = async () => {
@@ -223,195 +333,191 @@ export default function AdminEditor({
       )}
 
       {!sectionOnly && (
-      <div className="admin-tabs">
-        <button type="button" className={tab === "portfolio" ? "is-active" : ""} onClick={() => setTab("portfolio")}>
-          نمونه کارها
-        </button>
-        <button type="button" className={tab === "backstage" ? "is-active" : ""} onClick={() => setTab("backstage")}>
-          بک‌استیج
-        </button>
-      </div>
+        <div className="admin-tabs">
+          <button
+            type="button"
+            className={tab === "portfolio" ? "is-active" : ""}
+            onClick={() => setTab("portfolio")}
+          >
+            نمونه کارها
+          </button>
+          <button
+            type="button"
+            className={tab === "backstage" ? "is-active" : ""}
+            onClick={() => setTab("backstage")}
+          >
+            بک‌استیج
+          </button>
+        </div>
       )}
 
-        {message && <div className="admin-toast">{message}</div>}
+      {message && <div className="admin-toast">{message}</div>}
 
-        {(sectionOnly ?? tab) === "portfolio" ? (
-          <section className="admin-section">
-            <div className={`admin-form lux-card${compact ? " admin-form--compact" : ""}`}>
-              <h2>افزودن نمونه کار</h2>
-              {!compact && <p className="admin-note">تصویر یا ویدیو — نسبت عمودی/افقی/مربعی قابل تنظیم است</p>}
-              <input
-                value={portfolioForm.title}
-                onChange={(e) => setPortfolioForm((v) => ({ ...v, title: e.target.value }))}
-                placeholder="عنوان پروژه"
-              />
-              <select
-                value={portfolioForm.category}
-                onChange={(e) => setPortfolioForm((v) => ({ ...v, category: e.target.value }))}
-              >
-                {PORTFOLIO_FILTERS.filter((f) => f !== "همه").map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat}
-                  </option>
-                ))}
-              </select>
-              <textarea
-                value={portfolioForm.description}
-                onChange={(e) => setPortfolioForm((v) => ({ ...v, description: e.target.value }))}
-                placeholder="توضیحات پروژه"
-                rows={3}
-              />
-              <div className="grid gap-2 sm:grid-cols-2">
+      {(sectionOnly ?? tab) === "portfolio" ? (
+        <section className="admin-section">
+          <div className={`admin-form lux-card${compact ? " admin-form--compact" : ""}`}>
+            <h2>تب‌های فیلتر سایت</h2>
+            <p className="admin-note">هر نامی بخواهید؛ همین‌ها روی لندینگ به‌صورت تب نمایش داده می‌شوند</p>
+            <div className="portfolio-tabs-admin">
+              <div className="portfolio-tabs-admin-add">
                 <input
-                  value={portfolioForm.client}
-                  onChange={(e) => setPortfolioForm((v) => ({ ...v, client: e.target.value }))}
-                  placeholder="نام کارفرما / برند"
+                  value={newTabName}
+                  onChange={(e) => setNewTabName(e.target.value)}
+                  placeholder="مثلاً طراحی لوگو"
                 />
-                <input
-                  value={portfolioForm.year}
-                  onChange={(e) => setPortfolioForm((v) => ({ ...v, year: e.target.value }))}
-                  placeholder="سال (مثلاً ۱۴۰۳)"
-                />
+                <button type="button" className="btn-primary" disabled={busy} onClick={addCategoryTab}>
+                  افزودن تب
+                </button>
               </div>
-              <MediaItemFields
-                uploadKind="portfolio"
-                values={{
-                  image: portfolioForm.image,
-                  videoSrc: portfolioForm.videoSrc,
-                  mediaKind: portfolioForm.mediaKind,
-                  aspectRatio: portfolioForm.aspectRatio,
-                }}
-                onChange={(patch) => setPortfolioForm((v) => ({ ...v, ...patch }))}
-              />
-              <button type="button" className="btn-primary" disabled={busy} onClick={addPortfolio}>
-                افزودن کارت
-              </button>
-            </div>
-
-            <div className={`admin-list${compact ? " admin-list--compact" : ""}`}>
-              {content.portfolio.map((item, index) =>
-                compact ? (
-                  <LandingItemCard
-                    key={item.id}
-                    index={index + 1}
-                    title={item.title}
-                    subtitle={item.category}
-                    previewSrc={
-                      resolveMediaKind(item) === "video" && item.videoSrc
-                        ? item.videoSrc
-                        : item.image
-                    }
-                    previewKind={resolveMediaKind(item) === "video" ? "video" : "image"}
-                    onRemove={() => removeItem("portfolio", item.id)}
-                  >
+              <div className="portfolio-tabs-admin-list">
+                {categories.map((cat) => (
+                  <div key={cat.id} className="portfolio-tabs-admin-chip">
                     <input
-                      value={item.title}
+                      value={cat.name}
                       onChange={(e) =>
                         setContent((prev) =>
                           prev
                             ? {
                                 ...prev,
-                                portfolio: prev.portfolio.map((p) =>
-                                  p.id === item.id ? { ...p, title: e.target.value } : p,
+                                portfolioCategories: prev.portfolioCategories.map((c) =>
+                                  c.id === cat.id ? { ...c, name: e.target.value } : c,
                                 ),
                               }
                             : prev,
                         )
                       }
-                      placeholder="عنوان"
+                      onBlur={(e) => saveCategoryTab(cat.id, e.target.value)}
                     />
-                    <select
-                      value={item.category}
-                      onChange={(e) =>
-                        setContent((prev) =>
-                          prev
-                            ? {
-                                ...prev,
-                                portfolio: prev.portfolio.map((p) =>
-                                  p.id === item.id ? { ...p, category: e.target.value } : p,
-                                ),
-                              }
-                            : prev,
-                        )
-                      }
+                    <button type="button" disabled={busy} onClick={() => removeCategoryTab(cat.id)} aria-label="حذف">
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className={`admin-form lux-card${compact ? " admin-form--compact" : ""}`}>
+            <h2>افزودن نمونه کار</h2>
+            {!compact && (
+              <p className="admin-note">کاور روی کارت؛ ویدیو/عکس کامل در پنجره جزئیات با ابعاد اصلی</p>
+            )}
+            <input
+              value={portfolioForm.title}
+              onChange={(e) => setPortfolioForm((v) => ({ ...v, title: e.target.value }))}
+              placeholder="عنوان پروژه"
+            />
+            <select
+              value={portfolioForm.categoryId}
+              onChange={(e) => setPortfolioForm((v) => ({ ...v, categoryId: e.target.value }))}
+              disabled={!categories.length}
+            >
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
+            <textarea
+              value={portfolioForm.description}
+              onChange={(e) => setPortfolioForm((v) => ({ ...v, description: e.target.value }))}
+              placeholder="توضیحات پروژه"
+              rows={3}
+            />
+            <div className="grid gap-2 sm:grid-cols-2">
+              <input
+                value={portfolioForm.client}
+                onChange={(e) => setPortfolioForm((v) => ({ ...v, client: e.target.value }))}
+                placeholder="نام کارفرما / برند"
+              />
+              <input
+                value={portfolioForm.year}
+                onChange={(e) => setPortfolioForm((v) => ({ ...v, year: e.target.value }))}
+                placeholder="سال (مثلاً ۱۴۰۳)"
+              />
+            </div>
+            <MediaItemFields
+              uploadKind="portfolio"
+              values={{
+                image: portfolioForm.image,
+                videoSrc: portfolioForm.videoSrc,
+                mediaKind: portfolioForm.mediaKind,
+                aspectRatio: portfolioForm.aspectRatio,
+              }}
+              onChange={(patch) => setPortfolioForm((v) => ({ ...v, ...patch }))}
+            />
+            <button type="button" className="btn-primary" disabled={busy || !categories.length} onClick={addPortfolio}>
+              افزودن کارت
+            </button>
+          </div>
+
+          <div className={`admin-list${compact ? " admin-list--compact" : ""}`}>
+            {content.portfolio.map((item, index) =>
+              compact ? (
+                <LandingItemCard
+                  key={item.id}
+                  index={index + 1}
+                  title={item.title}
+                  subtitle={item.category}
+                  previewSrc={item.image}
+                  previewKind="image"
+                  posterSrc={item.image}
+                  onRemove={() => removeItem("portfolio", item.id)}
+                >
+                  <input
+                    value={item.title}
+                    onChange={(e) => patchPortfolio(item.id, { title: e.target.value })}
+                    placeholder="عنوان"
+                  />
+                  <select
+                    value={item.categoryId}
+                    onChange={(e) => patchPortfolio(item.id, { categoryId: e.target.value })}
+                  >
+                    {categories.map((cat) => (
+                      <option key={cat.id} value={cat.id}>
+                        {cat.name}
+                      </option>
+                    ))}
+                  </select>
+                  <MediaItemFields
+                    compact
+                    uploadKind="portfolio"
+                    values={{
+                      image: item.image,
+                      videoSrc: item.videoSrc,
+                      mediaKind: item.mediaKind,
+                      aspectRatio: item.aspectRatio,
+                    }}
+                    onChange={(patch) => patchPortfolio(item.id, patch)}
+                  />
+                  <div className="admin-item-actions">
+                    <button
+                      type="button"
+                      className="btn-primary"
+                      disabled={busy}
+                      onClick={() => updateItem("portfolio", item)}
                     >
-                      {PORTFOLIO_FILTERS.filter((f) => f !== "همه").map((cat) => (
-                        <option key={cat} value={cat}>
-                          {cat}
-                        </option>
-                      ))}
-                    </select>
-                    <MediaItemFields
-                      compact
-                      uploadKind="portfolio"
-                      values={{
-                        image: item.image,
-                        videoSrc: item.videoSrc,
-                        mediaKind: item.mediaKind,
-                        aspectRatio: item.aspectRatio,
-                      }}
-                      onChange={(patch) =>
-                        setContent((prev) =>
-                          prev
-                            ? {
-                                ...prev,
-                                portfolio: prev.portfolio.map((p) =>
-                                  p.id === item.id ? { ...p, ...patch } : p,
-                                ),
-                              }
-                            : prev,
-                        )
-                      }
-                    />
-                    <div className="admin-item-actions">
-                      <button type="button" className="btn-primary" disabled={busy} onClick={() => updateItem("portfolio", item)}>
-                        ذخیره
-                      </button>
-                    </div>
-                  </LandingItemCard>
-                ) : (
+                      ذخیره
+                    </button>
+                  </div>
+                </LandingItemCard>
+              ) : (
                 <article key={item.id} className="admin-item lux-card">
                   <div className="admin-item-media">
-                    {resolveMediaKind(item) === "video" && item.videoSrc ? (
-                      <video src={item.videoSrc} poster={item.image} muted playsInline className="h-full w-full object-cover" />
-                    ) : (
-                      <ContentImage src={item.image} alt={item.title} fill className="object-cover" />
-                    )}
+                    <ContentImage src={item.image} alt={item.title} fill className="object-cover" />
                   </div>
                   <div className="admin-item-body">
                     <input
                       value={item.title}
-                      onChange={(e) =>
-                        setContent((prev) =>
-                          prev
-                            ? {
-                                ...prev,
-                                portfolio: prev.portfolio.map((p) =>
-                                  p.id === item.id ? { ...p, title: e.target.value } : p,
-                                ),
-                              }
-                            : prev,
-                        )
-                      }
+                      onChange={(e) => patchPortfolio(item.id, { title: e.target.value })}
                     />
                     <select
-                      value={item.category}
-                      onChange={(e) =>
-                        setContent((prev) =>
-                          prev
-                            ? {
-                                ...prev,
-                                portfolio: prev.portfolio.map((p) =>
-                                  p.id === item.id ? { ...p, category: e.target.value } : p,
-                                ),
-                              }
-                            : prev,
-                        )
-                      }
+                      value={item.categoryId}
+                      onChange={(e) => patchPortfolio(item.id, { categoryId: e.target.value })}
                     >
-                      {PORTFOLIO_FILTERS.filter((f) => f !== "همه").map((cat) => (
-                        <option key={cat} value={cat}>
-                          {cat}
+                      {categories.map((cat) => (
+                        <option key={cat.id} value={cat.id}>
+                          {cat.name}
                         </option>
                       ))}
                     </select>
@@ -419,51 +525,18 @@ export default function AdminEditor({
                       value={item.description || ""}
                       rows={2}
                       placeholder="توضیحات"
-                      onChange={(e) =>
-                        setContent((prev) =>
-                          prev
-                            ? {
-                                ...prev,
-                                portfolio: prev.portfolio.map((p) =>
-                                  p.id === item.id ? { ...p, description: e.target.value } : p,
-                                ),
-                              }
-                            : prev,
-                        )
-                      }
+                      onChange={(e) => patchPortfolio(item.id, { description: e.target.value })}
                     />
                     <div className="grid gap-2 sm:grid-cols-2">
                       <input
                         value={item.client || ""}
                         placeholder="کارفرما"
-                        onChange={(e) =>
-                          setContent((prev) =>
-                            prev
-                              ? {
-                                  ...prev,
-                                  portfolio: prev.portfolio.map((p) =>
-                                    p.id === item.id ? { ...p, client: e.target.value } : p,
-                                  ),
-                                }
-                              : prev,
-                          )
-                        }
+                        onChange={(e) => patchPortfolio(item.id, { client: e.target.value })}
                       />
                       <input
                         value={item.year || ""}
                         placeholder="سال"
-                        onChange={(e) =>
-                          setContent((prev) =>
-                            prev
-                              ? {
-                                  ...prev,
-                                  portfolio: prev.portfolio.map((p) =>
-                                    p.id === item.id ? { ...p, year: e.target.value } : p,
-                                  ),
-                                }
-                              : prev,
-                          )
-                        }
+                        onChange={(e) => patchPortfolio(item.id, { year: e.target.value })}
                       />
                     </div>
                     <MediaItemFields
@@ -475,123 +548,141 @@ export default function AdminEditor({
                         mediaKind: item.mediaKind,
                         aspectRatio: item.aspectRatio,
                       }}
-                      onChange={(patch) =>
-                        setContent((prev) =>
-                          prev
-                            ? {
-                                ...prev,
-                                portfolio: prev.portfolio.map((p) =>
-                                  p.id === item.id ? { ...p, ...patch } : p,
-                                ),
-                              }
-                            : prev,
-                        )
-                      }
+                      onChange={(patch) => patchPortfolio(item.id, patch)}
                     />
                     <div className="admin-item-actions">
-                      <button type="button" className="btn-primary" disabled={busy} onClick={() => updateItem("portfolio", item)}>
+                      <button
+                        type="button"
+                        className="btn-primary"
+                        disabled={busy}
+                        onClick={() => updateItem("portfolio", item)}
+                      >
                         ذخیره
                       </button>
-                      <button type="button" className="btn-outline" disabled={busy} onClick={() => removeItem("portfolio", item.id)}>
+                      <button
+                        type="button"
+                        className="btn-outline"
+                        disabled={busy}
+                        onClick={() => removeItem("portfolio", item.id)}
+                      >
                         حذف
                       </button>
                     </div>
                   </div>
                 </article>
-                ),
-              )}
-            </div>
-          </section>
-        ) : (
-          <section className="admin-section">
-            <div className={`admin-form lux-card${compact ? " admin-form--compact" : ""}`}>
-              <h2>افزودن بک‌استیج</h2>
-              {!compact && <p className="admin-note">تصویر یا ویدیو — نسبت قابل تنظیم</p>}
-              <input
-                value={backstageForm.caption}
-                onChange={(e) => setBackstageForm((v) => ({ ...v, caption: e.target.value }))}
-                placeholder="عنوان کوتاه"
-              />
-              <MediaItemFields
-                uploadKind="backstage"
-                values={{
-                  image: backstageForm.image,
-                  videoSrc: backstageForm.videoSrc,
-                  mediaKind: backstageForm.mediaKind,
-                  aspectRatio: backstageForm.aspectRatio,
-                }}
-                onChange={(patch) => setBackstageForm((v) => ({ ...v, ...patch }))}
-              />
-              <button type="button" className="btn-primary" disabled={busy} onClick={addBackstage}>
-                افزودن کارت
-              </button>
-            </div>
+              ),
+            )}
+          </div>
+        </section>
+      ) : (
+        <section className="admin-section">
+          <div className={`admin-form lux-card${compact ? " admin-form--compact" : ""}`}>
+            <h2>افزودن بک‌استیج</h2>
+            {!compact && <p className="admin-note">تصویر یا ویدیو — نسبت قابل تنظیم</p>}
+            <input
+              value={backstageForm.caption}
+              onChange={(e) => setBackstageForm((v) => ({ ...v, caption: e.target.value }))}
+              placeholder="عنوان کوتاه"
+            />
+            <MediaItemFields
+              uploadKind="backstage"
+              values={{
+                image: backstageForm.image,
+                videoSrc: backstageForm.videoSrc,
+                mediaKind: backstageForm.mediaKind,
+                aspectRatio: backstageForm.aspectRatio,
+              }}
+              onChange={(patch) => setBackstageForm((v) => ({ ...v, ...patch }))}
+            />
+            <button type="button" className="btn-primary" disabled={busy} onClick={addBackstage}>
+              افزودن کارت
+            </button>
+          </div>
 
-            <div className={`admin-list${compact ? " admin-list--compact" : ""}`}>
-              {content.backstage.map((item, index) =>
-                compact ? (
-                  <LandingItemCard
-                    key={item.id}
-                    index={index + 1}
-                    title={item.caption}
-                    subtitle={resolveMediaKind(item) === "video" ? "ویدیو" : "تصویر"}
-                    previewSrc={
-                      resolveMediaKind(item) === "video" && item.videoSrc
-                        ? item.videoSrc
-                        : item.image
+          <div className={`admin-list${compact ? " admin-list--compact" : ""}`}>
+            {content.backstage.map((item, index) =>
+              compact ? (
+                <LandingItemCard
+                  key={item.id}
+                  index={index + 1}
+                  title={item.caption}
+                  subtitle={resolveMediaKind(item) === "video" ? "ویدیو" : "تصویر"}
+                  previewSrc={
+                    resolveMediaKind(item) === "video" && item.videoSrc ? item.videoSrc : item.image
+                  }
+                  previewKind={resolveMediaKind(item) === "video" ? "video" : "image"}
+                  posterSrc={item.image}
+                  onRemove={() => removeItem("backstage", item.id)}
+                >
+                  <input
+                    value={item.caption}
+                    onChange={(e) =>
+                      setContent((prev) =>
+                        prev
+                          ? {
+                              ...prev,
+                              backstage: prev.backstage.map((b) =>
+                                b.id === item.id ? { ...b, caption: e.target.value } : b,
+                              ),
+                            }
+                          : prev,
+                      )
                     }
-                    previewKind={resolveMediaKind(item) === "video" ? "video" : "image"}
-                    onRemove={() => removeItem("backstage", item.id)}
-                  >
-                    <input
-                      value={item.caption}
-                      onChange={(e) =>
-                        setContent((prev) =>
-                          prev
-                            ? {
-                                ...prev,
-                                backstage: prev.backstage.map((b) =>
-                                  b.id === item.id ? { ...b, caption: e.target.value } : b,
-                                ),
-                              }
-                            : prev,
-                        )
-                      }
-                      placeholder="عنوان"
-                    />
-                    <MediaItemFields
-                      compact
-                      uploadKind="backstage"
-                      values={{
-                        image: item.image,
-                        videoSrc: item.videoSrc,
-                        mediaKind: item.mediaKind,
-                        aspectRatio: item.aspectRatio,
-                      }}
-                      onChange={(patch) =>
-                        setContent((prev) =>
-                          prev
-                            ? {
-                                ...prev,
-                                backstage: prev.backstage.map((b) =>
-                                  b.id === item.id ? { ...b, ...patch } : b,
-                                ),
-                              }
-                            : prev,
-                        )
-                      }
-                    />
-                    <div className="admin-item-actions">
-                      <button type="button" className="btn-primary" disabled={busy} onClick={() => updateItem("backstage", item)}>
-                        ذخیره
-                      </button>
-                    </div>
-                  </LandingItemCard>
-                ) : (
+                    placeholder="عنوان"
+                  />
+                  <MediaItemFields
+                    compact
+                    uploadKind="backstage"
+                    values={{
+                      image: item.image,
+                      videoSrc: item.videoSrc,
+                      mediaKind: item.mediaKind,
+                      aspectRatio: item.aspectRatio,
+                    }}
+                    onChange={(patch) =>
+                      setContent((prev) =>
+                        prev
+                          ? {
+                              ...prev,
+                              backstage: prev.backstage.map((b) =>
+                                b.id === item.id ? { ...b, ...patch } : b,
+                              ),
+                            }
+                          : prev,
+                      )
+                    }
+                  />
+                  <div className="admin-item-actions">
+                    <button
+                      type="button"
+                      className="btn-primary"
+                      disabled={busy}
+                      onClick={() => updateItem("backstage", item)}
+                    >
+                      ذخیره
+                    </button>
+                  </div>
+                </LandingItemCard>
+              ) : (
                 <article key={item.id} className="admin-item lux-card">
                   <div className="admin-item-media">
                     {resolveMediaKind(item) === "video" && item.videoSrc ? (
-                      <video src={item.videoSrc} poster={item.image} muted playsInline className="h-full w-full object-cover" />
+                      isGoogleDriveUrl(item.videoSrc) ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={item.image || toGoogleDriveThumbnailUrl(item.videoSrc) || item.videoSrc}
+                          alt={item.caption}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <video
+                          src={toPlayableVideoUrl(item.videoSrc)}
+                          poster={item.image}
+                          muted
+                          playsInline
+                          className="h-full w-full object-cover"
+                        />
+                      )
                     ) : (
                       <ContentImage src={item.image} alt={item.caption} fill className="object-cover" />
                     )}
@@ -635,20 +726,30 @@ export default function AdminEditor({
                       }
                     />
                     <div className="admin-item-actions">
-                      <button type="button" className="btn-primary" disabled={busy} onClick={() => updateItem("backstage", item)}>
+                      <button
+                        type="button"
+                        className="btn-primary"
+                        disabled={busy}
+                        onClick={() => updateItem("backstage", item)}
+                      >
                         ذخیره
                       </button>
-                      <button type="button" className="btn-outline" disabled={busy} onClick={() => removeItem("backstage", item.id)}>
+                      <button
+                        type="button"
+                        className="btn-outline"
+                        disabled={busy}
+                        onClick={() => removeItem("backstage", item.id)}
+                      >
                         حذف
                       </button>
                     </div>
                   </div>
                 </article>
-                ),
-              )}
-            </div>
-          </section>
-        )}
+              ),
+            )}
+          </div>
+        </section>
+      )}
     </>
   );
 

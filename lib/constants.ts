@@ -68,6 +68,7 @@ export const SERVICES = [
   },
 ];
 
+/** @deprecated Use portfolioCategories from CMS instead */
 export const PORTFOLIO_FILTERS = [
   "همه",
   "طراحی وب‌سایت",
@@ -81,6 +82,7 @@ export const PORTFOLIO_ITEMS = [
     id: 1,
     title: "برند عطر لوکس",
     category: "برندینگ",
+    categoryId: "cat-branding",
     image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&h=1067&q=80",
     description: "طراحی هویت بصری کامل برای برند عطر لوکس؛ از لوگو و پالت رنگ تا بسته‌بندی و زبان بصری یکپارچه.",
     client: "برند عطر",
@@ -90,6 +92,7 @@ export const PORTFOLIO_ITEMS = [
     id: 2,
     title: "وب‌سایت املاک",
     category: "طراحی وب‌سایت",
+    categoryId: "cat-web",
     image: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&h=1067&q=80",
     description: "طراحی و توسعه وب‌سایت مدرن املاک با تجربه کاربری سریع، فیلترهای هوشمند و ساختار سئو‌محور.",
     client: "آژانس املاک",
@@ -99,6 +102,7 @@ export const PORTFOLIO_ITEMS = [
     id: 3,
     title: "کمپین هدیه",
     category: "تبلیغات",
+    categoryId: "cat-ads",
     image: "https://images.unsplash.com/photo-1626785774573-4b7993143464?auto=format&fit=crop&w=800&h=1067&q=80",
     description: "کمپین تبلیغاتی فصلی با ایده خلاقانه، طراحی بصری و اجرای چندکاناله برای افزایش فروش.",
     client: "برند خرده‌فروشی",
@@ -108,6 +112,7 @@ export const PORTFOLIO_ITEMS = [
     id: 4,
     title: "برند کفش ورزشی",
     category: "شبکه‌های اجتماعی",
+    categoryId: "cat-social",
     image: "https://images.unsplash.com/photo-1558655146-9f40138edfeb?auto=format&fit=crop&w=800&h=1067&q=80",
     description: "مدیریت و تولید محتوای شبکه‌های اجتماعی برای برند ورزشی؛ تقویم محتوا، طراحی پست و رشد تعامل.",
     client: "برند ورزشی",
@@ -117,6 +122,7 @@ export const PORTFOLIO_ITEMS = [
     id: 5,
     title: "هویت بصری کافه",
     category: "برندینگ",
+    categoryId: "cat-branding",
     image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?auto=format&fit=crop&w=800&h=1067&q=80",
     description: "خلق هویت بصری گرم و متمایز برای کافه؛ لوگو، منو، بسته‌بندی و المان‌های محیطی برند.",
     client: "کافه محلی",
@@ -126,6 +132,7 @@ export const PORTFOLIO_ITEMS = [
     id: 6,
     title: "پلتفرم فروش آنلاین",
     category: "طراحی وب‌سایت",
+    categoryId: "cat-web",
     image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&h=1067&q=80",
     description: "طراحی رابط کاربری و توسعه فرانت پلتفرم فروش آنلاین با تمرکز بر تبدیل و تجربه خرید روان.",
     client: "استارتاپ فروش",

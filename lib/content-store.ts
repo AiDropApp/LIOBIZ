@@ -25,19 +25,18 @@ import {
   type TestimonialItem,
 } from "@/lib/landing-defaults";
 import { normalizeMediaFields, type CmsMediaFields } from "@/lib/media-types";
+import {
+  DEFAULT_PORTFOLIO_CATEGORIES,
+  migratePortfolioItems,
+  normalizeCategories,
+  type PortfolioCategory,
+  type PortfolioItemBase,
+} from "@/lib/portfolio";
 
-export type { LandingContent };
-export { defaultLanding };
+export type { LandingContent, PortfolioCategory };
+export { defaultLanding, DEFAULT_PORTFOLIO_CATEGORIES };
 
-export type PortfolioItem = {
-  id: number;
-  title: string;
-  category: string;
-  image: string;
-  description?: string;
-  client?: string;
-  year?: string;
-} & CmsMediaFields;
+export type PortfolioItem = PortfolioItemBase;
 
 export type BackstageItem = {
   id: number;
@@ -72,6 +71,7 @@ export type ThemeSettings = {
 };
 
 export type SiteContent = {
+  portfolioCategories: PortfolioCategory[];
   portfolio: PortfolioItem[];
   backstage: BackstageItem[];
   landing: LandingContent;
@@ -135,8 +135,11 @@ export const defaultTheme: ThemeSettings = {
   headingScale: "md",
 };
 
+const defaultPortfolioMigrated = migratePortfolioItems(PORTFOLIO_ITEMS, DEFAULT_PORTFOLIO_CATEGORIES);
+
 const defaults: SiteContent = {
-  portfolio: PORTFOLIO_ITEMS,
+  portfolioCategories: defaultPortfolioMigrated.categories,
+  portfolio: defaultPortfolioMigrated.portfolio,
   backstage: BACKSTAGE_GALLERY,
   landing: defaultLanding,
   pages: defaultPages,
@@ -161,10 +164,17 @@ function mergeLanding(parsed?: Partial<LandingContent>): LandingContent {
 }
 
 function mergeContent(parsed: Partial<SiteContent>): SiteContent {
+  const baseCategories = normalizeCategories(
+    Array.isArray(parsed.portfolioCategories) ? parsed.portfolioCategories : defaults.portfolioCategories,
+  );
+  const migrated = migratePortfolioItems(
+    Array.isArray(parsed.portfolio) ? parsed.portfolio : defaults.portfolio,
+    baseCategories,
+  );
+
   return {
-    portfolio: Array.isArray(parsed.portfolio)
-      ? parsed.portfolio.map((item) => normalizeMediaFields(item))
-      : defaults.portfolio.map((item) => normalizeMediaFields(item)),
+    portfolioCategories: migrated.categories,
+    portfolio: migrated.portfolio,
     backstage: Array.isArray(parsed.backstage)
       ? parsed.backstage.map((item) => normalizeMediaFields(item))
       : defaults.backstage.map((item) => normalizeMediaFields(item)),
@@ -223,7 +233,8 @@ async function ensureStore() {
       !parsed.plans ||
       !parsed.faq ||
       !parsed.creativePartners ||
-      !parsed.landing?.aboutImage1;
+      !parsed.landing?.aboutImage1 ||
+      !Array.isArray(parsed.portfolioCategories);
     if (needsWrite) {
       await fs.writeFile(CONTENT_FILE, JSON.stringify(merged, null, 2), "utf8");
     }

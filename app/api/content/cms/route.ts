@@ -47,6 +47,9 @@ export async function PUT(request: Request) {
         }
       : current.site,
     theme: body.theme ? { ...current.theme, ...body.theme } : current.theme,
+    portfolioCategories: Array.isArray(body.portfolioCategories)
+      ? body.portfolioCategories
+      : current.portfolioCategories,
     portfolio: Array.isArray(body.portfolio) ? body.portfolio : current.portfolio,
     backstage: Array.isArray(body.backstage) ? body.backstage : current.backstage,
     plans: Array.isArray(body.plans) ? body.plans : current.plans,

@@ -1,5 +1,5 @@
 /* Liobiz PWA service worker */
-const CACHE = "liobiz-shell-v2";
+const CACHE = "liobiz-shell-v3";
 const PRECACHE = ["/", "/manifest.json", "/icons/icon-192.png", "/icons/icon-512.png", "/images/logo.png"];
 
 self.addEventListener("install", (event) => {
@@ -34,14 +34,17 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
+  // Never intercept API / uploads / Next data — always network
   if (
     url.pathname.startsWith("/api/") ||
     url.pathname.startsWith("/uploads/") ||
-    url.pathname.startsWith("/_next/data/")
+    url.pathname.startsWith("/_next/data/") ||
+    url.pathname.startsWith("/_next/static/")
   ) {
     return;
   }
 
+  // HTML navigations: network-first (avoid stale shell vs new JS hydration mismatch)
   if (request.mode === "navigate") {
     event.respondWith(
       fetch(request)
@@ -55,11 +58,11 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
+  // Static assets (images/fonts): stale-while-revalidate
   if (
-    url.pathname.startsWith("/_next/static/") ||
     url.pathname.startsWith("/icons/") ||
     url.pathname.startsWith("/images/") ||
-    url.pathname.match(/\.(css|js|png|jpg|jpeg|webp|svg|woff2?|ico)$/i)
+    url.pathname.match(/\.(png|jpg|jpeg|webp|svg|woff2?|ico)$/i)
   ) {
     event.respondWith(
       caches.open(CACHE).then(async (cache) => {

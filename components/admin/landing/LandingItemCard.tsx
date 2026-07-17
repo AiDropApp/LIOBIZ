@@ -2,6 +2,7 @@
 
 import { useState, type ReactNode } from "react";
 import { ChevronDown } from "lucide-react";
+import { isGoogleDriveUrl, toGoogleDriveThumbnailUrl, toPlayableVideoUrl } from "@/lib/media-types";
 
 type Props = {
   index: number;
@@ -9,6 +10,7 @@ type Props = {
   subtitle?: string;
   previewSrc?: string;
   previewKind?: "image" | "video";
+  posterSrc?: string;
   defaultOpen?: boolean;
   onRemove: () => void;
   children: ReactNode;
@@ -20,11 +22,16 @@ export default function LandingItemCard({
   subtitle,
   previewSrc,
   previewKind = "image",
+  posterSrc,
   defaultOpen = false,
   onRemove,
   children,
 }: Props) {
   const [open, setOpen] = useState(defaultOpen);
+  const driveThumb =
+    previewKind === "video" && previewSrc && isGoogleDriveUrl(previewSrc)
+      ? posterSrc || toGoogleDriveThumbnailUrl(previewSrc)
+      : null;
 
   return (
     <article className={`landing-item-card landing-item-card--collapsible${open ? " is-open" : ""}`}>
@@ -37,8 +44,11 @@ export default function LandingItemCard({
         >
           {previewSrc ? (
             <span className="landing-item-card-thumb" aria-hidden>
-              {previewKind === "video" ? (
-                <video src={previewSrc} muted playsInline preload="metadata" />
+              {previewKind === "video" && driveThumb ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={driveThumb} alt="" />
+              ) : previewKind === "video" ? (
+                <video src={toPlayableVideoUrl(previewSrc)} muted playsInline preload="metadata" />
               ) : (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={previewSrc} alt="" />

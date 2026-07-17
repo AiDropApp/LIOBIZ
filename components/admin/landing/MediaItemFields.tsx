@@ -21,16 +21,21 @@ type Props = {
   uploadKind: "portfolio" | "backstage" | "creative-partners";
   imageLabel?: string;
   compact?: boolean;
+  /** Hide aspect selector (use inside "more" for portfolio) */
+  showAspect?: boolean;
 };
 
 export default function MediaItemFields({
   values,
   onChange,
   uploadKind,
-  imageLabel = "تصویر / پوستر",
+  imageLabel,
   compact = false,
+  showAspect = true,
 }: Props) {
   const kind = values.mediaKind ?? "image";
+  const coverLabel =
+    imageLabel || (kind === "video" ? "کاور کارت (تصویر)" : "تصویر / کاور");
 
   return (
     <div className={`landing-media-fields${compact ? " landing-media-fields--compact" : ""}`}>
@@ -38,9 +43,7 @@ export default function MediaItemFields({
         <span>نوع نمایش</span>
         <select
           value={kind}
-          onChange={(e) =>
-            onChange({ mediaKind: e.target.value as MediaKind })
-          }
+          onChange={(e) => onChange({ mediaKind: e.target.value as MediaKind })}
         >
           {MEDIA_KIND_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -50,39 +53,43 @@ export default function MediaItemFields({
         </select>
       </label>
 
-      <label className="contact-field">
-        <span>نسبت تصویر</span>
-        <select
-          value={values.aspectRatio ?? "portrait"}
-          onChange={(e) =>
-            onChange({ aspectRatio: e.target.value as MediaAspect })
-          }
-        >
-          {MEDIA_ASPECT_OPTIONS.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
-      </label>
+      {showAspect ? (
+        <label className="contact-field">
+          <span>نسبت در جزئیات</span>
+          <select
+            value={values.aspectRatio ?? "portrait"}
+            onChange={(e) => onChange({ aspectRatio: e.target.value as MediaAspect })}
+          >
+            {MEDIA_ASPECT_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        </label>
+      ) : null}
 
       <MediaUrlField
-        label={imageLabel}
+        label={coverLabel}
         value={values.image}
         onChange={(url) => onChange({ image: url })}
         uploadKind={uploadKind}
         accept="image/*"
-        hint="برای ویدیو به‌عنوان پوستر (thumbnail) استفاده می‌شود"
+        hint={
+          kind === "video"
+            ? "روی کارت‌ها فقط همین کاور نمایش داده می‌شود"
+            : "آپلود یا لینک تصویر"
+        }
       />
 
       {kind === "video" && (
         <MediaUrlField
-          label="ویدیو (آپلود یا لینk)"
+          label="ویدیو (آپلود یا لینک)"
           value={values.videoSrc ?? ""}
           onChange={(url) => onChange({ videoSrc: url })}
           uploadKind={uploadKind}
           accept="video/mp4,video/webm"
-          hint="mp4 یا webm — در سایت به‌صورت autoplay بی‌صدا نمایش داده می‌شود"
+          hint="mp4، webm یا لینک Google Drive — در جزئیات با ابعاد واقعی پخش می‌شود"
         />
       )}
     </div>
