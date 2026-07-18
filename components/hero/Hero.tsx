@@ -8,6 +8,11 @@ import HeroStats from "./content/HeroStats";
 import usePrefersReducedMotion from "@/hooks/usePrefersReducedMotion";
 import type { LandingContent } from "@/lib/cms-defaults";
 import { defaultLanding } from "@/lib/cms-defaults";
+import {
+  isVideoUrl,
+  needsIframeVideoEmbed,
+  toPlayableVideoUrl,
+} from "@/lib/media-types";
 
 export default function Hero() {
   const reducedMotion = usePrefersReducedMotion();
@@ -22,28 +27,41 @@ export default function Hero() {
       .catch(() => undefined);
   }, []);
 
-  // Old Clarimol demo video breaks the hero; always fall back to brand artwork.
   const rawMedia = landing.heroMediaUrl || "/images/hero-lion.png";
   const media = rawMedia.includes("/videos/header.mp4") ? "/images/hero-lion.png" : rawMedia;
   const isVideo =
     media !== "/images/hero-lion.png" &&
-    (landing.heroMediaType === "video" || media.endsWith(".mp4") || media.endsWith(".webm"));
+    (landing.heroMediaType === "video" || isVideoUrl(media));
+  const useIframe = isVideo && needsIframeVideoEmbed(media);
+  const playable = isVideo ? toPlayableVideoUrl(media) : media;
 
   return (
     <section id="home" className="hero-section">
       <div className="hero-panel">
         <div className="hero-video-stage" aria-hidden="true">
           {isVideo ? (
-            <video
-              className="hero-video"
-              src={media}
-              autoPlay={!reducedMotion}
-              muted
-              loop
-              playsInline
-              preload="metadata"
-              key={media}
-            />
+            useIframe ? (
+              <iframe
+                className="hero-video hero-video-embed"
+                src={playable}
+                title="ویدیو پس‌زمینه"
+                allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+                allowFullScreen
+                referrerPolicy="no-referrer-when-downgrade"
+                key={playable}
+              />
+            ) : (
+              <video
+                className="hero-video"
+                src={playable}
+                autoPlay={!reducedMotion}
+                muted
+                loop
+                playsInline
+                preload="metadata"
+                key={playable}
+              />
+            )
           ) : (
             <Image src={media} alt="" fill className="hero-video object-cover" priority sizes="100vw" />
           )}

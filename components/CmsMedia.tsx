@@ -3,7 +3,7 @@
 import ContentImage from "@/components/ContentImage";
 import {
   aspectRatioClass,
-  isGoogleDriveUrl,
+  needsIframeVideoEmbed,
   resolveMediaKind,
   toPlayableVideoUrl,
   type MediaAspect,
@@ -53,15 +53,16 @@ export default function CmsMedia({
   if (natural) {
     if (kind === "video" && videoSrc) {
       const playable = toPlayableVideoUrl(videoSrc);
-      if (isGoogleDriveUrl(videoSrc)) {
+      if (needsIframeVideoEmbed(videoSrc)) {
         return (
           <div className={`cms-media-natural ${wrapperClassName}`}>
             <iframe
               src={playable}
               title={alt}
               className="cms-media-natural-frame"
-              allow="autoplay; encrypted-media; fullscreen"
+              allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
               allowFullScreen
+              referrerPolicy="no-referrer-when-downgrade"
             />
           </div>
         );
@@ -96,15 +97,16 @@ export default function CmsMedia({
 
   if (kind === "video" && videoSrc) {
     const playable = toPlayableVideoUrl(videoSrc);
-    if (isGoogleDriveUrl(videoSrc)) {
+    if (needsIframeVideoEmbed(videoSrc)) {
       return (
         <div className={`${wrapperBase} ${wrapperClassName}`}>
           <iframe
             src={playable}
             title={alt}
             className="absolute inset-0 h-full w-full border-0"
-            allow="autoplay; encrypted-media; fullscreen"
+            allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
             allowFullScreen
+            referrerPolicy="no-referrer-when-downgrade"
           />
         </div>
       );

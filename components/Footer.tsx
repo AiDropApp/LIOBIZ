@@ -5,6 +5,7 @@ import { Instagram, Linkedin, Send, Phone, Mail, MapPin } from "lucide-react";
 import Link from "next/link";
 import { SITE, SOCIAL_LINKS } from "@/lib/constants";
 import { defaultLanding, type LandingContent } from "@/lib/cms-defaults";
+import CmsRichText from "@/components/CmsRichText";
 import {
   defaultFooterQuickLinks,
   defaultFooterServiceLinks,
@@ -75,7 +76,7 @@ export default function Footer() {
           <div className="footer-cta mb-14 flex flex-col items-center gap-5 rounded-[var(--radius-card)] border border-white/10 bg-white/[0.03] px-6 py-8 text-center md:flex-row md:justify-between md:px-8 md:text-right">
             <div>
               <h3 className="text-2xl font-bold md:text-3xl">{landing.footerCtaTitle}</h3>
-              <p className="mt-2 text-muted">{landing.footerCtaText}</p>
+              <CmsRichText content={landing.footerCtaText} className="mt-2" />
             </div>
             <Link href={landing.footerCtaHref} className="btn-accent px-8">
               {landing.footerCtaButton}

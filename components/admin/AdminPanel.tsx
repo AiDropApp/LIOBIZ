@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import {
   LayoutDashboard,
   Layout,
+  BookOpen,
   ShoppingBag,
   MessageSquare,
   Users,
@@ -14,6 +15,7 @@ import {
 } from "lucide-react";
 import DashboardShell from "@/components/dashboard/DashboardShell";
 import AdminLandingEditor from "@/components/admin/AdminLandingEditor";
+import AdminBlogEditor from "@/components/admin/AdminBlogEditor";
 import {
   ORDER_STATUS_LABELS,
   TICKET_STATUS_LABELS,
@@ -24,6 +26,7 @@ import {
 type Tab =
   | "overview"
   | "landing"
+  | "blog"
   | "users"
   | "orders"
   | "tickets"
@@ -88,6 +91,7 @@ type TicketRow = {
 const NAV = [
   { id: "overview", label: "نمای کلی", icon: LayoutDashboard },
   { id: "landing", label: "مدیریت لندینگ", icon: Layout },
+  { id: "blog", label: "بلاگ", icon: BookOpen },
   { id: "orders", label: "سفارش‌ها", icon: ShoppingBag },
   { id: "tickets", label: "تیکت‌ها", icon: MessageSquare },
   { id: "users", label: "کاربران", icon: Users },
@@ -449,6 +453,8 @@ export default function AdminPanel() {
       )}
 
       {tab === "landing" && <AdminLandingEditor />}
+
+      {tab === "blog" && <AdminBlogEditor />}
 
       {tab === "orders" && (
         <section>

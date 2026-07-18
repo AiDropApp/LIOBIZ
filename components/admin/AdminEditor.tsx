@@ -7,7 +7,7 @@ import ContentImage from "@/components/ContentImage";
 import MediaItemFields from "@/components/admin/landing/MediaItemFields";
 import LandingItemCard from "@/components/admin/landing/LandingItemCard";
 import {
-  isGoogleDriveUrl,
+  needsIframeVideoEmbed,
   resolveMediaKind,
   toGoogleDriveThumbnailUrl,
   toPlayableVideoUrl,
@@ -667,13 +667,19 @@ export default function AdminEditor({
                 <article key={item.id} className="admin-item lux-card">
                   <div className="admin-item-media">
                     {resolveMediaKind(item) === "video" && item.videoSrc ? (
-                      isGoogleDriveUrl(item.videoSrc) ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={item.image || toGoogleDriveThumbnailUrl(item.videoSrc) || item.videoSrc}
-                          alt={item.caption}
-                          className="h-full w-full object-cover"
-                        />
+                      needsIframeVideoEmbed(item.videoSrc) ? (
+                        item.image || toGoogleDriveThumbnailUrl(item.videoSrc) ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={item.image || toGoogleDriveThumbnailUrl(item.videoSrc) || undefined}
+                            alt={item.caption}
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center bg-black/40 text-xs text-white/80">
+                            ویدیو لینک
+                          </div>
+                        )
                       ) : (
                         <video
                           src={toPlayableVideoUrl(item.videoSrc)}

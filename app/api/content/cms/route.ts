@@ -66,6 +66,7 @@ export async function PUT(request: Request) {
     footerServiceLinks: Array.isArray(body.footerServiceLinks)
       ? body.footerServiceLinks
       : current.footerServiceLinks,
+    blogPosts: Array.isArray(body.blogPosts) ? body.blogPosts : current.blogPosts,
   };
 
   if (body.landing?.heroStats) {

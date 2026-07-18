@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Check } from "lucide-react";
 import { motion } from "framer-motion";
 import { defaultLanding, type LandingContent } from "@/lib/cms-defaults";
+import CmsRichText from "@/components/CmsRichText";
 import { defaultPlans, type PlanItem } from "@/lib/landing-defaults";
 import usePrefersReducedMotion from "@/hooks/usePrefersReducedMotion";
 
@@ -29,7 +30,7 @@ export default function Plans() {
         <div className="mb-12 text-center">
           <span className="section-label">{landing.plansLabel}</span>
           <h2 className="section-title">{landing.plansTitle}</h2>
-          <p className="mx-auto mt-4 max-w-2xl text-muted">{landing.plansIntro}</p>
+          <CmsRichText content={landing.plansIntro} className="mx-auto mt-4 max-w-2xl" />
         </div>
 
         <div className="plans-grid">

@@ -24,6 +24,7 @@ import {
   type TeamStatItem,
   type TestimonialItem,
 } from "@/lib/landing-defaults";
+import { defaultBlogPosts, type BlogPost } from "@/lib/blog-defaults";
 import { normalizeMediaFields, type CmsMediaFields } from "@/lib/media-types";
 import {
   DEFAULT_PORTFOLIO_CATEGORIES,
@@ -70,6 +71,8 @@ export type ThemeSettings = {
   headingScale: "sm" | "md" | "lg";
 };
 
+export type { BlogPost };
+
 export type SiteContent = {
   portfolioCategories: PortfolioCategory[];
   portfolio: PortfolioItem[];
@@ -86,6 +89,7 @@ export type SiteContent = {
   teamStats: TeamStatItem[];
   footerQuickLinks: LinkItem[];
   footerServiceLinks: LinkItem[];
+  blogPosts: BlogPost[];
 };
 
 const DATA_DIR = path.join(process.cwd(), "data");
@@ -153,6 +157,7 @@ const defaults: SiteContent = {
   teamStats: defaultTeamStats,
   footerQuickLinks: defaultFooterQuickLinks,
   footerServiceLinks: defaultFooterServiceLinks,
+  blogPosts: defaultBlogPosts,
 };
 
 function mergeLanding(parsed?: Partial<LandingContent>): LandingContent {
@@ -211,6 +216,7 @@ function mergeContent(parsed: Partial<SiteContent>): SiteContent {
     footerServiceLinks: Array.isArray(parsed.footerServiceLinks)
       ? parsed.footerServiceLinks
       : defaults.footerServiceLinks,
+    blogPosts: Array.isArray(parsed.blogPosts) ? parsed.blogPosts : defaults.blogPosts,
   };
 }
 
@@ -234,7 +240,8 @@ async function ensureStore() {
       !parsed.faq ||
       !parsed.creativePartners ||
       !parsed.landing?.aboutImage1 ||
-      !Array.isArray(parsed.portfolioCategories);
+      !Array.isArray(parsed.portfolioCategories) ||
+      !Array.isArray(parsed.blogPosts);
     if (needsWrite) {
       await fs.writeFile(CONTENT_FILE, JSON.stringify(merged, null, 2), "utf8");
     }

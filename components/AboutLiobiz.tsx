@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import ContentImage from "@/components/ContentImage";
+import CmsRichText from "@/components/CmsRichText";
 import { defaultLanding, type LandingContent } from "@/lib/cms-defaults";
 
 export default function AboutLiobiz() {
@@ -32,12 +33,16 @@ export default function AboutLiobiz() {
             <h2 className="section-title mt-2 text-[1.75rem] md:text-3xl lg:text-[2.35rem]">
               {landing.aboutTitle}
             </h2>
-            <p className="mx-auto mt-5 max-w-xl leading-8 text-muted lg:mx-0">
-              {landing.aboutText1}
-            </p>
-            <p className="mx-auto mt-4 max-w-xl leading-8 text-muted lg:mx-0">
-              {landing.aboutText2}
-            </p>
+            <CmsRichText
+              content={landing.aboutText1}
+              className="mx-auto mt-5 max-w-xl lg:mx-0"
+              paragraphClassName="text-muted leading-8"
+            />
+            <CmsRichText
+              content={landing.aboutText2}
+              className="mx-auto mt-4 max-w-xl lg:mx-0"
+              paragraphClassName="text-muted leading-8"
+            />
             <Link href="/about" className="btn-accent btn-accent--black mt-8">
               بیشتر درباره ما
             </Link>

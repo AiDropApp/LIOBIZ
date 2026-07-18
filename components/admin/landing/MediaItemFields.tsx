@@ -88,8 +88,8 @@ export default function MediaItemFields({
           value={values.videoSrc ?? ""}
           onChange={(url) => onChange({ videoSrc: url })}
           uploadKind={uploadKind}
-          accept="video/mp4,video/webm"
-          hint="mp4، webm یا لینک Google Drive — در جزئیات با ابعاد واقعی پخش می‌شود"
+          accept="video/*"
+          hint="لینک مستقیم (هر پسوند ویدیو)، یا صفحه اشتراک مثل my.files.ir /drive/s/...، Google Drive، آپارات، یوتیوب — لینک پوشه کار نمی‌کند"
         />
       )}
     </div>

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { defaultLanding, type LandingContent } from "@/lib/cms-defaults";
+import CmsRichText from "@/components/CmsRichText";
 import { defaultFaq, type FaqItem } from "@/lib/landing-defaults";
 
 export default function FAQ() {
@@ -31,6 +32,7 @@ export default function FAQ() {
         >
           <span className="section-label">{landing.faqLabel}</span>
           <h2 className="section-title">{landing.faqTitle}</h2>
+          <CmsRichText content={landing.faqIntro} className="mx-auto mt-4 max-w-2xl" />
         </motion.div>
 
         <div className="faq-list">

@@ -4,6 +4,7 @@ import "./globals.css";
 import "./auth.css";
 import "./admin.css";
 import { SITE } from "@/lib/constants";
+import GoogleTagManager from "@/components/GoogleTagManager";
 import PwaBoot from "@/components/PwaBoot";
 import PwaRegister from "@/components/PwaRegister";
 import ThemeProvider from "@/components/ThemeProvider";
@@ -35,6 +36,9 @@ export const metadata: Metadata = {
   other: {
     "mobile-web-app-capable": "yes",
   },
+  verification: {
+    google: "googlef7e58775fcd4e139",
+  },
 };
 
 export const viewport: Viewport = {
@@ -53,6 +57,7 @@ export default function RootLayout({
   return (
     <html lang="fa" dir="rtl">
       <body className={`${vazirmatn.variable} font-vazir`}>
+        <GoogleTagManager />
         <PwaBoot />
         <ThemeProvider>{children}</ThemeProvider>
         <PwaRegister />

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { defaultLanding, type LandingContent } from "@/lib/cms-defaults";
+import CmsRichText from "@/components/CmsRichText";
 import { defaultCreativePartners, type CreativePartnerItem } from "@/lib/landing-defaults";
 import CmsMedia from "@/components/CmsMedia";
 import "./creative-partners.css";
@@ -42,7 +43,7 @@ export default function CreativePartners() {
         >
           <span className="section-label">{landing.creativePartnersLabel}</span>
           <h2 className="section-title mb-4">{landing.creativePartnersTitle}</h2>
-          <p className="mx-auto max-w-2xl leading-relaxed text-muted">{landing.creativePartnersIntro}</p>
+          <CmsRichText content={landing.creativePartnersIntro} className="mx-auto max-w-2xl" />
         </motion.div>
 
         <div className="cp-avatars" role="tablist" aria-label="همکاران خلاق">

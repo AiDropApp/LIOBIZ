@@ -13,6 +13,7 @@ export const NAV_LINKS = [
   { label: "خانه", href: "/" },
   { label: "خدمات", href: "/#services" },
   { label: "نمونه کارها", href: "/portfolio" },
+  { label: "بلاگ", href: "/blog" },
   { label: "فرآیند همکاری", href: "/process" },
   { label: "درباره ما", href: "/about" },
   { label: "تماس با ما", href: "/contact" },
@@ -217,6 +218,7 @@ export const PARTNERS = [
 export const FOOTER_QUICK_LINKS = [
   { label: "خانه", href: "/" },
   { label: "نمونه کارها", href: "/portfolio" },
+  { label: "بلاگ", href: "/blog" },
   { label: "فرآیند همکاری", href: "/process" },
   { label: "درباره ما", href: "/about" },
   { label: "تماس با ما", href: "/contact" },

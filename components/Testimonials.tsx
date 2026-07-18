@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { defaultLanding, type LandingContent } from "@/lib/cms-defaults";
+import CmsRichText from "@/components/CmsRichText";
 import { defaultTestimonials, type TestimonialItem } from "@/lib/landing-defaults";
 
 export default function Testimonials() {
@@ -30,7 +31,7 @@ export default function Testimonials() {
         >
           <span className="section-label">{landing.testimonialsLabel}</span>
           <h2 className="section-title mb-4">{landing.testimonialsTitle}</h2>
-          <p className="mx-auto max-w-2xl leading-relaxed text-muted">{landing.testimonialsIntro}</p>
+          <CmsRichText content={landing.testimonialsIntro} className="mx-auto max-w-2xl" />
         </motion.div>
 
         <div className="grid gap-5 lg:grid-cols-3">

@@ -14,6 +14,7 @@ import { aspectRatioClass, resolveMediaKind } from "@/lib/media-types";
 import usePrefersReducedMotion from "@/hooks/usePrefersReducedMotion";
 import { BACKSTAGE_GALLERY } from "@/lib/constants";
 import { defaultLanding, type LandingContent } from "@/lib/cms-defaults";
+import CmsRichText from "@/components/CmsRichText";
 import { defaultTeamStats, type TeamStatItem } from "@/lib/landing-defaults";
 import type { BackstageItem } from "@/lib/content-store";
 
@@ -240,7 +241,7 @@ export default function Backstage() {
         >
           <span className="section-label">{landing.backstageLabel}</span>
           <h2 className="section-title">{landing.backstageTitle}</h2>
-          <p className="mx-auto mt-4 max-w-2xl text-muted">{landing.backstageIntro}</p>
+          <CmsRichText content={landing.backstageIntro} className="mx-auto mt-4 max-w-2xl" />
         </motion.div>
       </div>
 

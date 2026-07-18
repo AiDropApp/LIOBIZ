@@ -12,6 +12,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { defaultLanding, type LandingContent } from "@/lib/cms-defaults";
+import CmsRichText from "@/components/CmsRichText";
 import { defaultServices, type ServiceItem } from "@/lib/landing-defaults";
 
 const iconMap: Record<string, LucideIcon> = {
@@ -49,7 +50,7 @@ export default function Services() {
           <h2 className="section-title text-[1.7rem] md:text-3xl lg:text-[2.2rem]">
             {landing.servicesTitle}
           </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-muted">{landing.servicesIntro}</p>
+          <CmsRichText content={landing.servicesIntro} className="mx-auto mt-4 max-w-2xl" />
         </motion.div>
 
         <div className="services-strip-grid">

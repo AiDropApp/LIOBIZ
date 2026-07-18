@@ -8,7 +8,8 @@ import LandingSectionPanel from "@/components/admin/landing/LandingSectionPanel"
 import MediaUrlField from "@/components/admin/landing/MediaUrlField";
 import MediaItemFields from "@/components/admin/landing/MediaItemFields";
 import LandingItemCard from "@/components/admin/landing/LandingItemCard";
-import { normalizeMediaFields, resolveMediaKind } from "@/lib/media-types";
+import { isVideoUrl, normalizeMediaFields, resolveMediaKind } from "@/lib/media-types";
+import { CMS_RICH_TEXT_HINT } from "@/lib/cms-rich-text";
 import type { CreativePartnerItem, PartnerItem, TestimonialItem } from "@/lib/landing-defaults";
 
 const SECTIONS = [
@@ -35,11 +36,13 @@ function Field({
   value,
   onChange,
   multiline,
+  hint,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
   multiline?: boolean;
+  hint?: string;
 }) {
   return (
     <label className="contact-field">
@@ -48,6 +51,9 @@ function Field({
         <textarea rows={3} value={value} onChange={(e) => onChange(e.target.value)} />
       ) : (
         <input value={value} onChange={(e) => onChange(e.target.value)} />
+      )}
+      {multiline && (
+        <small className="text-muted">{hint || CMS_RICH_TEXT_HINT}</small>
       )}
     </label>
   );
@@ -181,7 +187,7 @@ export default function AdminLandingEditor() {
               label="ویدیو / عکس پس‌زمینه هیرو"
               value={landing.heroMediaUrl}
               onChange={(url) => {
-                const isVideo = /\.(mp4|webm)(\?|$)/i.test(url);
+                const isVideo = isVideoUrl(url);
                 setContent({
                   ...content,
                   landing: {
@@ -192,6 +198,7 @@ export default function AdminLandingEditor() {
                 });
               }}
               uploadKind="hero"
+              hint="لینک Google Drive، my.files.ir، یوتیوب یا فایل مستقیم mp4"
             />
           </LandingSectionPanel>
         )}
