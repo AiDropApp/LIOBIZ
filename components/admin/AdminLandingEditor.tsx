@@ -35,12 +35,14 @@ function Field({
   label,
   value,
   onChange,
+  onBlur,
   multiline,
   hint,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
+  onBlur?: (value: string) => void;
   multiline?: boolean;
   hint?: string;
 }) {
@@ -48,9 +50,9 @@ function Field({
     <label className="contact-field">
       <span>{label}</span>
       {multiline ? (
-        <textarea rows={3} value={value} onChange={(e) => onChange(e.target.value)} />
+        <textarea rows={3} value={value} onChange={(e) => onChange(e.target.value)} onBlur={() => onBlur?.(value)} />
       ) : (
-        <input value={value} onChange={(e) => onChange(e.target.value)} />
+        <input value={value} onChange={(e) => onChange(e.target.value)} onBlur={() => onBlur?.(value)} />
       )}
       {multiline && (
         <small className="text-muted">{hint || CMS_RICH_TEXT_HINT}</small>
@@ -305,17 +307,19 @@ export default function AdminLandingEditor() {
             subtitle="سکشن #portfolio"
             open
             onToggle={() => undefined}
-            onSave={() =>
-              save({
-                landing,
-                portfolio: content.portfolio,
-                portfolioCategories: content.portfolioCategories,
-              })
-            }
-            saving={busy}
           >
-            <Field label="برچسب" value={landing.portfolioLabel} onChange={(v) => patchLanding("portfolioLabel", v)} />
-            <Field label="تیتر" value={landing.portfolioTitle} onChange={(v) => patchLanding("portfolioTitle", v)} />
+            <Field
+              label="برچسب"
+              value={landing.portfolioLabel}
+              onChange={(v) => patchLanding("portfolioLabel", v)}
+              onBlur={(portfolioLabel) => save({ landing: { ...landing, portfolioLabel } })}
+            />
+            <Field
+              label="تیتر"
+              value={landing.portfolioTitle}
+              onChange={(v) => patchLanding("portfolioTitle", v)}
+              onBlur={(portfolioTitle) => save({ landing: { ...landing, portfolioTitle } })}
+            />
             <p className="landing-section-hint">
               {content.portfolioCategories?.length || 0} تب · {content.portfolio.length} کارت — تب‌ها و نمونه‌کارها را پایین مدیریت کنید
             </p>

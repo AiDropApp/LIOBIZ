@@ -84,6 +84,19 @@ export default function AdminEditor({
     [content?.portfolioCategories],
   );
 
+  const isPortfolioDraftDirty = useMemo(
+    () =>
+      Boolean(
+        portfolioForm.title.trim() ||
+          portfolioForm.image.trim() ||
+          portfolioForm.videoSrc.trim() ||
+          portfolioForm.description.trim() ||
+          portfolioForm.client.trim() ||
+          portfolioForm.year.trim(),
+      ),
+    [portfolioForm],
+  );
+
   const load = async () => {
     const res = await fetch("/api/content", { cache: "no-store" });
     const data = (await res.json()) as SiteContent;
@@ -175,7 +188,7 @@ export default function AdminEditor({
     }
   };
 
-  const addPortfolio = async () => {
+  const savePortfolioDraft = async () => {
     const needsVideo = portfolioForm.mediaKind === "video";
     if (!portfolioForm.categoryId) {
       refreshMessage("ابتدا یک تب/دسته بسازید.");
@@ -200,12 +213,22 @@ export default function AdminEditor({
       if (!res.ok) throw new Error(data.message);
       applyContent(data.content);
       setPortfolioForm(emptyPortfolio(portfolioForm.categoryId));
-      refreshMessage("نمونه کار اضافه شد.");
+      refreshMessage("کارت ذخیره شد — می‌توانید کارت جدید بسازید.");
     } catch (error) {
       refreshMessage(error instanceof Error ? error.message : "خطا");
     } finally {
       setBusy(false);
     }
+  };
+
+  const startNewPortfolioDraft = () => {
+    if (isPortfolioDraftDirty) {
+      refreshMessage("ابتدا کارت فعلی را با «ذخیره کارت» ثبت کنید.");
+      return;
+    }
+    const categoryId = portfolioForm.categoryId || categories[0]?.id || "";
+    setPortfolioForm(emptyPortfolio(categoryId));
+    refreshMessage("فرم کارت جدید آماده است.");
   };
 
   const addBackstage = async () => {
@@ -398,10 +421,12 @@ export default function AdminEditor({
           </div>
 
           <div className={`admin-form lux-card${compact ? " admin-form--compact" : ""}`}>
-            <h2>افزودن نمونه کار</h2>
-            {!compact && (
-              <p className="admin-note">کاور روی کارت؛ ویدیو/عکس کامل در پنجره جزئیات با ابعاد اصلی</p>
-            )}
+            <h2>{isPortfolioDraftDirty ? "کارت در حال ساخت" : "کارت جدید"}</h2>
+            <p className="admin-note">
+              {compact
+                ? "فرم را پر کنید، «ذخیره کارت» بزنید؛ تا ذخیره نشود نمی‌توانید کارت جدید باز کنید."
+                : "کاور روی کارت؛ ویدیو/عکس کامل در پنجره جزئیات با ابعاد اصلی"}
+            </p>
             <input
               value={portfolioForm.title}
               onChange={(e) => setPortfolioForm((v) => ({ ...v, title: e.target.value }))}
@@ -446,9 +471,24 @@ export default function AdminEditor({
               }}
               onChange={(patch) => setPortfolioForm((v) => ({ ...v, ...patch }))}
             />
-            <button type="button" className="btn-primary" disabled={busy || !categories.length} onClick={addPortfolio}>
-              افزودن کارت
-            </button>
+            <div className="admin-item-actions">
+              <button
+                type="button"
+                className="btn-primary"
+                disabled={busy || !categories.length || !isPortfolioDraftDirty}
+                onClick={savePortfolioDraft}
+              >
+                ذخیره کارت
+              </button>
+              <button
+                type="button"
+                className="btn-outline"
+                disabled={busy || !categories.length || isPortfolioDraftDirty}
+                onClick={startNewPortfolioDraft}
+              >
+                افزودن کارت جدید
+              </button>
+            </div>
           </div>
 
           <div className={`admin-list${compact ? " admin-list--compact" : ""}`}>
