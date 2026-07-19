@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { parseAuthCookie } from "@/lib/auth-session";
-import { readSiteContent, writeSiteContent, type SiteContent } from "@/lib/content-store";
+import { readSiteContent, writeSiteContent, type BackstageItem, type PortfolioItem, type SiteContent } from "@/lib/content-store";
+import { isVideoUrl, normalizeMediaFields } from "@/lib/media-types";
+import type { CreativePartnerItem } from "@/lib/landing-defaults";
 
 export const runtime = "nodejs";
 
@@ -71,6 +73,29 @@ export async function PUT(request: Request) {
 
   if (body.landing?.heroStats) {
     next.landing.heroStats = body.landing.heroStats;
+  }
+
+  if (body.landing?.heroMediaUrl !== undefined) {
+    const heroMediaUrl = String(body.landing.heroMediaUrl || "").trim();
+    next.landing.heroMediaUrl = heroMediaUrl;
+    next.landing.heroMediaType = isVideoUrl(heroMediaUrl) ? "video" : "image";
+  }
+
+  if (Array.isArray(body.portfolio)) {
+    next.portfolio = (body.portfolio as PortfolioItem[]).map((item) => normalizeMediaFields(item));
+  }
+
+  if (Array.isArray(body.backstage)) {
+    next.backstage = (body.backstage as BackstageItem[]).map((item) => normalizeMediaFields(item));
+  }
+
+  if (Array.isArray(body.creativePartners)) {
+    next.creativePartners = (body.creativePartners as CreativePartnerItem[]).map((item) =>
+      normalizeMediaFields({
+        ...item,
+        avatarSrc: item.avatarSrc ?? (item as { image?: string }).image,
+      }),
+    );
   }
 
   await writeSiteContent(next);

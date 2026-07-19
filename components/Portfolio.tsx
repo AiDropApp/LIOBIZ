@@ -93,8 +93,10 @@ export default function Portfolio() {
                     <div className="portfolio-card-media">
                       <CmsMedia
                         image={item.image}
+                        videoSrc={item.videoSrc}
+                        mediaKind={item.mediaKind}
+                        aspectRatio={item.aspectRatio}
                         alt={item.title}
-                        mediaKind="image"
                         fill
                         fitParent
                         objectFit="cover"

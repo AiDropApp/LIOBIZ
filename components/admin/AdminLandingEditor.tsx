@@ -305,7 +305,13 @@ export default function AdminLandingEditor() {
             subtitle="سکشن #portfolio"
             open
             onToggle={() => undefined}
-            onSave={() => save({ landing })}
+            onSave={() =>
+              save({
+                landing,
+                portfolio: content.portfolio,
+                portfolioCategories: content.portfolioCategories,
+              })
+            }
             saving={busy}
           >
             <Field label="برچسب" value={landing.portfolioLabel} onChange={(v) => patchLanding("portfolioLabel", v)} />
@@ -419,7 +425,7 @@ export default function AdminLandingEditor() {
             subtitle="سکشن #backstage"
             open
             onToggle={() => undefined}
-            onSave={() => save({ landing, teamStats })}
+            onSave={() => save({ landing, teamStats, backstage: content.backstage })}
             saving={busy}
           >
             <Field label="برچسب" value={landing.backstageLabel} onChange={(v) => patchLanding("backstageLabel", v)} />

@@ -459,8 +459,12 @@ export default function AdminEditor({
                   index={index + 1}
                   title={item.title}
                   subtitle={item.category}
-                  previewSrc={item.image}
-                  previewKind="image"
+                  previewSrc={
+                    resolveMediaKind(item) === "video" && item.videoSrc
+                      ? item.videoSrc
+                      : item.image
+                  }
+                  previewKind={resolveMediaKind(item) === "video" ? "video" : "image"}
                   posterSrc={item.image}
                   onRemove={() => removeItem("portfolio", item.id)}
                 >
@@ -504,7 +508,32 @@ export default function AdminEditor({
               ) : (
                 <article key={item.id} className="admin-item lux-card">
                   <div className="admin-item-media">
-                    <ContentImage src={item.image} alt={item.title} fill className="object-cover" />
+                    {resolveMediaKind(item) === "video" && item.videoSrc ? (
+                      needsIframeVideoEmbed(item.videoSrc) ? (
+                        item.image || toGoogleDriveThumbnailUrl(item.videoSrc) ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={item.image || toGoogleDriveThumbnailUrl(item.videoSrc) || undefined}
+                            alt={item.title}
+                            className="h-full w-full object-cover"
+                          />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center bg-black/40 text-xs text-white/80">
+                            ویدیو
+                          </div>
+                        )
+                      ) : (
+                        <video
+                          src={toPlayableVideoUrl(item.videoSrc)}
+                          poster={item.image}
+                          muted
+                          playsInline
+                          className="h-full w-full object-cover"
+                        />
+                      )
+                    ) : (
+                      <ContentImage src={item.image} alt={item.title} fill className="object-cover" />
+                    )}
                   </div>
                   <div className="admin-item-body">
                     <input
