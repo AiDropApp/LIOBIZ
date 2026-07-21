@@ -59,27 +59,8 @@ Invoke-ScpLegacy "deploy-full.tar" "/tmp/deploy-full.tar"
 Invoke-ScpLegacy "next-build.tar" "/tmp/next-build.tar"
 
 Write-Host "=== DEPLOY ==="
-$cmd = @'
-set -e
-cd /var/www/liobiz
-tar -xf /tmp/deploy-full.tar
-rm -rf .next
-tar -xf /tmp/next-build.tar
-test -f .next/BUILD_ID
-if command -v pnpm >/dev/null 2>&1; then
-  pnpm install --frozen-lockfile --prod
-else
-  corepack enable 2>/dev/null || true
-  pnpm install --frozen-lockfile --prod
-fi
-chown -R ubuntu24:ubuntu24 app components lib public scripts .next node_modules package.json pnpm-lock.yaml 2>/dev/null || true
-systemctl restart liobiz
-sleep 3
-systemctl is-active liobiz
-curl -s -o /dev/null -w "local:%{http_code}\n" http://127.0.0.1:3000/
-curl -s -o /dev/null -w "public:%{http_code}\n" https://liobiz.com/ || true
-echo DEPLOY_COMPLETE
-'@
+scp -O -o BatchMode=yes -o ConnectTimeout=30 (Join-Path $PSScriptRoot "remote-deploy.sh") "${HostAlias}:/tmp/remote-deploy.sh"
+$cmd = "sed -i 's/\r$//' /tmp/remote-deploy.sh && bash /tmp/remote-deploy.sh"
 ssh -o BatchMode=yes $HostAlias $cmd
 
 Remove-Item deploy-full.tar, next-build.tar -Force -ErrorAction SilentlyContinue

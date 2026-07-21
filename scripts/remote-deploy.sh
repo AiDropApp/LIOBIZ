@@ -25,6 +25,9 @@ fi
 test -f .next/BUILD_ID
 echo "NEXT_BUILD_ID=$(cat .next/BUILD_ID)"
 
+echo "=== INSTALL ==="
+pnpm install --frozen-lockfile --prod
+
 echo "=== CLEANUP ==="
 rm -f /tmp/deploy-full.tar /tmp/next-build.tar /tmp/liobiz-next.tar /tmp/liobiz-deploy.tar
 rm -rf .next.broken
