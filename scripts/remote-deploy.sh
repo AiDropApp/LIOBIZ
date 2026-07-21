@@ -40,11 +40,27 @@ chown -R ubuntu24:ubuntu24 \
   /var/www/liobiz/scripts \
   /var/www/liobiz/.next 2>/dev/null || true
 
+echo "=== SSL ==="
+bash scripts/setup-nginx-ssl.sh
+
+echo "=== ADMIN ==="
+if [ -f data/liobiz.db ]; then
+  set -a
+  # shellcheck disable=SC1091
+  source .env.local 2>/dev/null || true
+  set +a
+  node scripts/ensure-admin.mjs data/liobiz.db || true
+fi
+
+echo "=== BACKUP CRON ==="
+bash scripts/install-backup-cron.sh /var/www/liobiz || true
+
 echo "=== RESTART ==="
 systemctl restart liobiz
 sleep 3
 systemctl is-active liobiz
 curl -s -o /dev/null -w "local:%{http_code}\n" http://127.0.0.1:3000/
+curl -s -o /dev/null -w "local443:%{http_code}\n" -k https://127.0.0.1/
 curl -s -o /dev/null -w "public:%{http_code}\n" https://liobiz.com/
 
 grep -q "Do NOT pre-encode" lib/auth.ts && echo AUTH_FIX_OK

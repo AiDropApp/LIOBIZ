@@ -107,7 +107,14 @@ cat > /etc/nginx/sites-available/liobiz << 'NGXEOF'
 server {
     listen 80 default_server;
     listen [::]:80 default_server;
+    listen 443 ssl default_server;
+    listen [::]:443 ssl default_server;
     server_name liobiz.com www.liobiz.com _;
+
+    ssl_certificate     /etc/nginx/ssl/liobiz.crt;
+    ssl_certificate_key /etc/nginx/ssl/liobiz.key;
+    ssl_protocols       TLSv1.2 TLSv1.3;
+
     client_max_body_size 50m;
     location / {
         proxy_pass http://127.0.0.1:3000;
@@ -121,6 +128,14 @@ server {
     }
 }
 NGXEOF
+apt-get install -y openssl >/dev/null 2>&1 || true
+mkdir -p /etc/nginx/ssl
+if [ ! -f /etc/nginx/ssl/liobiz.crt ]; then
+  openssl req -x509 -nodes -days 3650 -newkey rsa:2048 \
+    -keyout /etc/nginx/ssl/liobiz.key \
+    -out /etc/nginx/ssl/liobiz.crt \
+    -subj "/CN=liobiz.com" 2>/dev/null
+fi
 ln -sfn /etc/nginx/sites-available/liobiz /etc/nginx/sites-enabled/liobiz
 rm -f /etc/nginx/sites-enabled/default
 nginx -t
