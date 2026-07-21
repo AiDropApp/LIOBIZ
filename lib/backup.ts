@@ -170,6 +170,10 @@ function backupFilename(type: BackupType, date = new Date()): string {
   return `backup-${y}-${m}-${d}-${hh}${mm}${ss}-manual.zip`;
 }
 
+export function todayAutoBackupFilename(date = new Date()) {
+  return backupFilename("auto", date);
+}
+
 export async function ensureBackupsDir() {
   await fs.mkdir(BACKUPS_DIR, { recursive: true });
 }

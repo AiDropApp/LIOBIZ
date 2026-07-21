@@ -12,4 +12,4 @@ else
 fi
 
 echo "Manual test:"
-cd "$ROOT" && pnpm backup:auto
+cd "$ROOT" && /usr/bin/node "$ROOT/node_modules/tsx/dist/cli.mjs" "$ROOT/scripts/run-backup.ts"

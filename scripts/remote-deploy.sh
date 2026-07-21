@@ -41,10 +41,12 @@ chown -R ubuntu24:ubuntu24 \
   /var/www/liobiz/.next 2>/dev/null || true
 
 echo "=== SSL ==="
+sed -i 's/\r$//' scripts/setup-nginx-ssl.sh scripts/install-backup-cron.sh 2>/dev/null || true
 bash scripts/setup-nginx-ssl.sh
 
 echo "=== ADMIN ==="
 if [ -f data/liobiz.db ]; then
+  sed -i 's/\r$//' .env.local 2>/dev/null || true
   set -a
   # shellcheck disable=SC1091
   source .env.local 2>/dev/null || true
