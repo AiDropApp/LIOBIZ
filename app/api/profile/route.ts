@@ -6,6 +6,33 @@ import { getDb, users } from "@/lib/db";
 
 export const runtime = "nodejs";
 
+function profilePayload(user: NonNullable<ReturnType<typeof findUserById>>) {
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    phone: user.phone,
+    company: user.company,
+    createdAt: user.createdAt,
+  };
+}
+
+export async function GET() {
+  const cookieStore = await cookies();
+  const session = parseAuthCookie(cookieStore.get(AUTH_COOKIE)?.value);
+  if (!session) {
+    return NextResponse.json({ message: "دسترسی غیرمجاز" }, { status: 401 });
+  }
+
+  const user = findUserById(session.userId);
+  if (!user) {
+    return NextResponse.json({ message: "کاربر یافت نشد." }, { status: 404 });
+  }
+
+  return NextResponse.json({ ok: true, user: profilePayload(user) });
+}
+
 export async function PUT(request: Request) {
   const cookieStore = await cookies();
   const session = parseAuthCookie(cookieStore.get(AUTH_COOKIE)?.value);
@@ -36,15 +63,7 @@ export async function PUT(request: Request) {
   const nextSession = toSession(user);
   const response = NextResponse.json({
     ok: true,
-    user: {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      phone: user.phone,
-      company: user.company,
-      createdAt: user.createdAt,
-    },
+    user: profilePayload(user),
   });
   setAuthCookie(response, nextSession);
   return response;

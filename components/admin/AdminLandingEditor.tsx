@@ -3,25 +3,20 @@
 import { useCallback, useEffect, useState } from "react";
 import type { LandingContent } from "@/lib/cms-defaults";
 import type { SiteContent } from "@/lib/content-store";
-import AdminEditor from "@/components/admin/AdminEditor";
 import LandingSectionPanel from "@/components/admin/landing/LandingSectionPanel";
 import MediaUrlField from "@/components/admin/landing/MediaUrlField";
-import MediaItemFields from "@/components/admin/landing/MediaItemFields";
 import LandingItemCard from "@/components/admin/landing/LandingItemCard";
-import { isVideoUrl, normalizeMediaFields, resolveMediaKind } from "@/lib/media-types";
+import { isVideoUrl } from "@/lib/media-types";
 import { CMS_RICH_TEXT_HINT } from "@/lib/cms-rich-text";
-import type { CreativePartnerItem, PartnerItem, TestimonialItem } from "@/lib/landing-defaults";
+import type { PartnerItem, TestimonialItem } from "@/lib/landing-defaults";
 
 const SECTIONS = [
   { id: "hero", emoji: "🏠", title: "هیرو", subtitle: "تیتر، دکمه‌ها، ویدیو/عکس پس‌زمینه" },
   { id: "hero-stats", emoji: "📊", title: "آمار هیرو", subtitle: "اعداد و برچسب‌های زیر هیرو" },
   { id: "about", emoji: "ℹ️", title: "درباره لیوبیز", subtitle: "متن‌ها و دو تصویر" },
   { id: "services", emoji: "🛠️", title: "خدمات", subtitle: "عنوان سکشن و لیست خدمات" },
-  { id: "portfolio", emoji: "🎨", title: "نمونه کارها", subtitle: "عنوان + مدیریت آیتم‌ها" },
   { id: "process", emoji: "🔄", title: "فرایند همکاری", subtitle: "مراحل و عناوین" },
   { id: "plans", emoji: "💰", title: "پلن‌ها", subtitle: "سه پلن همکاری" },
-  { id: "backstage", emoji: "📸", title: "بک‌استیج", subtitle: "گالری، متن و آمار تیم" },
-  { id: "partners-creative", emoji: "🎬", title: "همکاران خلاق", subtitle: "پارتنرها با ویدیو/عکس" },
   { id: "faq", emoji: "❓", title: "FAQ", subtitle: "سوالات متداول" },
   { id: "testimonials", emoji: "💬", title: "نظرات مشتریان", subtitle: "گواهی مشتریان" },
   { id: "partners", emoji: "🤝", title: "برندهای همکار", subtitle: "لوگو + لینk" },
@@ -59,21 +54,6 @@ function Field({
       )}
     </label>
   );
-}
-
-function emptyCreativePartner(): CreativePartnerItem {
-  return normalizeMediaFields({
-    id: `partner-${Date.now()}`,
-    name: "",
-    role: "",
-    showcase: "",
-    bio: "",
-    quote: "",
-    avatarSrc: "",
-    videoSrc: "",
-    mediaKind: "image",
-    aspectRatio: "landscape",
-  });
 }
 
 function emptyTestimonial(): TestimonialItem {
@@ -132,14 +112,13 @@ export default function AdminLandingEditor() {
     return <p className="text-muted p-4">در حال بارگذاری محتوای لندینگ...</p>;
   }
 
-  const { landing, pages, site, plans, faq, testimonials, partners, creativePartners, teamStats, theme } =
-    content;
+  const { landing, pages, site, plans, faq, testimonials, partners, theme } = content;
 
   return (
     <section className="landing-admin">
       <div className="dash-section-head">
         <h2>مدیریت لندینگ</h2>
-        <p>هر بخش = یک قسمت از صفحه اصلی. باز کنید، ویرایش کنید، ذخیره کنید.</p>
+        <p>هر بخش = یک قسمت از صفحه اصلی. نمونه کار، بک‌استیج و همکاران خلاق از تب «رسانه» مدیریت می‌شوند.</p>
         <a href="/" target="_blank" rel="noreferrer" className="btn-outline mt-3 inline-flex text-sm">
           پیش‌نمایش سایت ↗
         </a>
@@ -299,36 +278,6 @@ export default function AdminLandingEditor() {
           </LandingSectionPanel>
         )}
 
-        {open === "portfolio" && (
-          <LandingSectionPanel
-            id="portfolio"
-            emoji="🎨"
-            title="نمونه کارها"
-            subtitle="سکشن #portfolio"
-            open
-            onToggle={() => undefined}
-          >
-            <Field
-              label="برچسب"
-              value={landing.portfolioLabel}
-              onChange={(v) => patchLanding("portfolioLabel", v)}
-              onBlur={(portfolioLabel) => save({ landing: { ...landing, portfolioLabel } })}
-            />
-            <Field
-              label="تیتر"
-              value={landing.portfolioTitle}
-              onChange={(v) => patchLanding("portfolioTitle", v)}
-              onBlur={(portfolioTitle) => save({ landing: { ...landing, portfolioTitle } })}
-            />
-            <p className="landing-section-hint">
-              {content.portfolioCategories?.length || 0} تب · {content.portfolio.length} کارت — تب‌ها و نمونه‌کارها را پایین مدیریت کنید
-            </p>
-            <div className="admin-editor-shell">
-              <AdminEditor embedded compact sectionOnly="portfolio" onContentChange={setContent} />
-            </div>
-          </LandingSectionPanel>
-        )}
-
         {open === "process" && (
           <LandingSectionPanel
             id="process"
@@ -418,141 +367,6 @@ export default function AdminLandingEditor() {
                 />
               </div>
             ))}
-          </LandingSectionPanel>
-        )}
-
-        {open === "backstage" && (
-          <LandingSectionPanel
-            id="backstage"
-            emoji="📸"
-            title="بک‌استیج"
-            subtitle="سکشن #backstage"
-            open
-            onToggle={() => undefined}
-            onSave={() => save({ landing, teamStats, backstage: content.backstage })}
-            saving={busy}
-          >
-            <Field label="برچسب" value={landing.backstageLabel} onChange={(v) => patchLanding("backstageLabel", v)} />
-            <Field label="تیتر" value={landing.backstageTitle} onChange={(v) => patchLanding("backstageTitle", v)} />
-            <Field label="توضیح" value={landing.backstageIntro} onChange={(v) => patchLanding("backstageIntro", v)} multiline />
-            {teamStats.map((stat, i) => (
-              <div key={i} className="landing-item-card">
-                <Field label="مقدار" value={stat.value} onChange={(v) => {
-                  const next = [...teamStats];
-                  next[i] = { ...next[i], value: v };
-                  setContent({ ...content, teamStats: next });
-                }} />
-                <Field label="برچسب" value={stat.label} onChange={(v) => {
-                  const next = [...teamStats];
-                  next[i] = { ...next[i], label: v };
-                  setContent({ ...content, teamStats: next });
-                }} />
-              </div>
-            ))}
-            <p className="landing-section-hint">{content.backstage.length} کارت — روی هر کارت کلیک کنید تا باز شود</p>
-            <div className="admin-editor-shell">
-              <AdminEditor embedded compact sectionOnly="backstage" onContentChange={setContent} />
-            </div>
-          </LandingSectionPanel>
-        )}
-
-        {open === "partners-creative" && (
-          <LandingSectionPanel
-            id="partners-creative"
-            emoji="🎬"
-            title="همکاران خلاق"
-            subtitle="سکشن #creative-partners"
-            open
-            onToggle={() => undefined}
-            onSave={() => save({ landing, creativePartners })}
-            saving={busy}
-          >
-            <Field label="برچسب" value={landing.creativePartnersLabel} onChange={(v) => patchLanding("creativePartnersLabel", v)} />
-            <Field label="تیتر" value={landing.creativePartnersTitle} onChange={(v) => patchLanding("creativePartnersTitle", v)} />
-            <Field label="توضیح" value={landing.creativePartnersIntro} onChange={(v) => patchLanding("creativePartnersIntro", v)} multiline />
-            <p className="landing-section-hint">{creativePartners.length} همکار — روی هر ردیف کلیک کنید تا فرم باز شود، سپس «ذخیره این بخش»</p>
-            {creativePartners.map((p, i) => (
-              <LandingItemCard
-                key={p.id}
-                index={i + 1}
-                title={p.name || `همکار ${i + 1}`}
-                subtitle={p.role || "بدون نقش"}
-                previewSrc={
-                  resolveMediaKind({ mediaKind: p.mediaKind, videoSrc: p.videoSrc }) === "video" && p.videoSrc
-                    ? p.videoSrc
-                    : p.avatarSrc
-                }
-                previewKind={
-                  resolveMediaKind({ mediaKind: p.mediaKind, videoSrc: p.videoSrc }) === "video"
-                    ? "video"
-                    : "image"
-                }
-                onRemove={() => {
-                  const next = creativePartners.filter((_, idx) => idx !== i);
-                  setContent({ ...content, creativePartners: next });
-                }}
-              >
-                <Field label="نام" value={p.name} onChange={(v) => {
-                  const next = [...creativePartners];
-                  next[i] = { ...next[i], name: v };
-                  setContent({ ...content, creativePartners: next });
-                }} />
-                <Field label="نقش / تخصص" value={p.role} onChange={(v) => {
-                  const next = [...creativePartners];
-                  next[i] = { ...next[i], role: v };
-                  setContent({ ...content, creativePartners: next });
-                }} />
-                <Field label="نمونه کار" value={p.showcase} onChange={(v) => {
-                  const next = [...creativePartners];
-                  next[i] = { ...next[i], showcase: v };
-                  setContent({ ...content, creativePartners: next });
-                }} />
-                <Field label="درباره" value={p.bio} onChange={(v) => {
-                  const next = [...creativePartners];
-                  next[i] = { ...next[i], bio: v };
-                  setContent({ ...content, creativePartners: next });
-                }} multiline />
-                <Field label="نقل‌قول" value={p.quote} onChange={(v) => {
-                  const next = [...creativePartners];
-                  next[i] = { ...next[i], quote: v };
-                  setContent({ ...content, creativePartners: next });
-                }} multiline />
-                <MediaItemFields
-                  compact
-                  values={{
-                    image: p.avatarSrc,
-                    videoSrc: p.videoSrc,
-                    mediaKind: p.mediaKind,
-                    aspectRatio: p.aspectRatio,
-                  }}
-                  onChange={(patch) => {
-                    const next = [...creativePartners];
-                    next[i] = normalizeMediaFields({
-                      ...next[i],
-                      avatarSrc: patch.image ?? next[i].avatarSrc,
-                      videoSrc: patch.videoSrc ?? next[i].videoSrc,
-                      mediaKind: patch.mediaKind ?? next[i].mediaKind,
-                      aspectRatio: patch.aspectRatio ?? next[i].aspectRatio,
-                    });
-                    setContent({ ...content, creativePartners: next });
-                  }}
-                  uploadKind="creative-partners"
-                  imageLabel="آواتار / پوستر"
-                />
-              </LandingItemCard>
-            ))}
-            <button
-              type="button"
-              className="landing-add-btn"
-              onClick={() =>
-                setContent({
-                  ...content,
-                  creativePartners: [...creativePartners, emptyCreativePartner()],
-                })
-              }
-            >
-              + افزودن همکار جدید
-            </button>
           </LandingSectionPanel>
         )}
 

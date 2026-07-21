@@ -60,6 +60,7 @@ export default function DashboardShell({
           <button
             key={item.id}
             type="button"
+            data-testid={`dash-nav-${item.id}`}
             className={active === item.id ? "is-active" : ""}
             onClick={() => {
               onNavigate(item.id);

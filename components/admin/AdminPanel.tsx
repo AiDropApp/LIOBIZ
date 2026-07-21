@@ -12,10 +12,14 @@ import {
   UserPlus,
   Inbox,
   Ticket,
+  Shield,
+  Cloud,
 } from "lucide-react";
 import DashboardShell from "@/components/dashboard/DashboardShell";
 import AdminLandingEditor from "@/components/admin/AdminLandingEditor";
 import AdminBlogEditor from "@/components/admin/AdminBlogEditor";
+import AdminBackupPanel from "@/components/admin/AdminBackupPanel";
+import AdminMediaCenter from "@/components/admin/AdminMediaCenter";
 import {
   ORDER_STATUS_LABELS,
   TICKET_STATUS_LABELS,
@@ -27,10 +31,12 @@ type Tab =
   | "overview"
   | "landing"
   | "blog"
-  | "users"
   | "orders"
   | "tickets"
-  | "messages";
+  | "users"
+  | "messages"
+  | "backup"
+  | "media";
 
 type UserRow = {
   id: number;
@@ -96,6 +102,8 @@ const NAV = [
   { id: "tickets", label: "تیکت‌ها", icon: MessageSquare },
   { id: "users", label: "کاربران", icon: Users },
   { id: "messages", label: "پیام‌های تماس", icon: Mail },
+  { id: "media", label: "رسانه", icon: Cloud },
+  { id: "backup", label: "بک‌آپ", icon: Shield },
 ];
 
 const ORDER_STATUS = ORDER_STATUS_LABELS;
@@ -744,6 +752,10 @@ export default function AdminPanel() {
           </div>
         </section>
       )}
+
+      {tab === "backup" && <AdminBackupPanel onToast={flash} />}
+
+      {tab === "media" && <AdminMediaCenter onToast={flash} />}
     </DashboardShell>
   );
 }

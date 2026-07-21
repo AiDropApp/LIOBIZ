@@ -3,16 +3,23 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 3001",
+    "dev:clean": "node scripts/clean-dev.mjs",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 3001",
     "lint": "next lint",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "audit:api": "node scripts/audit-dashboard-api.mjs",
+    "audit:full": "node scripts/full-platform-audit.mjs",
     "db:seed": "tsx scripts/seed-db.ts",
-    "screenshots": "node scripts/capture-screenshots.mjs",
-    "screenshots:audit": "node scripts/capture-ui-audit.mjs",
+    "backup:auto": "tsx scripts/run-backup.ts",
     "pwa:icons": "node scripts/generate-pwa-icons.mjs"
   },
   "dependencies": {
+    "adm-zip": "^0.6.0",
+    "archiver": "^8.0.0",
     "bcryptjs": "^3.0.3",
     "better-sqlite3": "^12.11.1",
     "drizzle-orm": "^0.45.2",
@@ -25,6 +32,9 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
+    "@types/adm-zip": "^0.5.8",
+    "@types/archiver": "^8.0.0",
     "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^22.10.0",
     "@types/react": "^19.0.0",
@@ -36,7 +46,8 @@
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17",
     "tsx": "^4.19.0",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "vitest": "^3.2.7"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

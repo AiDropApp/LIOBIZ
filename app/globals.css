@@ -2219,6 +2219,17 @@ main > section:not(.hero-section):not(.backstage-section):not(.portfolio-section
   animation: none !important;
 }
 
+.backstage-marquee-full .backstage-marquee-track.is-static {
+  mask-image: none;
+}
+
+.backstage-marquee-full .backstage-marquee-row.is-static {
+  width: 100%;
+  max-width: 100%;
+  justify-content: center;
+  will-change: auto;
+}
+
 .backstage-marquee-group {
   display: flex;
   flex: 0 0 auto;
@@ -2244,6 +2255,17 @@ main > section:not(.hero-section):not(.backstage-section):not(.portfolio-section
     width: min(18vw, 280px);
     min-width: min(18vw, 280px);
   }
+}
+
+.backstage-slide-frame--empty {
+  background: rgba(255, 255, 255, 0.04);
+  border-style: dashed;
+}
+
+.backstage-slide-empty {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
 }
 
 .backstage-slide-frame {
@@ -3202,6 +3224,10 @@ textarea {
   .dash-shell {
     padding: 1rem 1.15rem 2rem;
   }
+
+  .dash-page--admin .dash-shell {
+    padding: 0;
+  }
 }
 
 /* Large desktop / TV */
@@ -3214,6 +3240,10 @@ textarea {
 
   .dash-shell {
     max-width: 1600px;
+  }
+
+  .dash-page--admin .dash-shell {
+    max-width: none;
   }
 }
 

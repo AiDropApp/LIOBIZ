@@ -59,13 +59,25 @@ export default function CreativePartners() {
                 className={`cp-avatar${isActive ? " cp-avatar--active" : ""}`}
                 title={item.name}
               >
-                <img
-                  src={item.avatarSrc}
-                  alt={item.name}
-                  className="cp-avatar__img"
-                  loading="lazy"
-                  decoding="async"
-                />
+                {item.avatarVideoSrc ? (
+                  <video
+                    src={item.avatarVideoSrc}
+                    className="cp-avatar__img"
+                    muted
+                    loop
+                    playsInline
+                    autoPlay
+                    aria-hidden
+                  />
+                ) : (
+                  <img
+                    src={item.avatarSrc}
+                    alt={item.name}
+                    className="cp-avatar__img"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                )}
               </button>
             );
           })}

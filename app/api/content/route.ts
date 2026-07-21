@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
-import { readSiteContent } from "@/lib/content-store";
+import { readPublicSiteContent } from "@/lib/content-store";
 import { parseAuthCookie } from "@/lib/auth-session";
 
 export const runtime = "nodejs";
 
 export async function GET() {
   try {
-    const content = await readSiteContent();
+    const content = await readPublicSiteContent();
     return NextResponse.json(content);
   } catch (error) {
     console.error("[api/content] GET failed:", error);

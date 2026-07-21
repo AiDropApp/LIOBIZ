@@ -1,5 +1,6 @@
 import { promises as fs } from "fs";
 import path from "path";
+import { getDataDir, getProjectRoot, getUploadsDir } from "@/lib/paths";
 import { BACKSTAGE_GALLERY, PORTFOLIO_ITEMS, SITE, SOCIAL_LINKS } from "@/lib/constants";
 import { ABOUT_PAGE, CONTACT_PAGE, PROCESS_PAGE, PORTFOLIO_PAGE } from "@/lib/pages-content";
 import { defaultLanding, type LandingContent } from "@/lib/cms-defaults";
@@ -33,6 +34,7 @@ import {
   type PortfolioCategory,
   type PortfolioItemBase,
 } from "@/lib/portfolio";
+import { readPublicSiteContentWithMedia } from "@/lib/media-center/public";
 
 export type { LandingContent, PortfolioCategory };
 export { defaultLanding, DEFAULT_PORTFOLIO_CATEGORIES };
@@ -92,9 +94,9 @@ export type SiteContent = {
   blogPosts: BlogPost[];
 };
 
-const DATA_DIR = path.join(process.cwd(), "data");
+const DATA_DIR = getDataDir();
 const CONTENT_FILE = path.join(DATA_DIR, "site-content.json");
-const UPLOADS_DIR = path.join(process.cwd(), "public", "uploads");
+const UPLOADS_DIR = getUploadsDir();
 
 export const defaultPages: PagesContent = {
   about: {
@@ -168,7 +170,8 @@ function mergeLanding(parsed?: Partial<LandingContent>): LandingContent {
   };
 }
 
-function mergeContent(parsed: Partial<SiteContent>): SiteContent {
+/** Merge backup/partial CMS JSON with code defaults (keeps new sections after restore). */
+export function mergeContent(parsed: Partial<SiteContent>): SiteContent {
   const baseCategories = normalizeCategories(
     Array.isArray(parsed.portfolioCategories) ? parsed.portfolioCategories : defaults.portfolioCategories,
   );
@@ -251,11 +254,13 @@ async function ensureStore() {
 }
 
 async function mediaUploadExists(url?: string): Promise<boolean> {
-  if (!url?.startsWith("/api/media/")) return true;
+  if (!url?.trim()) return false;
+  if (url.startsWith("/api/media/filesir/")) return true;
+  if (!url.startsWith("/api/media/")) return true;
   const relative = url.replace("/api/media/", "");
   const [folder, ...rest] = relative.split("/");
   if (!folder || rest.length === 0) return false;
-  const filePath = path.join(process.cwd(), "public", "uploads", folder, rest.join("/"));
+  const filePath = path.join(getUploadsDir(), folder, rest.join("/"));
   try {
     await fs.access(filePath);
     return true;
@@ -285,6 +290,12 @@ export async function readSiteContent(): Promise<SiteContent> {
   const merged = mergeContent(parsed);
   merged.backstage = await hydrateBackstage(merged.backstage);
   return merged;
+}
+
+/** Public landing/pages: overlay published media-center cards on CMS JSON. */
+export async function readPublicSiteContent(): Promise<SiteContent> {
+  const merged = await readSiteContent();
+  return readPublicSiteContentWithMedia(merged);
 }
 
 export async function writeSiteContent(content: SiteContent) {

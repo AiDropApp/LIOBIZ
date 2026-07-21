@@ -6,7 +6,7 @@ import CmsMedia from "@/components/CmsMedia";
 import PortfolioDetailModal from "@/components/PortfolioDetailModal";
 import type { PortfolioCategory, PortfolioItem } from "@/lib/content-store";
 import { resolveMediaKind } from "@/lib/media-types";
-import { DEFAULT_PORTFOLIO_CATEGORIES, sortCategories } from "@/lib/portfolio";
+import { DEFAULT_PORTFOLIO_CATEGORIES, portfolioMatchesCategoryFilter, sortCategories } from "@/lib/portfolio";
 
 export default function PortfolioGallery({ compact = false }: { compact?: boolean }) {
   const [filter, setFilter] = useState("همه");
@@ -28,8 +28,10 @@ export default function PortfolioGallery({ compact = false }: { compact?: boolea
 
   const tabs = useMemo(() => ["همه", ...categories.map((c) => c.name)], [categories]);
 
-  const visible =
-    filter === "همه" ? items : items.filter((item) => item.category === filter);
+  const visible = useMemo(
+    () => (filter === "همه" ? items : items.filter((item) => portfolioMatchesCategoryFilter(item, filter))),
+    [filter, items],
+  );
 
   return (
     <div>

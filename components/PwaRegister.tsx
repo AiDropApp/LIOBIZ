@@ -6,6 +6,8 @@ import { PwaInstallPrompt } from "@/components/PwaInstallPrompt";
 export default function PwaRegister() {
   useEffect(() => {
     if (!("serviceWorker" in navigator)) return;
+    const path = window.location.pathname;
+    if (path.startsWith("/admin") || path.startsWith("/dashboard")) return;
 
     let cancelled = false;
 

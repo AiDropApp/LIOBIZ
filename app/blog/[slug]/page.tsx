@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import SiteShell from "@/components/SiteShell";
 import ContentImage from "@/components/ContentImage";
 import CmsRichText from "@/components/CmsRichText";
-import { readSiteContent } from "@/lib/content-store";
+import { readPublicSiteContent } from "@/lib/content-store";
 
 export const dynamic = "force-dynamic";
 
@@ -12,7 +12,7 @@ type Props = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const content = await readSiteContent();
+  const content = await readPublicSiteContent();
   const post = content.blogPosts.find((p) => p.slug === slug && p.published);
   if (!post) return { title: "مقاله یافت نشد | لیوبیز" };
   return {
@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params;
-  const content = await readSiteContent();
+  const content = await readPublicSiteContent();
   const post = content.blogPosts.find((p) => p.slug === slug && p.published);
   if (!post) notFound();
 

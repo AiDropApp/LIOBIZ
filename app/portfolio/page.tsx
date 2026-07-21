@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import SiteShell from "@/components/SiteShell";
 import PageHero from "@/components/PageHero";
 import PortfolioGallery from "@/components/PortfolioGallery";
-import { readSiteContent } from "@/lib/content-store";
+import { readPublicSiteContent } from "@/lib/content-store";
 
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const content = await readSiteContent();
+  const content = await readPublicSiteContent();
   return {
     title: `${content.pages.portfolio.title} | لیوبیز`,
     description: content.pages.portfolio.intro,
@@ -15,7 +15,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function PortfolioPage() {
-  const content = await readSiteContent();
+  const content = await readPublicSiteContent();
   const portfolio = content.pages.portfolio;
 
   return (

@@ -26,6 +26,7 @@
 /data/contact-messages.json
 /data/liobiz.db
 /data/liobiz.db-*
+/data/backups/
 
 # debug
 npm-debug.log*
@@ -62,3 +63,12 @@ ts-trace.txt
 
 # deploy secrets / certs (never commit)
 .deploy/
+
+# local deploy artifacts
+deploy-full.tar
+next-build.tar
+
+# test artifacts
+/test-results/
+/docs/playwright-report/
+/playwright-report/

@@ -1,5 +1,6 @@
 import { createElement } from "react";
 import { parseCmsRichText } from "@/lib/cms-rich-text";
+import { needsIframeVideoEmbed, toPlayableVideoUrl } from "@/lib/media-types";
 
 type Props = {
   content?: string;
@@ -38,6 +39,36 @@ export default function CmsRichText({
               className: `${levelClass} ${headingClassName}`.trim(),
             },
             block.text,
+          );
+        }
+        if (block.type === "image") {
+          return (
+            <figure key={`img-${index}`} className="cms-rich-media my-6">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={block.src} alt={block.alt} className="w-full rounded-xl object-cover" loading="lazy" />
+            </figure>
+          );
+        }
+        if (block.type === "video") {
+          const src = toPlayableVideoUrl(block.src);
+          if (needsIframeVideoEmbed(block.src)) {
+            return (
+              <div key={`vid-${index}`} className="cms-rich-media my-6 aspect-video overflow-hidden rounded-xl">
+                <iframe
+                  src={src}
+                  title="ویدیو"
+                  className="h-full w-full border-0"
+                  allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+                  allowFullScreen
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
+              </div>
+            );
+          }
+          return (
+            <div key={`vid-${index}`} className="cms-rich-media my-6 overflow-hidden rounded-xl">
+              <video src={src} controls playsInline preload="metadata" className="w-full" />
+            </div>
           );
         }
         return (

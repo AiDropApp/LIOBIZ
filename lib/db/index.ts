@@ -4,6 +4,7 @@ import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import fs from "fs";
 import path from "path";
+import { getDataDir } from "@/lib/paths";
 import * as schema from "@/lib/db/schema";
 import {
   contactMessages,
@@ -15,10 +16,24 @@ import {
   users,
 } from "@/lib/db/schema";
 
-const DATA_DIR = path.join(process.cwd(), "data");
+const DATA_DIR = getDataDir();
 const DB_PATH = path.join(DATA_DIR, "liobiz.db");
 
 let dbInstance: ReturnType<typeof drizzle<typeof schema>> | null = null;
+let sqliteHandle: Database.Database | null = null;
+
+/** Close SQLite (required before backup restore). */
+export function closeDb() {
+  if (sqliteHandle) {
+    try {
+      sqliteHandle.close();
+    } catch {
+      // ignore
+    }
+  }
+  sqliteHandle = null;
+  dbInstance = null;
+}
 
 function ensureSchema(database: Database.Database) {
   database.exec(`
@@ -181,12 +196,20 @@ export function getDb() {
 
   fs.mkdirSync(DATA_DIR, { recursive: true });
   const sqlite = new Database(DB_PATH);
+  sqliteHandle = sqlite;
   sqlite.pragma("journal_mode = WAL");
   ensureSchema(sqlite);
   dbInstance = drizzle(sqlite, { schema });
   seedAdmin(dbInstance);
   migrateContactJson(dbInstance);
   return dbInstance;
+}
+
+export function checkpointDb() {
+  if (!sqliteHandle) {
+    getDb();
+  }
+  sqliteHandle?.pragma("wal_checkpoint(TRUNCATE)");
 }
 
 export type {

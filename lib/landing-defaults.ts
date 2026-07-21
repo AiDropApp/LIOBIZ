@@ -54,6 +54,8 @@ export type CreativePartnerItem = {
   quote: string;
   videoSrc: string;
   avatarSrc: string;
+  /** When avatar is a video file, render with <video> instead of <img>. */
+  avatarVideoSrc?: string;
   image?: string;
 } & CmsMediaFields;
 

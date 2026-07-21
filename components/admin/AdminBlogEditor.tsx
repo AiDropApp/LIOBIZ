@@ -5,7 +5,7 @@ import type { BlogPost } from "@/lib/blog-defaults";
 import { slugifyBlogTitle } from "@/lib/blog-defaults";
 import { CMS_RICH_TEXT_HINT } from "@/lib/cms-rich-text";
 import type { SiteContent } from "@/lib/content-store";
-import MediaUrlField from "@/components/admin/landing/MediaUrlField";
+import MediaUrlField, { uploadBlogMedia } from "@/components/admin/landing/MediaUrlField";
 
 function emptyPost(): BlogPost {
   return {
@@ -25,6 +25,7 @@ function emptyPost(): BlogPost {
 export default function AdminBlogEditor() {
   const [content, setContent] = useState<SiteContent | null>(null);
   const [editing, setEditing] = useState<BlogPost | null>(null);
+  const [contentUploadBusy, setContentUploadBusy] = useState(false);
   const [busy, setBusy] = useState(false);
   const [toast, setToast] = useState("");
 
@@ -40,6 +41,26 @@ export default function AdminBlogEditor() {
   const flash = (text: string) => {
     setToast(text);
     setTimeout(() => setToast(""), 2500);
+  };
+
+  const appendContentLine = (line: string) => {
+    if (!editing) return;
+    const prefix = editing.content.trim() ? "\n\n" : "";
+    setEditing({ ...editing, content: `${editing.content}${prefix}${line}` });
+  };
+
+  const uploadContentMedia = async (file: File, kind: "image" | "video") => {
+    setContentUploadBusy(true);
+    try {
+      const url = await uploadBlogMedia(file);
+      const alt = file.name.replace(/\.[^.]+$/, "") || "تصویر";
+      appendContentLine(kind === "image" ? `![${alt}](${url})` : `::video ${url}`);
+      flash(kind === "image" ? "تصویر به محتوا اضافه شد." : "ویدیو به محتوا اضافه شد.");
+    } catch (e) {
+      flash(e instanceof Error ? e.message : "خطا در آپلود");
+    } finally {
+      setContentUploadBusy(false);
+    }
   };
 
   const savePosts = async (posts: BlogPost[]) => {
@@ -152,14 +173,45 @@ export default function AdminBlogEditor() {
             <span>محتوا</span>
             <textarea rows={10} value={editing.content} onChange={(e) => setEditing({ ...editing, content: e.target.value })} />
             <small className="text-muted">{CMS_RICH_TEXT_HINT}</small>
+            <div className="mt-2 flex flex-wrap gap-2">
+              <label className="btn-outline text-sm cursor-pointer">
+                {contentUploadBusy ? "در حال آپلود…" : "افزودن تصویر به متن"}
+                <input
+                  type="file"
+                  accept="image/*"
+                  hidden
+                  disabled={contentUploadBusy}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) uploadContentMedia(file, "image");
+                    e.target.value = "";
+                  }}
+                />
+              </label>
+              <label className="btn-outline text-sm cursor-pointer">
+                {contentUploadBusy ? "در حال آپلود…" : "افزودن ویدیو به متن"}
+                <input
+                  type="file"
+                  accept="video/*"
+                  hidden
+                  disabled={contentUploadBusy}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) uploadContentMedia(file, "video");
+                    e.target.value = "";
+                  }}
+                />
+              </label>
+            </div>
           </label>
 
           <MediaUrlField
             label="تصویر کاور"
             value={editing.coverImage}
             onChange={(url) => setEditing({ ...editing, coverImage: url })}
-            uploadKind="uploads"
+            filesirSection="blog"
             accept="image/*"
+            hint="فایل در پوشه blog در MyFile ذخیره می‌شود."
           />
 
           <label className="contact-field">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import styles from "./PwaInstallPrompt.module.css";
 
 // ── تنظیمات سایت ──
@@ -54,6 +55,7 @@ function readDeferred(): BeforeInstallPromptEvent | null {
 }
 
 export function PwaInstallPrompt({ lang }: { lang?: Lang } = {}) {
+  const pathname = usePathname();
   const t = copy[lang ?? (typeof document !== "undefined" ? detectLang() : "fa")];
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
   const [visible, setVisible] = useState(false);
@@ -145,7 +147,8 @@ export function PwaInstallPrompt({ lang }: { lang?: Lang } = {}) {
     }
   }, [deferred]);
 
-  if (hidden || !visible) return null;
+  const isAppShell = pathname?.startsWith("/admin") || pathname?.startsWith("/dashboard");
+  if (isAppShell || hidden || !visible) return null;
 
   const body = deferred ? t.body : isIos ? t.ios : t.desktop;
 

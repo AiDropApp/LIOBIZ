@@ -66,7 +66,13 @@ tar -xf /tmp/deploy-full.tar
 rm -rf .next
 tar -xf /tmp/next-build.tar
 test -f .next/BUILD_ID
-chown -R ubuntu24:ubuntu24 app components lib public scripts .next 2>/dev/null || true
+if command -v pnpm >/dev/null 2>&1; then
+  pnpm install --frozen-lockfile --prod
+else
+  corepack enable 2>/dev/null || true
+  pnpm install --frozen-lockfile --prod
+fi
+chown -R ubuntu24:ubuntu24 app components lib public scripts .next node_modules package.json pnpm-lock.yaml 2>/dev/null || true
 systemctl restart liobiz
 sleep 3
 systemctl is-active liobiz

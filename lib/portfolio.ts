@@ -35,6 +35,16 @@ export function categoryNameById(categories: PortfolioCategory[], id?: string): 
   return categories.find((c) => c.id === id)?.name || "";
 }
 
+/** Match portfolio items against a root category chip (includes all subcategories). */
+export function portfolioMatchesCategoryFilter(
+  item: Pick<PortfolioItemBase, "category">,
+  filterName: string,
+): boolean {
+  if (filterName === "همه") return true;
+  const category = item.category?.trim() || "";
+  return category === filterName || category.startsWith(`${filterName} › `);
+}
+
 export function resolveCategoryCover(
   cat: PortfolioCategory,
   items: Array<{ categoryId?: string; image?: string }>,

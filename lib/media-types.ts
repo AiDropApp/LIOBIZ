@@ -128,17 +128,20 @@ export function toGoogleDriveThumbnailUrl(url: string, size = 240): string | nul
 
 export function isVideoUrl(url?: string) {
   if (!url) return false;
-  if (isGoogleDriveUrl(url) || isFilesIrUrl(url)) return true;
+  if (isDirectVideoFileUrl(url)) return true;
   if (youtubeEmbedUrl(url) || aparatEmbedUrl(url) || vimeoEmbedUrl(url)) return true;
-  return isDirectVideoFileUrl(url);
+  // Google Drive / Files.ir share pages may host video — only treat as video when explicitly used as videoSrc
+  if (isGoogleDriveUrl(url) || isFilesIrUrl(url)) return true;
+  return false;
 }
 
 export function resolveMediaKind(item: {
   mediaKind?: MediaKind;
   videoSrc?: string;
 }): MediaKind {
+  if (item.mediaKind === "image") return "image";
   if (item.mediaKind === "video" && item.videoSrc?.trim()) return "video";
-  if (item.mediaKind !== "image" && isVideoUrl(item.videoSrc)) return "video";
+  if (item.videoSrc?.trim() && isVideoUrl(item.videoSrc)) return "video";
   return "image";
 }
 
@@ -155,10 +158,16 @@ export function aspectRatioClass(ratio?: MediaAspect): string {
 
 export function normalizeMediaFields<T extends CmsMediaFields>(item: T): T {
   const videoSrc = item.videoSrc?.trim() || undefined;
+  const mediaKind: MediaKind =
+    item.mediaKind === "video" || item.mediaKind === "image"
+      ? item.mediaKind
+      : videoSrc && isVideoUrl(videoSrc)
+        ? "video"
+        : "image";
   return {
     ...item,
-    mediaKind: item.mediaKind ?? (isVideoUrl(videoSrc) ? "video" : "image"),
+    mediaKind,
     aspectRatio: item.aspectRatio ?? "portrait",
-    videoSrc,
+    videoSrc: mediaKind === "video" ? videoSrc : undefined,
   };
 }

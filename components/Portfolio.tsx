@@ -8,7 +8,7 @@ import PortfolioDetailModal from "@/components/PortfolioDetailModal";
 import { defaultLanding, type LandingContent } from "@/lib/cms-defaults";
 import type { PortfolioCategory, PortfolioItem } from "@/lib/content-store";
 import { resolveMediaKind } from "@/lib/media-types";
-import { DEFAULT_PORTFOLIO_CATEGORIES, sortCategories } from "@/lib/portfolio";
+import { DEFAULT_PORTFOLIO_CATEGORIES, portfolioMatchesCategoryFilter, sortCategories } from "@/lib/portfolio";
 
 const LANDING_LIMIT = 8;
 
@@ -36,7 +36,7 @@ export default function Portfolio() {
 
   const visible = useMemo(() => {
     const filtered =
-      filter === "همه" ? items : items.filter((item) => item.category === filter);
+      filter === "همه" ? items : items.filter((item) => portfolioMatchesCategoryFilter(item, filter));
     return filtered.slice(0, LANDING_LIMIT);
   }, [filter, items]);
 

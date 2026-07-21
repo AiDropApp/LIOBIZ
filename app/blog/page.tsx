@@ -3,7 +3,7 @@ import Link from "next/link";
 import SiteShell from "@/components/SiteShell";
 import PageHero from "@/components/PageHero";
 import ContentImage from "@/components/ContentImage";
-import { readSiteContent } from "@/lib/content-store";
+import { readPublicSiteContent } from "@/lib/content-store";
 
 export const dynamic = "force-dynamic";
 
@@ -15,7 +15,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function BlogPage() {
-  const content = await readSiteContent();
+  const content = await readPublicSiteContent();
   const posts = content.blogPosts
     .filter((post) => post.published)
     .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
