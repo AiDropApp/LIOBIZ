@@ -152,7 +152,9 @@
   min-height: 100vh;
   min-height: 100dvh;
   padding: 0;
-  /* background/colors: see dashboard-theme.css */
+  background:
+    radial-gradient(ellipse at 15% 0%, rgba(253, 245, 242, 0.95), transparent 42%),
+    #f7f7f8;
   color: #111827;
 }
 
