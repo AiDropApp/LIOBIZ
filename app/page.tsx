@@ -13,14 +13,21 @@ import FAQ from "@/components/FAQ";
 import Footer from "@/components/Footer";
 import LoadingScreen from "@/components/LoadingScreen";
 import SmoothScroll from "@/components/SmoothScroll";
+import { defaultLanding } from "@/lib/cms-defaults";
+import { readPublicSiteContent } from "@/lib/content-store";
 
-export default function HomePage() {
+export const dynamic = "force-dynamic";
+
+export default async function HomePage() {
+  const content = await readPublicSiteContent();
+  const landing = { ...defaultLanding, ...content.landing };
+
   return (
     <SmoothScroll>
       <LoadingScreen />
-      <Header />
+      <Header initialLogoUrl={content.site.logoUrl} />
       <main className="w-full overflow-x-clip">
-        <Hero />
+        <Hero initialLanding={landing} />
         <AboutLiobiz />
         <Services />
         <Portfolio />

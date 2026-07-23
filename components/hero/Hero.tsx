@@ -14,24 +14,23 @@ import {
   toPlayableVideoUrl,
 } from "@/lib/media-types";
 
-export default function Hero() {
+export default function Hero({ initialLanding }: { initialLanding?: LandingContent }) {
   const reducedMotion = usePrefersReducedMotion();
-  const [landing, setLanding] = useState<LandingContent>(defaultLanding);
+  const [landing, setLanding] = useState<LandingContent>(initialLanding ?? defaultLanding);
 
   useEffect(() => {
+    if (initialLanding) return;
     fetch("/api/content", { cache: "no-store" })
       .then((r) => r.json())
       .then((data) => {
         if (data?.landing) setLanding({ ...defaultLanding, ...data.landing });
       })
       .catch(() => undefined);
-  }, []);
+  }, [initialLanding]);
 
-  const rawMedia = landing.heroMediaUrl || "/images/hero-lion.png";
-  const media = rawMedia.includes("/videos/header.mp4") ? "/images/hero-lion.png" : rawMedia;
-  const isVideo =
-    media !== "/images/hero-lion.png" &&
-    (landing.heroMediaType === "video" || isVideoUrl(media));
+  const rawMedia = landing.heroMediaUrl.trim();
+  const media = rawMedia.includes("/videos/header.mp4") ? "" : rawMedia;
+  const isVideo = Boolean(media) && (landing.heroMediaType === "video" || isVideoUrl(media));
   const useIframe = isVideo && needsIframeVideoEmbed(media);
   const playable = isVideo ? toPlayableVideoUrl(media) : media;
 
@@ -62,9 +61,9 @@ export default function Hero() {
                 key={playable}
               />
             )
-          ) : (
+          ) : media ? (
             <Image src={media} alt="" fill className="hero-video object-cover" priority sizes="100vw" />
-          )}
+          ) : null}
           <div className="hero-video-scrim" />
         </div>
 

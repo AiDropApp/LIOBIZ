@@ -9,23 +9,18 @@ import { NAV_LINKS, SERVICES } from "@/lib/constants";
 import Logo from "./Logo";
 import usePrefersReducedMotion from "@/hooks/usePrefersReducedMotion";
 
-export default function Header() {
+export default function Header({ initialLogoUrl = "/images/logo.png" }: { initialLogoUrl?: string }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
-  const [logoUrl, setLogoUrl] = useState("/images/logo.png");
+  const [logoUrl, setLogoUrl] = useState(initialLogoUrl);
   const servicesRef = useRef<HTMLDivElement>(null);
   const reducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
-    fetch("/api/content", { cache: "no-store" })
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (data?.site?.logoUrl) setLogoUrl(data.site.logoUrl);
-      })
-      .catch(() => undefined);
-  }, []);
+    setLogoUrl(initialLogoUrl);
+  }, [initialLogoUrl]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -89,9 +84,8 @@ export default function Header() {
     <header className={`lux-header ${scrolled ? "is-scrolled" : ""}`}>
       <motion.div
         className="lux-header-shell"
-        initial={reducedMotion ? false : { opacity: 0, y: -12 }}
+        initial={false}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.55, ease: "easeOut" }}
       >
         <div className="header-bar">
           <motion.div className="header-brand" {...fade(0.05)}>

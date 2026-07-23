@@ -5,6 +5,7 @@ import "./auth.css";
 import "./admin.css";
 import { SITE } from "@/lib/constants";
 import GoogleTagManager from "@/components/GoogleTagManager";
+import ContentsquareAnalytics from "@/components/ContentsquareAnalytics";
 import PwaBoot from "@/components/PwaBoot";
 import PwaRegister from "@/components/PwaRegister";
 import ThemeProvider from "@/components/ThemeProvider";
@@ -57,6 +58,7 @@ export default function RootLayout({
   return (
     <html lang="fa" dir="rtl">
       <body className={`${vazirmatn.variable} font-vazir`}>
+        <ContentsquareAnalytics />
         <GoogleTagManager />
         <PwaBoot />
         <ThemeProvider>{children}</ThemeProvider>
