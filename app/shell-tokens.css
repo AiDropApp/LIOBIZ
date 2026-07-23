@@ -1,0 +1,166 @@
+/**
+ * Liobiz Midnight Agency — unified design tokens (dashboard + auth).
+ * Navy canvas · indigo creative · champagne gold · coral brand.
+ */
+:root {
+  /* Navy base scale — pure cool navy (no brown) */
+  --liobiz-navy-0: #050810;
+  --liobiz-navy-1: #0a0f18;
+  --liobiz-navy-2: #101827;
+  --liobiz-navy-3: #162033;
+
+  /* Typography — 3-tier contrast on navy */
+  --liobiz-ink: #e8ecf4;
+  --liobiz-secondary: #c8d0dc;
+  --liobiz-muted: #9aa3b2;
+  --liobiz-soft: #7a8496;
+  --liobiz-border: rgba(148, 163, 184, 0.12);
+  --liobiz-border-strong: rgba(148, 163, 184, 0.2);
+
+  /* Indigo — creative secondary (agency) */
+  --liobiz-indigo: #818cf8;
+  --liobiz-indigo-hover: #6366f1;
+  --liobiz-indigo-bright: #a5b4fc;
+  --liobiz-indigo-soft: rgba(99, 102, 241, 0.18);
+  --liobiz-indigo-border: rgba(129, 140, 248, 0.34);
+  --liobiz-indigo-glow: rgba(99, 102, 241, 0.28);
+  --liobiz-indigo-shadow: rgba(99, 102, 241, 0.35);
+
+  /* Champagne gold — primary accent */
+  --liobiz-gold: #c9a962;
+  --liobiz-gold-hover: #b8954f;
+  --liobiz-gold-bright: #dfc078;
+  --liobiz-gold-soft: rgba(201, 169, 98, 0.12);
+  --liobiz-gold-border: rgba(201, 169, 98, 0.28);
+  --liobiz-gold-glow: rgba(201, 169, 98, 0.2);
+  --liobiz-gold-shadow: rgba(201, 169, 98, 0.32);
+
+  /* Liobiz coral — brand accent (sparing) */
+  --liobiz-coral: #e07a5a;
+  --liobiz-coral-hover: #cc6648;
+  --liobiz-coral-link: #f0a088;
+  --liobiz-coral-soft: rgba(224, 122, 90, 0.12);
+  --liobiz-coral-border: rgba(224, 122, 90, 0.28);
+  --liobiz-coral-glow: rgba(224, 122, 90, 0.16);
+  --liobiz-coral-shadow: rgba(224, 122, 90, 0.28);
+
+  /* Cool pearl surfaces */
+  --liobiz-champagne: #d4dce8;
+  --liobiz-pearl: rgba(148, 163, 184, 0.08);
+  --liobiz-pearl-border: rgba(148, 163, 184, 0.18);
+
+  /* Semantic — navy-harmonized (muted, not neon) */
+  --liobiz-success: #4ade80;
+  --liobiz-success-text: #86efac;
+  --liobiz-success-soft: rgba(74, 222, 128, 0.1);
+  --liobiz-success-border: rgba(74, 222, 128, 0.22);
+  --liobiz-danger: #f87171;
+  --liobiz-danger-soft: rgba(248, 113, 113, 0.1);
+  --liobiz-danger-border: rgba(248, 113, 113, 0.26);
+  --liobiz-info: #60a5fa;
+  --liobiz-info-text: #93c5fd;
+  --liobiz-info-soft: rgba(96, 165, 250, 0.1);
+  --liobiz-info-border: rgba(96, 165, 250, 0.22);
+  --liobiz-violet: #a78bfa;
+  --liobiz-violet-soft: rgba(167, 139, 250, 0.12);
+  --liobiz-violet-border: rgba(167, 139, 250, 0.28);
+
+  --liobiz-on-gold: #0c1018;
+  --liobiz-on-indigo: #0c1018;
+
+  /* Legacy aliases */
+  --liobiz-ivory: rgba(148, 163, 184, 0.04);
+  --liobiz-ivory-sidebar: rgba(148, 163, 184, 0.055);
+  --liobiz-ivory-input: rgba(148, 163, 184, 0.035);
+  --liobiz-ivory-row: rgba(148, 163, 184, 0.03);
+  --liobiz-bg: var(--liobiz-ivory);
+  --liobiz-bg-soft: var(--liobiz-ivory-row);
+
+  /* Glass — frosted, tiered by surface */
+  --liobiz-glass: rgba(148, 163, 184, 0.028);
+  --liobiz-glass-strong: rgba(148, 163, 184, 0.055);
+  --liobiz-glass-hero: rgba(148, 163, 184, 0.032);
+  --liobiz-glass-list: rgba(148, 163, 184, 0.048);
+  --liobiz-glass-sidebar: rgba(148, 163, 184, 0.062);
+  --liobiz-glass-border: rgba(199, 210, 254, 0.14);
+  --liobiz-glass-rim: rgba(129, 140, 248, 0.26);
+  --liobiz-glass-stroke: rgba(148, 163, 184, 0.09);
+  --liobiz-glass-highlight: rgba(199, 210, 254, 0.18);
+  --liobiz-glass-shine: linear-gradient(
+    145deg,
+    rgba(199, 210, 254, 0.16) 0%,
+    rgba(148, 163, 184, 0.05) 38%,
+    rgba(148, 163, 184, 0) 72%
+  );
+  --liobiz-glass-depth: linear-gradient(
+    180deg,
+    rgba(148, 163, 184, 0.07) 0%,
+    rgba(148, 163, 184, 0) 48%,
+    rgba(6, 9, 16, 0.35) 100%
+  );
+
+  /* Shape & motion */
+  --liobiz-radius-sidebar: 1.35rem;
+  --liobiz-radius-card: 1.15rem;
+  --liobiz-radius-btn: 0.8rem;
+  --liobiz-radius-pill: 999px;
+  --liobiz-blur: 36px;
+  --liobiz-blur-heavy: 56px;
+  --liobiz-blur-card: 40px;
+  --liobiz-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --liobiz-dur: 0.32s;
+
+  /* Midnight canvas — indigo + gold mesh on navy */
+  --liobiz-canvas-dash:
+    radial-gradient(ellipse 80% 58% at 12% -8%, rgba(99, 102, 241, 0.22), transparent 58%),
+    radial-gradient(ellipse 66% 52% at 92% 4%, rgba(129, 140, 248, 0.14), transparent 52%),
+    radial-gradient(ellipse 58% 44% at 50% 108%, rgba(201, 169, 98, 0.08), transparent 54%),
+    radial-gradient(ellipse 44% 38% at 72% 42%, rgba(96, 165, 250, 0.07), transparent 48%),
+    linear-gradient(168deg, var(--liobiz-navy-0) 0%, var(--liobiz-navy-1) 38%, var(--liobiz-navy-2) 72%, var(--liobiz-navy-0) 100%);
+
+  --liobiz-canvas: var(--liobiz-canvas-dash);
+
+  /* Shadows — cool depth + indigo/gold rim */
+  --liobiz-shadow-sidebar-dash:
+    0 0 0 1px rgba(148, 163, 184, 0.12),
+    0 24px 64px rgba(2, 6, 23, 0.65),
+    0 0 72px rgba(99, 102, 241, 0.08),
+    inset 0 1px 0 rgba(199, 210, 254, 0.12),
+    inset 0 -1px 0 rgba(6, 9, 16, 0.4);
+
+  --liobiz-shadow-card-dash:
+    0 0 0 1px rgba(148, 163, 184, 0.1),
+    0 0 0 1px rgba(99, 102, 241, 0.05),
+    0 10px 24px rgba(2, 6, 23, 0.42),
+    0 28px 56px rgba(2, 6, 23, 0.32),
+    inset 0 1px 0 rgba(199, 210, 254, 0.1),
+    inset 0 -12px 24px rgba(6, 9, 16, 0.15);
+
+  --liobiz-shadow-card-hover-dash:
+    0 0 0 1px rgba(129, 140, 248, 0.28),
+    0 14px 32px rgba(2, 6, 23, 0.48),
+    0 36px 72px rgba(2, 6, 23, 0.38),
+    0 0 56px rgba(99, 102, 241, 0.12),
+    inset 0 1px 0 rgba(199, 210, 254, 0.14);
+
+  --liobiz-shadow-btn:
+    0 8px 24px var(--liobiz-indigo-shadow),
+    0 0 32px var(--liobiz-indigo-glow);
+
+  --liobiz-shadow-sidebar: var(--liobiz-shadow-sidebar-dash);
+  --liobiz-shadow-card: var(--liobiz-shadow-card-dash);
+  --liobiz-shadow-card-hover: var(--liobiz-shadow-card-hover-dash);
+}
+
+@keyframes liobiz-aurora-drift {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.45;
+  }
+
+  50% {
+    transform: translate(1.5%, -1%) scale(1.05);
+    opacity: 0.72;
+  }
+}

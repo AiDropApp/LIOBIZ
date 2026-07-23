@@ -3226,7 +3226,8 @@ textarea {
   }
 
   .dash-page--admin .dash-shell {
-    padding: 0;
+    max-width: none;
+    /* padding/gap: dashboard-theme.css */
   }
 }
 

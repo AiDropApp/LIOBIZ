@@ -2,12 +2,25 @@
 
 import { useEffect } from "react";
 import { PwaInstallPrompt } from "@/components/PwaInstallPrompt";
+import { isPwaSuppressedPath } from "@/lib/pwa-paths";
 
 export default function PwaRegister() {
   useEffect(() => {
+    if (process.env.NODE_ENV === "development") {
+      if (!("serviceWorker" in navigator)) return;
+      navigator.serviceWorker.getRegistrations().then((regs) => {
+        regs.forEach((reg) => reg.unregister());
+      });
+      if ("caches" in window) {
+        caches.keys().then((keys) => {
+          keys.filter((key) => key.startsWith("liobiz-")).forEach((key) => caches.delete(key));
+        });
+      }
+      return;
+    }
     if (!("serviceWorker" in navigator)) return;
     const path = window.location.pathname;
-    if (path.startsWith("/admin") || path.startsWith("/dashboard")) return;
+    if (isPwaSuppressedPath(path)) return;
 
     let cancelled = false;
 

@@ -13,8 +13,8 @@ export default function Logo({
   height?: number;
   src?: string;
 }) {
-  const h = height ?? (width ? Math.round(width * 1.15) : 120);
-  const w = width ?? Math.round(h * 0.9);
+  const w = width ?? (height ? Math.round(height * 0.87) : 120);
+  const h = height ?? Math.round(w * 1.15);
 
   return (
     <a
@@ -30,7 +30,10 @@ export default function Logo({
         priority
         unoptimized={src.startsWith("/api/media/")}
         className="header-logo-image object-contain"
-        style={height ? { height, width: "auto" } : { width: w, height: "auto" }}
+        style={{
+          width: width ? `${width}px` : "auto",
+          height: height ? `${height}px` : "auto",
+        }}
       />
     </a>
   );

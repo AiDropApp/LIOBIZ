@@ -73,7 +73,9 @@ export default function AuthForm({ mode }: { mode: Mode }) {
     <div className="auth-page">
       <div className="auth-card">
         <div className="auth-card-top">
-          <Logo width={140} />
+          <div className="auth-logo-wrap">
+            <Logo width={140} />
+          </div>
           <h1>{title}</h1>
           <p>{subtitle}</p>
         </div>
@@ -120,7 +122,7 @@ export default function AuthForm({ mode }: { mode: Mode }) {
 
           {error && <p className="auth-error">{error}</p>}
 
-          <button type="submit" className="btn-primary w-full justify-center py-3.5" disabled={loading}>
+          <button type="submit" className="btn-primary w-full justify-center" disabled={loading}>
             {loading ? "لطفاً صبر کنید..." : isLogin ? "ورود" : "ثبت‌نام و ورود"}
           </button>
         </form>

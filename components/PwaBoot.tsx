@@ -11,6 +11,14 @@ export default function PwaBoot() {
         __html: `
 (function () {
   try {
+    var path = window.location.pathname || "";
+    var suppressed =
+      path.indexOf("/admin") === 0 ||
+      path.indexOf("/dashboard") === 0 ||
+      path.indexOf("/login") === 0 ||
+      path.indexOf("/register") === 0;
+    if (suppressed) return;
+
     window.__liobizPwa = window.__liobizPwa || { deferred: null };
     window.addEventListener("beforeinstallprompt", function (e) {
       e.preventDefault();

@@ -16,6 +16,9 @@ import {
   Cloud,
 } from "lucide-react";
 import DashboardShell from "@/components/dashboard/DashboardShell";
+import DashQuickCard from "@/components/dashboard/DashQuickCard";
+import DashStatCard from "@/components/dashboard/DashStatCard";
+import CountUp from "@/components/dashboard/CountUp";
 import AdminLandingEditor from "@/components/admin/AdminLandingEditor";
 import AdminBlogEditor from "@/components/admin/AdminBlogEditor";
 import AdminBackupPanel from "@/components/admin/AdminBackupPanel";
@@ -316,7 +319,7 @@ export default function AdminPanel() {
       {toast && <div className="admin-toast">{toast}</div>}
 
       {tab === "overview" && (
-        <section>
+        <section className="dash-overview">
           <div className="dash-hero">
             <h2>سلام، به پنل مدیریت لیوبیز خوش آمدید</h2>
             <p>
@@ -324,88 +327,85 @@ export default function AdminPanel() {
               امروز را در یک نگاه ببینید.
             </p>
             <div className="dash-hero-meta">
-              <span className="dash-hero-chip">{overview?.stats.users ?? users.length} کاربر</span>
-              <span className="dash-hero-chip">{newOrders} سفارش جدید</span>
-              <span className="dash-hero-chip">{openTickets} تیکت باز</span>
+              <span className="dash-hero-chip">
+                <CountUp value={overview?.stats.users ?? users.length} duration={700} /> کاربر
+              </span>
+              <span className="dash-hero-chip">
+                <CountUp value={newOrders} duration={700} /> سفارش جدید
+              </span>
+              <span className="dash-hero-chip">
+                <CountUp value={openTickets} duration={700} /> تیکت باز
+              </span>
             </div>
           </div>
 
           <div className="dash-stats">
-            <article className="dash-stat-card">
-              <span className="dash-stat-icon">
-                <Users size={18} />
-              </span>
-              <strong>{overview?.stats.users ?? "—"}</strong>
-              <span>کاربر</span>
-            </article>
-            <article className="dash-stat-card">
-              <span className="dash-stat-icon">
-                <ShoppingBag size={18} />
-              </span>
-              <strong>{newOrders}</strong>
-              <span>سفارش جدید</span>
-            </article>
-            <article className="dash-stat-card">
-              <span className="dash-stat-icon">
-                <Inbox size={18} />
-              </span>
-              <strong>{newMessages}</strong>
-              <span>پیام جدید</span>
-            </article>
-            <article className="dash-stat-card">
-              <span className="dash-stat-icon">
-                <Ticket size={18} />
-              </span>
-              <strong>{openTickets}</strong>
-              <span>تیکت باز</span>
-            </article>
-            <article className="dash-stat-card">
-              <span className="dash-stat-icon">
-                <Layout size={18} />
-              </span>
-              <strong>{overview?.stats.portfolio ?? "—"}</strong>
-              <span>نمونه کار</span>
-            </article>
-            <article className="dash-stat-card">
-              <span className="dash-stat-icon">
-                <LayoutDashboard size={18} />
-              </span>
-              <strong>{overview?.stats.backstage ?? "—"}</strong>
-              <span>بک‌استیج</span>
-            </article>
+            <DashStatCard
+              seed="users"
+              icon={Users}
+              label="کاربر"
+              value={overview?.stats.users}
+              onClick={() => setTab("users")}
+            />
+            <DashStatCard
+              seed="new-orders"
+              icon={ShoppingBag}
+              label="سفارش جدید"
+              value={newOrders}
+              onClick={() => setTab("orders")}
+            />
+            <DashStatCard
+              seed="new-messages"
+              icon={Inbox}
+              label="پیام جدید"
+              value={newMessages}
+              onClick={() => setTab("messages")}
+            />
+            <DashStatCard
+              seed="open-tickets"
+              icon={Ticket}
+              label="تیکت باز"
+              value={openTickets}
+              onClick={() => setTab("tickets")}
+            />
+            <DashStatCard
+              seed="portfolio"
+              icon={Layout}
+              label="نمونه کار"
+              value={overview?.stats.portfolio}
+              onClick={() => setTab("landing")}
+            />
+            <DashStatCard
+              seed="backstage"
+              icon={LayoutDashboard}
+              label="بک‌استیج"
+              value={overview?.stats.backstage}
+              onClick={() => setTab("landing")}
+            />
           </div>
 
           <div className="dash-quick-grid">
-            <button type="button" className="dash-quick-card" onClick={() => setTab("landing")}>
-              <span className="dash-quick-card-icon">
-                <Layout size={18} />
-              </span>
-              <span>
-                <strong>مدیریت لندینگ</strong>
-                <small>ویرایش هیرو، پلن‌ها، FAQ و بیشتر</small>
-              </span>
-            </button>
-            <button type="button" className="dash-quick-card" onClick={() => setTab("orders")}>
-              <span className="dash-quick-card-icon">
-                <ShoppingBag size={18} />
-              </span>
-              <span>
-                <strong>سفارش‌ها</strong>
-                <small>تغییر وضعیت و آپلود فایل تحویل</small>
-              </span>
-            </button>
-            <button type="button" className="dash-quick-card" onClick={() => setTab("tickets")}>
-              <span className="dash-quick-card-icon">
-                <MessageSquare size={18} />
-              </span>
-              <span>
-                <strong>تیکت‌ها</strong>
-                <small>پاسخ به گفتگوهای کاربران</small>
-              </span>
-            </button>
+            <DashQuickCard
+              icon={Layout}
+              title="مدیریت لندینگ"
+              description="ویرایش هیرو، پلن‌ها، FAQ و بیشتر"
+              onClick={() => setTab("landing")}
+            />
+            <DashQuickCard
+              icon={ShoppingBag}
+              title="سفارش‌ها"
+              description="تغییر وضعیت و آپلود فایل تحویل"
+              onClick={() => setTab("orders")}
+            />
+            <DashQuickCard
+              icon={MessageSquare}
+              title="تیکت‌ها"
+              description="پاسخ به گفتگوهای کاربران"
+              onClick={() => setTab("tickets")}
+            />
           </div>
 
-          <div className="dash-split-grid mt-5">
+          <div className="dash-split-grid">
             <div className="lux-card">
               <div className="dash-panel-title">
                 <h3>آخرین سفارش‌ها</h3>
@@ -418,7 +418,12 @@ export default function AdminPanel() {
                   <p className="text-muted text-sm">سفارشی ثبت نشده.</p>
                 ) : (
                   recentOrders.map((order) => (
-                    <div key={order.id} className="dash-mini-item">
+                    <button
+                      key={order.id}
+                      type="button"
+                      className="dash-mini-item"
+                      onClick={() => setTab("orders")}
+                    >
                       <div>
                         <strong>{order.title}</strong>
                         <span>{order.user?.name || "کاربر"}</span>
@@ -426,7 +431,7 @@ export default function AdminPanel() {
                       <span className={orderBadgeClass(order.status)}>
                         {ORDER_STATUS[order.status] || order.status}
                       </span>
-                    </div>
+                    </button>
                   ))
                 )}
               </div>
@@ -443,7 +448,12 @@ export default function AdminPanel() {
                   <p className="text-muted text-sm">پیامی ثبت نشده.</p>
                 ) : (
                   recentMessages.map((item) => (
-                    <div key={item.id} className="dash-mini-item">
+                    <button
+                      key={item.id}
+                      type="button"
+                      className="dash-mini-item"
+                      onClick={() => setTab("messages")}
+                    >
                       <div>
                         <strong>{item.name}</strong>
                         <span>{item.message.length > 48 ? `${item.message.slice(0, 48)}…` : item.message}</span>
@@ -451,7 +461,7 @@ export default function AdminPanel() {
                       <span className={`dash-badge status-${item.status}`}>
                         {item.status === "new" ? "جدید" : item.status === "read" ? "خوانده" : "بسته"}
                       </span>
-                    </div>
+                    </button>
                   ))
                 )}
               </div>

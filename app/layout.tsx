@@ -1,8 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { Vazirmatn } from "next/font/google";
 import "./globals.css";
+import "./shell-tokens.css";
 import "./auth.css";
 import "./admin.css";
+import "./dashboard-theme.css";
 import { SITE } from "@/lib/constants";
 import GoogleTagManager from "@/components/GoogleTagManager";
 import ContentsquareAnalytics from "@/components/ContentsquareAnalytics";
@@ -56,7 +58,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fa" dir="rtl">
+    <html lang="fa" dir="rtl" data-scroll-behavior="smooth">
       <body className={`${vazirmatn.variable} font-vazir`}>
         <ContentsquareAnalytics />
         <GoogleTagManager />

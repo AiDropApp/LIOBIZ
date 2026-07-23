@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import { isPwaSuppressedPath } from "@/lib/pwa-paths";
 import styles from "./PwaInstallPrompt.module.css";
 
 // ── تنظیمات سایت ──
@@ -63,6 +64,11 @@ export function PwaInstallPrompt({ lang }: { lang?: Lang } = {}) {
   const [isIos, setIsIos] = useState(false);
 
   useEffect(() => {
+    if (isPwaSuppressedPath(pathname)) {
+      setHidden(true);
+      return;
+    }
+
     if (localStorage.getItem(INSTALLED_KEY) === "1" || isRunningStandalone()) {
       localStorage.setItem(INSTALLED_KEY, "1");
       setHidden(true);
@@ -125,7 +131,7 @@ export function PwaInstallPrompt({ lang }: { lang?: Lang } = {}) {
       window.removeEventListener("liobiz-pwa-installed", onInstalled);
       window.clearTimeout(timer);
     };
-  }, []);
+  }, [pathname]);
 
   const dismiss = useCallback(() => {
     sessionStorage.setItem(DISMISS_KEY, "1");
@@ -147,7 +153,7 @@ export function PwaInstallPrompt({ lang }: { lang?: Lang } = {}) {
     }
   }, [deferred]);
 
-  const isAppShell = pathname?.startsWith("/admin") || pathname?.startsWith("/dashboard");
+  const isAppShell = isPwaSuppressedPath(pathname);
   if (isAppShell || hidden || !visible) return null;
 
   const body = deferred ? t.body : isIos ? t.ios : t.desktop;
