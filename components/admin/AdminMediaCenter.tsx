@@ -56,6 +56,9 @@ export default function AdminMediaCenter({ onToast }: { onToast: (text: string) 
   const [categoryKind, setCategoryKind] = useState<"main" | "sub">("main");
   const [categoryParentId, setCategoryParentId] = useState("");
   const [categoryName, setCategoryName] = useState("");
+  const [deleteCategoryModalOpen, setDeleteCategoryModalOpen] = useState(false);
+  const [deleteCategoryConfirmName, setDeleteCategoryConfirmName] = useState("");
+  const [deleteCategoryShake, setDeleteCategoryShake] = useState(false);
 
   const sectionCategories = categories.filter((c) => c.section === section);
   const rootSectionCategories = useMemo(
@@ -229,20 +232,47 @@ export default function AdminMediaCenter({ onToast }: { onToast: (text: string) 
     }
   };
 
-  const deleteSelectedCategory = async () => {
+  const selectedCategoryForDelete = useMemo(
+    () => (selectedCategoryId === "all" ? null : sectionCategories.find((c) => c.id === selectedCategoryId) ?? null),
+    [selectedCategoryId, sectionCategories],
+  );
+
+  const closeDeleteCategoryModal = () => {
+    setDeleteCategoryModalOpen(false);
+    setDeleteCategoryConfirmName("");
+    setDeleteCategoryShake(false);
+  };
+
+  const openDeleteCategoryModal = () => {
     if (selectedCategoryId === "all") {
       onToast("برای حذف دسته، ابتدا «دسته اصلی» یا «زیردسته» را انتخاب کنید — گزینه «همه» قابل حذف نیست.");
       return;
     }
-    const cat = sectionCategories.find((c) => c.id === selectedCategoryId);
-    if (!cat) return;
-    if (
-      !confirm(
-        `دسته «${cat.name}» و کارت‌های داخل آن از سایت و MyFile حذف شوند؟\n\nاین عمل قابل بازگشت نیست.`,
-      )
-    ) {
+    if (!selectedCategoryForDelete) return;
+    setDeleteCategoryConfirmName("");
+    setDeleteCategoryShake(false);
+    setDeleteCategoryModalOpen(true);
+  };
+
+  const triggerDeleteCategoryShake = () => {
+    setDeleteCategoryShake(true);
+    window.setTimeout(() => setDeleteCategoryShake(false), 480);
+  };
+
+  const tryDeleteSelectedCategory = () => {
+    if (!selectedCategoryForDelete) return;
+    const expected = selectedCategoryForDelete.name.trim();
+    const typed = deleteCategoryConfirmName.trim();
+    if (!typed || typed !== expected) {
+      triggerDeleteCategoryShake();
       return;
     }
+    void deleteSelectedCategory();
+  };
+
+  const deleteSelectedCategory = async () => {
+    if (!selectedCategoryForDelete) return;
+    closeDeleteCategoryModal();
     setBusy("cat-del");
     const res = await fetch(
       `/api/admin/media/categories?id=${encodeURIComponent(selectedCategoryId)}`,
@@ -657,7 +687,7 @@ export default function AdminMediaCenter({ onToast }: { onToast: (text: string) 
               className="btn-sm admin-media-category-delete"
               disabled={!bootstrapped || busy === "cat-del"}
               title={selectedCategoryId === "all" ? "ابتدا دسته اصلی یا زیردسته را انتخاب کنید" : "حذف دسته از سایت و MyFile"}
-              onClick={() => void deleteSelectedCategory()}
+              onClick={openDeleteCategoryModal}
             >
               <Trash2 size={14} /> حذف دسته
             </button>
@@ -705,6 +735,64 @@ export default function AdminMediaCenter({ onToast }: { onToast: (text: string) 
           )}
         </div>
       </div>
+
+      {deleteCategoryModalOpen && selectedCategoryForDelete && (
+        <div className="admin-media-modal-backdrop" onClick={closeDeleteCategoryModal}>
+          <div
+            className={`admin-media-modal admin-media-category-modal admin-media-delete-modal${deleteCategoryShake ? " is-shake" : ""}`}
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-labelledby="delete-category-title"
+            aria-modal="true"
+          >
+            <div className="admin-media-modal-head">
+              <h3 id="delete-category-title">حذف دسته</h3>
+            </div>
+            <div className="admin-media-delete-modal-body">
+              <p className="admin-media-delete-modal-hint">
+                دسته{" "}
+                <span className="admin-media-delete-modal-name">{selectedCategoryForDelete.name}</span> و کارت‌های
+                داخل آن از سایت و MyFile حذف می‌شوند. این عمل قابل بازگشت نیست.
+              </p>
+              <label className="admin-media-delete-modal-field">
+                <span>
+                  برای تأیید، نام دسته را بنویسید:{" "}
+                  <strong dir="rtl">{selectedCategoryForDelete.name}</strong>
+                </span>
+                <input
+                  type="text"
+                  value={deleteCategoryConfirmName}
+                  onChange={(e) => setDeleteCategoryConfirmName(e.target.value)}
+                  placeholder={selectedCategoryForDelete.name}
+                  autoComplete="off"
+                  spellCheck={false}
+                  aria-invalid={deleteCategoryShake}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      tryDeleteSelectedCategory();
+                    }
+                  }}
+                />
+              </label>
+            </div>
+            <div className="admin-media-delete-modal-footer">
+              <button type="button" className="btn-outline" onClick={closeDeleteCategoryModal}>
+                لغو
+              </button>
+              <button
+                type="button"
+                className="btn-sm admin-media-category-delete"
+                disabled={busy === "cat-del"}
+                onClick={tryDeleteSelectedCategory}
+              >
+                {busy === "cat-del" ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
+                تایید حذف
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {categoryModalOpen && (
         <div className="admin-media-modal-backdrop" onClick={() => setCategoryModalOpen(false)}>

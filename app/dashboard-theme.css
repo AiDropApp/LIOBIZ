@@ -1252,3 +1252,160 @@
     overflow-y: auto !important;
   }
 }
+
+/* ——— Server hotfix: select options, empty states, media cards (Jul 2026) ——— */
+
+/* Native dropdown list: dark surface so ink-colored text stays readable */
+.dash-page select option,
+.dash-page select optgroup {
+  background-color: var(--liobiz-navy-2) !important;
+  color: var(--liobiz-ink) !important;
+}
+
+.dash-page select option:checked,
+.dash-page select option:hover,
+.dash-page select option:focus {
+  background-color: var(--liobiz-indigo-hover) !important;
+  color: var(--liobiz-on-indigo) !important;
+}
+
+/* Empty states — match glass dashboard theme */
+.dash-page .dash-empty {
+  background:
+    var(--liobiz-glass-shine),
+    var(--liobiz-glass-depth),
+    var(--liobiz-glass-strong) !important;
+  border: 1px dashed var(--liobiz-border-strong) !important;
+  backdrop-filter: blur(var(--liobiz-blur-card)) saturate(190%);
+  -webkit-backdrop-filter: blur(var(--liobiz-blur-card)) saturate(190%);
+  box-shadow: var(--liobiz-shadow-card-dash) !important;
+}
+
+.dash-page .dash-empty h3 {
+  color: var(--liobiz-ink) !important;
+}
+
+.dash-page .dash-empty p {
+  color: var(--liobiz-muted) !important;
+}
+
+.dash-page .dash-empty-icon {
+  background: var(--liobiz-indigo-soft) !important;
+  color: var(--liobiz-indigo-bright) !important;
+}
+
+/* Media center — remaining light-theme surfaces */
+.dash-page .admin-media-card {
+  background:
+    var(--liobiz-glass-shine),
+    var(--liobiz-glass-depth),
+    var(--liobiz-glass-list) !important;
+  border: 1px solid var(--liobiz-glass-border) !important;
+  box-shadow: var(--liobiz-shadow-card-dash) !important;
+}
+
+.dash-page .admin-media-card-thumb {
+  background: rgba(148, 163, 184, 0.06) !important;
+}
+
+.dash-page .admin-media-card-body p,
+.dash-page .admin-media-card-placeholder {
+  color: var(--liobiz-muted) !important;
+}
+
+.dash-page .admin-media-sidebar {
+  background:
+    var(--liobiz-glass-shine),
+    var(--liobiz-glass-depth),
+    var(--liobiz-glass-strong) !important;
+  border: 1px solid var(--liobiz-glass-border) !important;
+}
+
+.dash-page .admin-media-sidebar button {
+  color: var(--liobiz-secondary) !important;
+}
+
+.dash-page .admin-media-drawer {
+  background:
+    var(--liobiz-glass-shine),
+    var(--liobiz-glass-depth),
+    var(--liobiz-glass-strong) !important;
+  border: 1px solid var(--liobiz-glass-border) !important;
+  color: var(--liobiz-ink) !important;
+}
+
+.dash-page .admin-media-drawer-preview-label {
+  color: var(--liobiz-muted) !important;
+}
+
+.dash-page .admin-media-category-field span,
+.dash-page .admin-media-library-field {
+  color: var(--liobiz-muted) !important;
+}
+
+/* Forms — unify inputs inside dashboard */
+.dash-page .admin-form input,
+.dash-page .admin-form select,
+.dash-page .admin-form textarea,
+.dash-page .admin-item-body input,
+.dash-page .admin-item-body select,
+.dash-page .admin-item-body textarea,
+.dash-page .contact-field input,
+.dash-page .contact-field select,
+.dash-page .contact-field textarea {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid var(--liobiz-border-strong) !important;
+  color: var(--liobiz-ink) !important;
+}
+
+.dash-page .contact-field span {
+  color: var(--liobiz-muted) !important;
+}
+
+.dash-page .dash-loading {
+  color: var(--liobiz-muted) !important;
+}
+
+.dash-page .dash-order-meta span {
+  background: rgba(148, 163, 184, 0.08) !important;
+  color: var(--liobiz-muted) !important;
+}
+
+/* Delete category confirm modal — dark theme */
+.dash-page .admin-media-delete-modal {
+  width: min(400px, calc(100vw - 2rem)) !important;
+  max-width: 400px !important;
+}
+
+.dash-page .admin-media-delete-modal-hint {
+  color: var(--liobiz-muted) !important;
+}
+
+.dash-page .admin-media-delete-modal-name {
+  background: rgba(248, 113, 113, 0.12) !important;
+  color: var(--liobiz-danger) !important;
+}
+
+.dash-page .admin-media-delete-modal-field span {
+  color: var(--liobiz-muted) !important;
+}
+
+.dash-page .admin-media-delete-modal-field span strong {
+  color: var(--liobiz-ink) !important;
+}
+
+.dash-page .admin-media-delete-modal-field input {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1px solid var(--liobiz-border-strong) !important;
+  color: var(--liobiz-ink) !important;
+}
+
+.dash-page .admin-media-delete-modal-field input:focus {
+  border-color: rgba(248, 113, 113, 0.45) !important;
+  box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.14) !important;
+}
+
+.dash-page .admin-media-delete-modal-field input[aria-invalid="true"] {
+  border-color: rgba(248, 113, 113, 0.55) !important;
+  box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.18) !important;
+}

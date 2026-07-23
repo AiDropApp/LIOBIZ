@@ -643,8 +643,8 @@ export default function AdminPanel() {
             />
             <span className="text-muted text-sm">{filteredUsers.length} کاربر</span>
           </div>
-          <div className="dash-table lux-card">
-            {filteredUsers.length === 0 ? (
+          {filteredUsers.length === 0 ? (
+            <div className="dash-list">
               <div className="dash-empty">
                 <span className="dash-empty-icon">
                   <UserPlus size={22} />
@@ -652,7 +652,9 @@ export default function AdminPanel() {
                 <h3>کاربری یافت نشد</h3>
                 <p>هنوز کسی ثبت‌نام نکرده یا نتیجه‌ای برای جستجو نیست.</p>
               </div>
-            ) : (
+            </div>
+          ) : (
+            <div className="dash-table lux-card">
               <table>
                 <thead>
                   <tr>
@@ -694,8 +696,8 @@ export default function AdminPanel() {
                   ))}
                 </tbody>
               </table>
-            )}
-          </div>
+            </div>
+          )}
         </section>
       )}
 
