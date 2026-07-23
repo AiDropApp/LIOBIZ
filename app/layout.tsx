@@ -3,6 +3,7 @@ import { Vazirmatn } from "next/font/google";
 import "./globals.css";
 import "./auth.css";
 import "./admin.css";
+import "./dashboard-theme.css";
 import { SITE } from "@/lib/constants";
 import GoogleTagManager from "@/components/GoogleTagManager";
 import ContentsquareAnalytics from "@/components/ContentsquareAnalytics";

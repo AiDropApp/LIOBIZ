@@ -57,7 +57,7 @@ export default function Hero({ initialLanding }: { initialLanding?: LandingConte
                 muted
                 loop
                 playsInline
-                preload="metadata"
+                preload="auto"
                 key={playable}
               />
             )

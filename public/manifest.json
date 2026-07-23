@@ -30,5 +30,21 @@
       "type": "image/png",
       "purpose": "maskable"
     }
+  ],
+  "shortcuts": [
+    {
+      "name": "پنل ادمین",
+      "short_name": "ادمین",
+      "description": "مدیریت سایت و رسانه",
+      "url": "/admin",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "داشبورد کاربر",
+      "short_name": "داشبورد",
+      "description": "سفارش‌ها و تیکت‌ها",
+      "url": "/dashboard",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    }
   ]
 }

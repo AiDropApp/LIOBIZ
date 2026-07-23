@@ -16,8 +16,6 @@ import SmoothScroll from "@/components/SmoothScroll";
 import { defaultLanding } from "@/lib/cms-defaults";
 import { readPublicSiteContent } from "@/lib/content-store";
 
-export const dynamic = "force-dynamic";
-
 export default async function HomePage() {
   const content = await readPublicSiteContent();
   const landing = { ...defaultLanding, ...content.landing };
@@ -25,7 +23,7 @@ export default async function HomePage() {
   return (
     <SmoothScroll>
       <LoadingScreen />
-      <Header initialLogoUrl={content.site.logoUrl} />
+      <Header />
       <main className="w-full overflow-x-clip">
         <Hero initialLanding={landing} />
         <AboutLiobiz />

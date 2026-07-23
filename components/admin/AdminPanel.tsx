@@ -656,15 +656,19 @@ export default function AdminPanel() {
                 <tbody>
                   {filteredUsers.map((user) => (
                     <tr key={user.id}>
-                      <td>{user.name}</td>
-                      <td dir="ltr">{user.email}</td>
-                      <td dir="ltr">{user.phone || "—"}</td>
-                      <td>
+                      <td data-label="نام">{user.name}</td>
+                      <td data-label="ایمیل" dir="ltr">
+                        {user.email}
+                      </td>
+                      <td data-label="تلفن" dir="ltr">
+                        {user.phone || "—"}
+                      </td>
+                      <td data-label="وضعیت">
                         <span className={`dash-badge ${user.blocked ? "order-cancelled" : "order-completed"}`}>
                           {user.blocked ? "مسدود" : "فعال"}
                         </span>
                       </td>
-                      <td className="space-x-2 space-x-reverse">
+                      <td data-label="عملیات" className="space-x-2 space-x-reverse">
                         <button
                           type="button"
                           className="btn-outline"
