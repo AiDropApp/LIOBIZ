@@ -1,0 +1,12 @@
+{
+  "dryRun": false,
+  "totalFound": 477,
+  "downloaded": 477,
+  "skippedExisting": 0,
+  "failed": 0,
+  "bytesDownloaded": 5224081797,
+  "gbDownloaded": 4.865,
+  "mapEntries": 477,
+  "cardsPatchedWithLocal": 56,
+  "mediaRoot": "/var/www/liobiz/public/media"
+}

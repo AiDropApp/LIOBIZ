@@ -1,6 +1,15 @@
 import { NextResponse } from "next/server";
 import { getFilesIrToken } from "@/lib/filesir/auth";
 import { isFilesIrConfigured } from "@/lib/filesir/config";
+import {
+  absoluteMediaPath,
+  getLocalEntry,
+  localFileExists,
+  publicMediaUrl,
+} from "@/lib/media-center/local-map";
+import { createReadStream } from "fs";
+import { stat } from "fs/promises";
+import { Readable } from "stream";
 
 function forwardHeaders(source: Response, contentType?: string, thumb = false): Headers {
   const headers = new Headers();
@@ -22,21 +31,95 @@ function forwardHeaders(source: Response, contentType?: string, thumb = false): 
     headers.set("content-type", contentType);
   }
 
-  headers.set("Cache-Control", thumb ? "private, max-age=3600, stale-while-revalidate=86400" : "private, max-age=300, stale-while-revalidate=600");
+  headers.set(
+    "Cache-Control",
+    thumb
+      ? "public, max-age=86400, stale-while-revalidate=604800"
+      : "public, max-age=2592000, stale-while-revalidate=86400",
+  );
   return headers;
 }
 
-export async function proxyFilesIrEntry(request: Request, entryId: number): Promise<Response> {
-  if (!isFilesIrConfigured()) {
-    return NextResponse.json({ message: "Files.ir پیکربندی نشده." }, { status: 503 });
+const MIME: Record<string, string> = {
+  png: "image/png",
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  webp: "image/webp",
+  gif: "image/gif",
+  mp4: "video/mp4",
+  webm: "video/webm",
+  mov: "video/quicktime",
+};
+
+async function serveLocalFile(request: Request, localPath: string, mimeHint?: string): Promise<Response> {
+  const abs = absoluteMediaPath(localPath);
+  const st = await stat(abs);
+  const ext = localPath.split(".").pop()?.toLowerCase() || "";
+  const contentType = mimeHint || MIME[ext] || "application/octet-stream";
+  const range = request.headers.get("range");
+
+  if (range) {
+    const match = /^bytes=(\d+)-(\d*)$/.exec(range);
+    if (match) {
+      const start = Number(match[1]);
+      const end = match[2] ? Number(match[2]) : st.size - 1;
+      if (start >= st.size || end >= st.size || start > end) {
+        return new Response(null, {
+          status: 416,
+          headers: { "Content-Range": `bytes */${st.size}` },
+        });
+      }
+      const stream = createReadStream(abs, { start, end });
+      return new Response(Readable.toWeb(stream) as ReadableStream, {
+        status: 206,
+        headers: {
+          "Content-Type": contentType,
+          "Content-Length": String(end - start + 1),
+          "Content-Range": `bytes ${start}-${end}/${st.size}`,
+          "Accept-Ranges": "bytes",
+          "Cache-Control": "public, max-age=2592000, immutable",
+        },
+      });
+    }
   }
 
+  const stream = createReadStream(abs);
+  return new Response(Readable.toWeb(stream) as ReadableStream, {
+    status: 200,
+    headers: {
+      "Content-Type": contentType,
+      "Content-Length": String(st.size),
+      "Accept-Ranges": "bytes",
+      "Cache-Control": "public, max-age=2592000, immutable",
+    },
+  });
+}
+
+export async function proxyFilesIrEntry(request: Request, entryId: number): Promise<Response> {
   if (!entryId) {
     return NextResponse.json({ message: "entryId نامعتبر" }, { status: 400 });
   }
 
   const url = new URL(request.url);
   const thumb = url.searchParams.get("thumb") === "1";
+  const local = await getLocalEntry(entryId);
+
+  // Prefer local disk: redirect so nginx/Cloudflare can cache and Node stays light.
+  if (local?.localPath && (await localFileExists(local.localPath))) {
+    // Video thumbs may not exist locally — fall through to Files.ir for thumbnails only.
+    if (!(thumb && local.kind === "video")) {
+      if (url.searchParams.get("direct") === "1") {
+        return serveLocalFile(request, local.localPath, local.mime);
+      }
+      const target = new URL(publicMediaUrl(local.localPath), url.origin);
+      return NextResponse.redirect(target, 302);
+    }
+  }
+
+  if (!isFilesIrConfigured()) {
+    return NextResponse.json({ message: "Files.ir پیکربندی نشده." }, { status: 503 });
+  }
+
   const range = request.headers.get("range");
 
   try {

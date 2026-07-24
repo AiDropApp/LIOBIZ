@@ -13,7 +13,10 @@ export type PortfolioItemBase = {
   /** Denormalized category name for display */
   category: string;
   categoryId: string;
+  /** Card/grid image (prefers lightweight thumbnail) */
   image: string;
+  /** Full-resolution image for detail modal when different from thumbnail */
+  imageFull?: string;
   description?: string;
   client?: string;
   year?: string;

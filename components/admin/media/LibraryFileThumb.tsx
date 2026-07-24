@@ -5,9 +5,19 @@ import { FileImage, Video } from "lucide-react";
 import { isThumbCached, markThumbCached } from "@/lib/media-center/thumb-cache";
 import type { LibraryEntry } from "@/components/admin/media/MediaLibraryBrowser";
 
-function previewUrl(entryId: number, opts?: { thumb?: boolean }) {
+function previewUrl(entry: LibraryEntry, opts?: { thumb?: boolean }) {
+  if (entry.previewUrl) return entry.previewUrl;
+  if (entry.localPath) {
+    const clean = entry.localPath
+      .replace(/^\/+/, "")
+      .split("/")
+      .filter(Boolean)
+      .map(encodeURIComponent)
+      .join("/");
+    return `/media/${clean}`;
+  }
   const qs = opts?.thumb ? "?thumb=1" : "";
-  return `/api/admin/media/preview/${entryId}${qs}`;
+  return `/api/admin/media/preview/${entry.id}${qs}`;
 }
 
 function useLazyVisible() {
@@ -37,18 +47,19 @@ function PreviewSkeleton() {
   return <span className="admin-media-library-preview-skeleton" aria-hidden />;
 }
 
-function VideoPreview({ entryId, active }: { entryId: number; active: boolean }) {
+function VideoPreview({ entry, active }: { entry: LibraryEntry; active: boolean }) {
   if (!active) return <PreviewSkeleton />;
+  const src = previewUrl(entry);
 
   return (
     <>
       <video
-        src={`${previewUrl(entryId)}#t=0.1`}
+        src={`${src}#t=0.1`}
         className="admin-media-library-preview"
         muted
         playsInline
         preload="metadata"
-        onLoadedData={() => markThumbCached(entryId, false, true)}
+        onLoadedData={() => markThumbCached(entry.id, false, true)}
       />
       <span className="admin-media-library-video-badge" aria-hidden>
         <Video size={14} />
@@ -57,14 +68,15 @@ function VideoPreview({ entryId, active }: { entryId: number; active: boolean })
   );
 }
 
-function ImagePreview({ entryId, name, active }: { entryId: number; name: string; active: boolean }) {
+function ImagePreview({ entry, active }: { entry: LibraryEntry; active: boolean }) {
+  const local = Boolean(entry.previewUrl || entry.localPath);
   const [imageSrc, setImageSrc] = useState<string | null>(() =>
-    active ? previewUrl(entryId, { thumb: true }) : null,
+    active ? previewUrl(entry, { thumb: !local }) : null,
   );
 
   useEffect(() => {
-    if (active && !imageSrc) setImageSrc(previewUrl(entryId, { thumb: true }));
-  }, [active, entryId, imageSrc]);
+    if (active && !imageSrc) setImageSrc(previewUrl(entry, { thumb: !local }));
+  }, [active, entry, imageSrc, local]);
 
   if (!active) return <PreviewSkeleton />;
 
@@ -73,16 +85,16 @@ function ImagePreview({ entryId, name, active }: { entryId: number; name: string
       // eslint-disable-next-line @next/next/no-img-element
       <img
         src={imageSrc}
-        alt={name}
+        alt={entry.name}
         className="admin-media-library-preview"
         loading="lazy"
         decoding="async"
-        onLoad={() => markThumbCached(entryId, imageSrc.includes("thumb=1"), true)}
+        onLoad={() => markThumbCached(entry.id, imageSrc.includes("thumb=1"), true)}
         onError={() => {
-          markThumbCached(entryId, true, false);
-          const full = previewUrl(entryId);
+          markThumbCached(entry.id, true, false);
+          const full = previewUrl(entry);
           if (imageSrc !== full) setImageSrc(full);
-          else markThumbCached(entryId, false, false);
+          else markThumbCached(entry.id, false, false);
         }}
       />
     );
@@ -93,14 +105,15 @@ function ImagePreview({ entryId, name, active }: { entryId: number; name: string
 
 export default function LibraryFileThumb({ entry }: { entry: LibraryEntry }) {
   const { ref, visible } = useLazyVisible();
-  const skipLazy = entry.type === "image" && isThumbCached(entry.id, true);
+  const skipLazy =
+    entry.type === "image" && (Boolean(entry.previewUrl || entry.localPath) || isThumbCached(entry.id, true));
 
   return (
     <div ref={ref} className="admin-media-library-preview-host">
       {entry.type === "video" ? (
-        <VideoPreview entryId={entry.id} active={visible} />
+        <VideoPreview entry={entry} active={visible} />
       ) : entry.type === "image" ? (
-        <ImagePreview entryId={entry.id} name={entry.name} active={visible || skipLazy} />
+        <ImagePreview entry={entry} active={visible || skipLazy} />
       ) : (
         <span className="admin-media-library-preview-fallback">
           <FileImage size={28} />

@@ -3,6 +3,7 @@ import { deleteEntries } from "@/lib/filesir/client";
 import type { MediaCard, MediaCenterStore } from "@/lib/filesir/types";
 import { collectCardEntryIds } from "@/lib/media-center/asset-utils";
 import { listLiobizMediaFlat } from "@/lib/media-center/library-entries";
+import { readLocalMap } from "@/lib/media-center/local-map";
 import { readMediaCenterStore, writeMediaCenterStore } from "@/lib/media-center/store";
 
 const PRUNE_INTERVAL_MS = 5 * 60 * 1000;
@@ -34,8 +35,35 @@ export async function pruneCardsMissingOnMyFile(): Promise<{
   const store = await readMediaCenterStore();
   if (!store.rootFolderId) return { removedTitles: [], store };
 
-  const validEntryIds = await collectLiobizEntryIds(store);
-  const orphanCards = findCardsWithMissingMyFileEntries(store.cards, validEntryIds);
+  // Never auto-prune in local-first mode — assignments must survive My Files outages.
+  if (process.env.MEDIA_LOCAL_FIRST === "1") {
+    return { removedTitles: [], store };
+  }
+
+  let validEntryIds: Set<number>;
+  try {
+    validEntryIds = await collectLiobizEntryIds(store);
+  } catch {
+    // API failure must NOT delete local cards (this previously wiped portfolio on crash).
+    return { removedTitles: [], store };
+  }
+
+  // Safety: empty/tiny listing almost always means API/pagination failure, not mass delete.
+  if (validEntryIds.size === 0) {
+    return { removedTitles: [], store };
+  }
+
+  const localMap = await readLocalMap();
+  for (const id of Object.keys(localMap.entries)) {
+    const n = Number(id);
+    if (n) validEntryIds.add(n);
+  }
+
+  // Keep cards that already have localPath even if My Files entry is gone.
+  const orphanCards = findCardsWithMissingMyFileEntries(store.cards, validEntryIds).filter((card) => {
+    const refs = [card.cover, card.video, card.image, card.avatar];
+    return !refs.some((r) => r?.localPath);
+  });
   if (!orphanCards.length) return { removedTitles: [], store };
 
   const removeIds = new Set(orphanCards.map((c) => c.id));
@@ -47,6 +75,7 @@ export async function pruneCardsMissingOnMyFile(): Promise<{
 
 /** Rate-limited prune for public pages (avoids hammering MyFile API). */
 export async function maybePruneCardsFromMyFile(force = false): Promise<string[]> {
+  if (process.env.MEDIA_LOCAL_FIRST === "1") return [];
   if (!isFilesIrConfigured()) return [];
   if (!force && Date.now() - lastPublicPruneAt < PRUNE_INTERVAL_MS) return [];
   try {
@@ -79,6 +108,7 @@ export async function deleteCardsLinkedToEntryIds(entryIds: number[]): Promise<{
 }
 
 export async function deleteCardAssetsFromMyFile(card: MediaCard): Promise<void> {
+  if (process.env.MEDIA_LOCAL_FIRST === "1") return;
   const entryIds = [...new Set(collectCardEntryIds(card))];
   if (!entryIds.length) return;
   try {

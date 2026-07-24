@@ -4,6 +4,7 @@ import { getDataDir } from "@/lib/paths";
 import type { MediaCard, MediaCategory, MediaCenterStore, MediaSection } from "@/lib/filesir/types";
 import { EMPTY_MEDIA_STORE } from "@/lib/filesir/types";
 import { collectCardEntryIds } from "@/lib/media-center/asset-utils";
+import { snapshotJsonFile } from "@/lib/json-snapshot";
 
 const STORE_PATH = path.join(getDataDir(), "media-center.json");
 
@@ -11,14 +12,27 @@ export async function readMediaCenterStore(): Promise<MediaCenterStore> {
   try {
     const raw = await fs.readFile(STORE_PATH, "utf8");
     const parsed = JSON.parse(raw) as MediaCenterStore;
-    return { ...EMPTY_MEDIA_STORE, ...parsed, version: 1 };
+    return {
+      ...EMPTY_MEDIA_STORE,
+      ...parsed,
+      version: 1,
+      storageMode: parsed.storageMode === "filesir" ? "filesir" : "local",
+    };
   } catch {
     return { ...EMPTY_MEDIA_STORE };
   }
 }
 
+export async function setMediaStorageMode(mode: "local" | "filesir") {
+  const store = await readMediaCenterStore();
+  store.storageMode = mode === "filesir" ? "filesir" : "local";
+  await writeMediaCenterStore(store);
+  return store;
+}
+
 export async function writeMediaCenterStore(store: MediaCenterStore) {
   await fs.mkdir(getDataDir(), { recursive: true });
+  await snapshotJsonFile(STORE_PATH, "media-center");
   await fs.writeFile(STORE_PATH, JSON.stringify(store, null, 2), "utf8");
 }
 

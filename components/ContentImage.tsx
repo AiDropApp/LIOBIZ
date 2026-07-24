@@ -10,6 +10,7 @@ type Props = Omit<ImageProps, "src"> & {
 export default function ContentImage({ src, alt, unoptimized, ...rest }: Props) {
   const skipOptimizer =
     src.startsWith("/uploads/") ||
+    src.startsWith("/media/") ||
     src.startsWith("/api/media/") ||
     src.startsWith("http://") ||
     src.startsWith("https://") ||

@@ -16,7 +16,7 @@ function createZipArchiver(): Archiver {
   return new ZipArchive({ zlib: { level: 9 } });
 }
 
-export const MAX_BACKUPS = 3;
+export const MAX_BACKUPS = 14;
 export const BACKUP_MANIFEST = "manifest.json";
 
 const PROJECT_ROOT = getProjectRoot();

@@ -13,6 +13,9 @@ export function resolveTargetFolderId(card: MediaCard, store: MediaCenterStore):
 
 /** Move all card assets into the correct Files.ir folder after save. */
 export async function syncCardAssetsToFolders(card: MediaCard, store: MediaCenterStore) {
+  // Local-first mode: skip remote My Files moves (they refresh the whole library and are slow).
+  if (process.env.MEDIA_LOCAL_FIRST === "1") return;
+
   const destinationId = resolveTargetFolderId(card, store);
   const entryIds = [...new Set(collectCardEntryIds(card))];
   if (!destinationId || entryIds.length === 0) return;

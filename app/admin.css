@@ -2034,6 +2034,62 @@ button.dash-mini-item {
   }
 }
 
+.admin-media-storage-box {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem 1rem;
+  margin-top: 0.85rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 0.85rem;
+  background: rgba(17, 24, 39, 0.03);
+  border: 1px solid rgba(17, 24, 39, 0.08);
+}
+
+.admin-media-storage-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.admin-media-storage-toggle {
+  display: inline-flex;
+  gap: 0.35rem;
+  padding: 0.2rem;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid rgba(17, 24, 39, 0.1);
+}
+
+.admin-media-storage-toggle button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.85rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #4b5563;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.admin-media-storage-toggle button.is-active {
+  background: rgba(255, 106, 0, 0.14);
+  color: #c2410c;
+  font-weight: 600;
+}
+
+.admin-media-storage-toggle button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.admin-media-storage-hint {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
 .admin-media-toolbar {
   display: flex;
   flex-wrap: wrap;

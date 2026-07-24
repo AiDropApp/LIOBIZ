@@ -47,6 +47,19 @@ yarn-error.log*
 # large media kept locally (copy into public/videos for deploy)
 /header.mp4
 
+# Full media library lives on server/local disk (too large for GitHub).
+# Lightweight thumbs are committed for portfolio fast-load.
+/public/media/**
+!/public/media/.thumbs/
+!/public/media/.thumbs/**
+
+# local sync archives
+/liobiz-*.tar
+/liobiz-*.tgz
+../liobiz-media.tar
+../liobiz-code-sync.tgz
+../liobiz-thumbs.tgz
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

@@ -7,6 +7,7 @@ import { buildEntryLinkMap } from "@/lib/media-center/asset-utils";
 import { descendantCategoryIds } from "@/lib/media-center/categories";
 import { listLiobizMediaFlat, listSectionMediaFlat, type SectionMediaEntry } from "@/lib/media-center/library-entries";
 import { clearEntriesCache, getEntriesCache, setEntriesCache } from "@/lib/media-center/entries-cache";
+import { listLocalMediaFlat } from "@/lib/media-center/local-library";
 import { readMediaCenterStore } from "@/lib/media-center/store";
 
 export const runtime = "nodejs";
@@ -14,8 +15,6 @@ export const runtime = "nodejs";
 export async function GET(request: Request) {
   const admin = await adminGuard();
   if (admin instanceof Response) return admin;
-  const cfg = filesIrGuard();
-  if (cfg) return cfg;
 
   const url = new URL(request.url);
   const parentIdParam = url.searchParams.get("parentId");
@@ -34,9 +33,66 @@ export async function GET(request: Request) {
 
   try {
     const store = await readMediaCenterStore();
+    const storageMode = store.storageMode === "filesir" ? "filesir" : "local";
     const linkMap = buildEntryLinkMap(store.cards);
 
+    if (storageMode === "local") {
+      let categoryNames: string[] | undefined;
+      if (categoryId) {
+        const allowed = descendantCategoryIds(store.categories, categoryId);
+        categoryNames = store.categories
+          .filter((c) => allowed.has(c.id))
+          .flatMap((c) => [c.name, c.slug])
+          .filter(Boolean);
+      }
+
+      let localEntries = await listLocalMediaFlat({
+        section: scope === "liobiz" || scope === "all" ? null : section,
+        query,
+        categoryNames,
+      });
+
+      if (type) {
+        const wanted = new Set(type.split(",").map((t) => t.trim()).filter(Boolean));
+        if (wanted.size) localEntries = localEntries.filter((e) => wanted.has(e.type));
+      }
+
+      if (unlinkedOnly) localEntries = localEntries.filter((e) => !linkMap.has(e.id));
+      if (linkedOnly) localEntries = localEntries.filter((e) => linkMap.has(e.id));
+
+      if (sort === "size") {
+        localEntries = [...localEntries].sort((a, b) => (b.file_size || 0) - (a.file_size || 0));
+      } else {
+        localEntries = [...localEntries].sort((a, b) => a.name.localeCompare(b.name, "fa"));
+      }
+
+      const enriched = localEntries.map((e) => ({
+        ...e,
+        linked: linkMap.get(e.id) || null,
+      }));
+
+      const stats = {
+        total: localEntries.length,
+        linked: localEntries.filter((e) => linkMap.has(e.id)).length,
+        free: localEntries.filter((e) => !linkMap.has(e.id)).length,
+      };
+
+      return NextResponse.json({
+        ok: true,
+        storageMode: "local",
+        entries: enriched,
+        breadcrumbs: [{ id: null, name: "سرور محلی" }],
+        rootFolderId: store.rootFolderId ?? null,
+        sectionFolderIds: store.sectionFolderIds,
+        stats,
+      });
+    }
+
+    const cfg = filesIrGuard();
+    if (cfg) return cfg;
+
     const cacheKey = [
+      "filesir",
       scope,
       section ?? "",
       parentIdParam ?? "",
@@ -58,6 +114,7 @@ export async function GET(request: Request) {
       if (cached) {
         return NextResponse.json({
           ok: true,
+          storageMode: "filesir",
           entries: cached.entries.map((e) => ({ ...e, linked: linkMap.get(e.id) || null })),
           breadcrumbs: cached.breadcrumbs,
           rootFolderId: store.rootFolderId ?? null,
@@ -145,7 +202,6 @@ export async function GET(request: Request) {
       entries = entries.filter((e) => linkMap.has(e.id));
     }
 
-    const mediaEntries = entries.filter((e) => e.type !== "folder");
     if (sort === "size") {
       entries = [...entries].sort((a, b) => (b.file_size || 0) - (a.file_size || 0));
     } else if (sort === "name") {
@@ -181,6 +237,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json({
       ok: true,
+      storageMode: "filesir",
       entries: enriched,
       breadcrumbs,
       rootFolderId: store.rootFolderId ?? null,
@@ -188,6 +245,7 @@ export async function GET(request: Request) {
       stats,
     });
   } catch (error) {
+    clearEntriesCache();
     return handleFilesIrError(error);
   }
 }

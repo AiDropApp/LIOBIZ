@@ -12,6 +12,9 @@ type InitResponse = {
   mode?: string;
   fileEntry?: { id: number; name: string; mime?: string; type: string };
   message?: string;
+  publicUrl?: string;
+  localPath?: string;
+  shareHash?: string;
 };
 
 export type UploadProgress = { percent: number; stage: string };
@@ -28,21 +31,38 @@ export async function uploadMediaFile(
   opts: {
     section?: string;
     categoryFolderId?: number;
+    categoryName?: string;
+    storageMode?: "local" | "filesir";
     onProgress?: (p: UploadProgress) => void;
   },
 ) {
-  const { section, categoryFolderId, onProgress } = opts;
+  const { section, categoryFolderId, categoryName, storageMode = "local", onProgress } = opts;
   onProgress?.({ percent: 2, stage: "آماده‌سازی…" });
 
-  if (file.size <= 4 * 1024 * 1024) {
+  if (storageMode === "local" || file.size <= 4 * 1024 * 1024) {
     const form = new FormData();
     form.append("file", file);
     if (section) form.append("section", section);
     if (categoryFolderId) form.append("categoryFolderId", String(categoryFolderId));
+    if (categoryName) form.append("categoryName", categoryName);
+    form.append("storageMode", storageMode);
     onProgress?.({ percent: 30, stage: "آپلود…" });
     const res = await fetch("/api/admin/media/upload", { method: "POST", body: form });
-    const data = (await res.json()) as InitResponse;
+    const data = (await res.json()) as InitResponse & {
+      publicUrl?: string;
+      localPath?: string;
+      shareHash?: string;
+    };
     if (!res.ok) throw new Error(data.message || "آپلود ناموفق");
+    if (storageMode === "local" || data.localPath) {
+      onProgress?.({ percent: 100, stage: "تمام" });
+      return {
+        fileEntry: data.fileEntry!,
+        publicUrl: data.publicUrl || "",
+        shareHash: data.shareHash,
+        localPath: data.localPath,
+      };
+    }
     onProgress?.({ percent: 85, stage: "ساخت لینک…" });
     const share = await attachShareLink(data.fileEntry!.id);
     onProgress?.({ percent: 100, stage: "تمام" });
@@ -155,6 +175,7 @@ export function toAssetRefFromUpload(
   mime?: string;
   fileName?: string;
   kind: "image" | "video" | "other";
+  localPath?: string;
 } {
   const kind =
     upload.fileEntry.type === "video" || upload.fileEntry.mime?.startsWith("video/")
@@ -169,5 +190,6 @@ export function toAssetRefFromUpload(
     mime: upload.fileEntry.mime,
     fileName: upload.fileEntry.name,
     kind,
+    localPath: upload.localPath,
   };
 }

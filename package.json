@@ -15,6 +15,7 @@
     "audit:full": "node scripts/full-platform-audit.mjs",
     "db:seed": "tsx scripts/seed-db.ts",
     "backup:auto": "tsx scripts/run-backup.ts",
+    "media:migrate": "tsx scripts/migrate-filesir-to-local.ts",
     "pwa:icons": "node scripts/generate-pwa-icons.mjs"
   },
   "dependencies": {

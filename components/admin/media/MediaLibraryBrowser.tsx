@@ -24,6 +24,8 @@ export type LibraryEntry = {
   description?: string;
   folderId?: number;
   folderLabel?: string;
+  localPath?: string;
+  previewUrl?: string;
   linked?: {
     cardId: string;
     cardTitle: string;

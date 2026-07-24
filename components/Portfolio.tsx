@@ -20,7 +20,7 @@ export default function Portfolio() {
   const [landing, setLanding] = useState<LandingContent>(defaultLanding);
 
   useEffect(() => {
-    fetch("/api/content", { cache: "no-store" })
+    fetch("/api/content")
       .then((res) => res.json())
       .then((data) => {
         setItems(Array.isArray(data.portfolio) ? data.portfolio : []);
@@ -81,7 +81,7 @@ export default function Portfolio() {
                   initial={{ opacity: 0, scale: 0.96 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.96 }}
-                  transition={{ duration: 0.3, delay: index * 0.03 }}
+                  transition={{ duration: 0.25, delay: Math.min(index, 6) * 0.02 }}
                   className="portfolio-card group"
                 >
                   <button
@@ -93,14 +93,14 @@ export default function Portfolio() {
                     <div className="portfolio-card-media">
                       <CmsMedia
                         image={item.image}
-                        videoSrc={item.videoSrc}
-                        mediaKind={item.mediaKind}
+                        mediaKind="image"
                         aspectRatio={item.aspectRatio}
                         alt={item.title}
                         fill
                         fitParent
                         objectFit="cover"
                         sizes="(max-width: 768px) 50vw, 25vw"
+                        priority={index < 4}
                         className="transition-transform duration-700 group-hover:scale-105"
                       />
                       {isVideo ? (

@@ -7,7 +7,12 @@ export const runtime = "nodejs";
 export async function GET() {
   try {
     const content = await readPublicSiteContent();
-    return NextResponse.json(content);
+    return NextResponse.json(content, {
+      headers: {
+        // Browser/CDN can reuse JSON briefly; admin edits refresh within a minute.
+        "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+      },
+    });
   } catch (error) {
     console.error("[api/content] GET failed:", error);
     return NextResponse.json({ message: "خطا در بارگذاری محتوا" }, { status: 500 });

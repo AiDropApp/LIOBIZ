@@ -74,7 +74,7 @@ export async function deleteEntries(entryIds: number[], deleteForever = false) {
   return filesIrRequest("/file-entries/delete", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ entryIds, deleteForever: deleteForever ? "true" : "false" }),
+    body: JSON.stringify({ entryIds, deleteForever: Boolean(deleteForever) }),
   });
 }
 

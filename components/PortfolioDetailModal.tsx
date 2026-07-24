@@ -43,6 +43,9 @@ export default function PortfolioDetailModal({
   if (typeof document === "undefined") return null;
 
   const meta = item ? portfolioMeta(item) : null;
+  const full = item?.imageFull?.trim() || "";
+  const detailImage =
+    full && full !== "/images/logo.png" ? full : item?.image || "";
 
   return createPortal(
     <AnimatePresence>
@@ -83,7 +86,7 @@ export default function PortfolioDetailModal({
             <div className="portfolio-detail-grid">
               <div className="portfolio-detail-media">
                 <CmsMedia
-                  image={item.image}
+                  image={detailImage}
                   videoSrc={item.videoSrc}
                   mediaKind={item.mediaKind}
                   aspectRatio={item.aspectRatio ?? "portrait"}

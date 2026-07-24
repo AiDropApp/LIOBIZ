@@ -300,6 +300,8 @@ export async function readPublicSiteContent(): Promise<SiteContent> {
 
 export async function writeSiteContent(content: SiteContent) {
   await ensureStore();
+  const { snapshotJsonFile } = await import("@/lib/json-snapshot");
+  await snapshotJsonFile(CONTENT_FILE, "site-content");
   await fs.writeFile(CONTENT_FILE, JSON.stringify(content, null, 2), "utf8");
 }
 

@@ -66,6 +66,8 @@ export type MediaAssetRef = {
   mime?: string;
   fileName?: string;
   kind: "image" | "video" | "other";
+  /** Relative path under public/media — preferred for local serving */
+  localPath?: string;
 };
 
 export type MediaCategory = {
@@ -98,12 +100,16 @@ export type MediaCard = {
   updatedAt: string;
 };
 
+export type MediaStorageMode = "local" | "filesir";
+
 export type MediaCenterStore = {
   version: 1;
   rootFolderId?: number;
   sectionFolderIds: Partial<Record<MediaSection, number>>;
   categories: MediaCategory[];
   cards: MediaCard[];
+  /** Where admin library reads/writes media. Persists until user changes it. */
+  storageMode?: MediaStorageMode;
 };
 
 export const EMPTY_MEDIA_STORE: MediaCenterStore = {
@@ -111,4 +117,5 @@ export const EMPTY_MEDIA_STORE: MediaCenterStore = {
   sectionFolderIds: {},
   categories: [],
   cards: [],
+  storageMode: "local",
 };
