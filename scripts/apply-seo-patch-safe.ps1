@@ -20,6 +20,8 @@ $Files = @(
   "lib/security-headers.ts",
   "lib/strip-content-styles.ts",
   "lib/homepage-limits.ts",
+  "lib/homepage-payload.ts",
+  "lib/portfolio.ts",
   "hooks/useHomeLanding.ts",
   "components/HomeDataProvider.tsx",
   "components/SeoKeywordsMeta.tsx",
@@ -27,6 +29,9 @@ $Files = @(
   "components/DeferredAnalytics.tsx",
   "components/FacebookPixel.tsx",
   "components/Footer.tsx",
+  "components/SocialShare.tsx",
+  "components/Logo.tsx",
+  "components/CmsMedia.tsx",
   "components/AboutLiobiz.tsx",
   "components/hero/Hero.tsx",
   "components/Portfolio.tsx",
@@ -48,7 +53,8 @@ $Files = @(
   "components/cms-edit/CmsCardRichInput.tsx",
   "scripts/strip-cms-inline-styles.mjs",
   "scripts/patch-server-seo.mjs",
-  "scripts/apply-seo-patch-on-server.sh"
+  "scripts/apply-seo-patch-on-server.sh",
+  "public/images/logo.webp"
 )
 
 $Stage = Join-Path $env:TEMP "liobiz-seo-patch-files"
