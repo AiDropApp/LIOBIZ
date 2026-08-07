@@ -14,6 +14,26 @@ import { useEffect, useState } from "react";
 import type { BlogPost } from "@/lib/blog-defaults";
 import { BLOG_PAGE } from "@/lib/pages-content";
 import { isBlogPublished } from "@/lib/validation";
+import { HOME_BLOG_LIMIT } from "@/lib/homepage-limits";
+
+function BlogCardMeta({ post, index, edit }: { post: BlogPost; index: number; edit?: boolean }) {
+  return (
+    <div className="blog-card-meta">
+      <time className="blog-card-date" dateTime={post.publishedAt}>
+        {new Date(post.publishedAt).toLocaleDateString("fa-IR")}
+      </time>
+      {post.category ? (
+        edit ? (
+          <EditableText path={`blogPosts.${index}.category`} as="span" className="blog-tag">
+            {post.category}
+          </EditableText>
+        ) : (
+          <span className="blog-tag">{post.category}</span>
+        )
+      ) : null}
+    </div>
+  );
+}
 
 export default function BlogSection({
   initialLanding,
@@ -43,7 +63,7 @@ export default function BlogSection({
           list
             .filter(isBlogPublished)
             .sort((a: BlogPost, b: BlogPost) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
-            .slice(0, 3),
+            .slice(0, HOME_BLOG_LIMIT),
         );
       })
       .catch(() => undefined);
@@ -52,25 +72,26 @@ export default function BlogSection({
   if (posts.length === 0 && !edit) return null;
 
   return (
-    <section id="blog" className="section-padding">
+    <section id="blog" className="section-padding blog-home-section">
       <div className="container mx-auto px-4 lg:px-8">
-        <div className="mb-10 flex flex-wrap items-end justify-between gap-4">
+        <div className="blog-section-header">
           <LandingSectionHeader
             labelPath="pages.blog.label"
             titlePath="pages.blog.title"
             label={blogPage.label}
             title={blogPage.title}
+            className="blog-section-heading"
           />
           <EditableCta
             labelPath="landing.blogViewAllCta"
             hrefPath="landing.blogViewAllHref"
             label={landing.blogViewAllCta}
             href={landing.blogViewAllHref}
-            className="btn-outline"
+            className="btn-outline blog-section-cta shrink-0"
           />
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+        <div className={`blog-home-grid blog-home-grid--count-${Math.min(posts.length, 3)}`}>
           {posts.map((post) => {
             const index = allPosts.findIndex((p) => p.id === post.id);
             const body = (
@@ -89,15 +110,12 @@ export default function BlogSection({
                     />
                   ) : null}
                 </div>
-                <div className="p-5">
-                  <time className="text-xs text-muted" dateTime={post.publishedAt}>
-                    {new Date(post.publishedAt).toLocaleDateString("fa-IR")}
-                  </time>
-                  {post.category ? <span className="blog-tag mr-2">{post.category}</span> : null}
-                  <EditableText path={`blogPosts.${index}.title`} as="h3" className="mt-2 text-lg font-bold leading-relaxed">
+                <div className="blog-card-body p-5">
+                  <BlogCardMeta post={post} index={index} edit={edit} />
+                  <EditableText path={`blogPosts.${index}.title`} as="h3" className="blog-card-title">
                     {post.title}
                   </EditableText>
-                  <EditableText path={`blogPosts.${index}.excerpt`} as="p" className="mt-2 line-clamp-2 text-sm leading-7 text-muted" multiline>
+                  <EditableText path={`blogPosts.${index}.excerpt`} as="p" className="blog-card-excerpt" multiline>
                     {post.excerpt}
                   </EditableText>
                 </div>
@@ -121,17 +139,14 @@ export default function BlogSection({
                         />
                       ) : null}
                     </div>
-                    <div className="p-5">
-                      <time className="text-xs text-muted" dateTime={post.publishedAt}>
-                        {new Date(post.publishedAt).toLocaleDateString("fa-IR")}
-                      </time>
-                      {post.category ? <span className="blog-tag mr-2">{post.category}</span> : null}
-                      <h3 className="mt-2 text-lg font-bold leading-relaxed">
+                    <div className="blog-card-body p-5">
+                      <BlogCardMeta post={post} index={index} />
+                      <h3 className="blog-card-title">
                         <Link href={`/blog/${post.slug}`} className="blog-card-title-link">
                           {post.title}
                         </Link>
                       </h3>
-                      <p className="mt-2 line-clamp-2 text-sm leading-7 text-muted">{post.excerpt}</p>
+                      <p className="blog-card-excerpt">{post.excerpt}</p>
                     </div>
                   </>
                 )}

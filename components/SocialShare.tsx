@@ -12,7 +12,15 @@ function WhatsAppIcon() {
   );
 }
 
-export default function SocialShare({ url, title }: { url?: string; title?: string }) {
+export default function SocialShare({
+  url,
+  title,
+  layout = "vertical",
+}: {
+  url?: string;
+  title?: string;
+  layout?: "vertical" | "horizontal";
+}) {
   const pageUrl = url || SITE.url;
   const pageTitle = title || SITE.title;
   const encodedUrl = encodeURIComponent(pageUrl);
@@ -27,7 +35,10 @@ export default function SocialShare({ url, title }: { url?: string; title?: stri
   }, [pageUrl]);
 
   return (
-    <div className="footer-share" aria-label="اشتراک‌گذاری صفحه">
+    <div
+      className={`footer-share footer-share--${layout}`}
+      aria-label="اشتراک‌گذاری صفحه"
+    >
       <p className="footer-share-title">اشتراک‌گذاری</p>
       <div className="footer-share-links">
         <a
@@ -36,6 +47,7 @@ export default function SocialShare({ url, title }: { url?: string; title?: stri
           rel="noopener noreferrer"
           className="footer-share-link"
           aria-label="اشتراک در تلگرام"
+          title="تلگرام"
         >
           <Send size={16} aria-hidden="true" />
         </a>
@@ -45,6 +57,7 @@ export default function SocialShare({ url, title }: { url?: string; title?: stri
           rel="noopener noreferrer"
           className="footer-share-link"
           aria-label="اشتراک در واتساپ"
+          title="واتساپ"
         >
           <WhatsAppIcon />
         </a>
@@ -52,7 +65,8 @@ export default function SocialShare({ url, title }: { url?: string; title?: stri
           type="button"
           onClick={copyLink}
           className="footer-share-link"
-          aria-label="کپی لینک"
+          aria-label="کپی لینk"
+          title="کپی لینk"
         >
           <Link2 size={16} aria-hidden="true" />
         </button>

@@ -41,6 +41,7 @@ $Files = @(
   "components/Plans.tsx",
   "components/FAQ.tsx",
   "components/BlogSection.tsx",
+  "app/globals.css",
   "components/Testimonials.tsx",
   "components/Partners.tsx",
   "components/CreativePartners.tsx",

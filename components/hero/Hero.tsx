@@ -1,14 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
 import Image from "next/image";
 import HeroContent from "./content/HeroContent";
 import HeroStats from "./content/HeroStats";
 import usePrefersReducedMotion from "@/hooks/usePrefersReducedMotion";
 import { useHomeLanding } from "@/hooks/useHomeLanding";
 import type { LandingContent } from "@/lib/cms-defaults";
-import { useCmsEdit } from "@/components/cms-edit/CmsEditProvider";
 import EditableImage from "@/components/cms-edit/EditableImage";
 import {
   isVideoUrl,
@@ -18,7 +15,6 @@ import {
 import { blockMediaContextMenu, MEDIA_PROTECT_CLASS, protectedVideoProps } from "@/lib/media-protect";
 
 export default function Hero({ initialLanding }: { initialLanding?: LandingContent }) {
-  const cms = useCmsEdit();
   const reducedMotion = usePrefersReducedMotion();
   const landing = useHomeLanding(initialLanding);
   const activeLanding = landing;
@@ -78,23 +74,18 @@ export default function Hero({ initialLanding }: { initialLanding?: LandingConte
 
         <div className="hero-panel-inner">
           <div className="hero-layout">
-            <motion.div
-              className="hero-copy"
-              initial={reducedMotion ? false : { opacity: 0, y: 18 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.65, ease: "easeOut", delay: 0.1 }}
-            >
+            <div className="hero-copy">
               <HeroContent
                 reducedMotion={reducedMotion}
                 delay={reducedMotion ? 0 : 0.12}
                 landing={activeLanding}
               />
-            </motion.div>
+            </div>
           </div>
         </div>
 
         <div className="hero-stats-bridge">
-          <HeroStats reducedMotion={reducedMotion} delay={reducedMotion ? 0 : 0.25} />
+          <HeroStats reducedMotion={reducedMotion} delay={0} />
         </div>
       </div>
     </section>

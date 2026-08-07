@@ -146,7 +146,8 @@ export default function Portfolio({
           id="portfolio-panel"
           role="tabpanel"
           aria-labelledby="portfolio-tab-all"
-          className="portfolio-grid"
+          className={`portfolio-grid${visible.length > 0 && visible.length < 4 ? " portfolio-grid--compact" : ""}`}
+          data-count={visible.length}
           aria-label="نمونه کارهای منتخب"
         >
           <AnimatePresence mode="popLayout">

@@ -9,7 +9,6 @@ import {
   BlogSection,
   CreativePartners,
   FAQ,
-  LoadingScreen,
   Partners,
   Plans,
   Portfolio,
@@ -29,7 +28,6 @@ export default async function HomePage() {
     <SiteShell mainClassName="">
       <HomeDataProvider value={homeData}>
         <SmoothScroll>
-          <LoadingScreen />
           <Hero />
           <AboutLiobiz />
           <Services />
@@ -39,9 +37,9 @@ export default async function HomePage() {
           <Plans />
           <CreativePartners />
           <FAQ />
-          <BlogSection />
           <Testimonials />
           <Partners />
+          <BlogSection />
         </SmoothScroll>
       </HomeDataProvider>
     </SiteShell>

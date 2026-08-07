@@ -149,17 +149,17 @@ export default function Footer() {
             )}
           </div>
 
-          <div className="grid gap-10 md:grid-cols-2 xl:grid-cols-4">
-            <div>
+          <div className="footer-main-grid">
+            <div className="footer-brand-col">
               <EditableText path="site.brandDisplayName" as="p" className="mb-2 text-xl font-extrabold tracking-wide text-white">
                 {site.brandDisplayName || "LIOBIZ"}
               </EditableText>
-              <p className="mb-6 max-w-sm leading-relaxed text-muted">
+              <p className="mb-5 max-w-sm leading-relaxed text-muted">
                 <EditableText path="site.footerText" multiline>
                   {site.footerText || site.description || SITE.description}
                 </EditableText>
               </p>
-              <div className="footer-socials">
+              <div className="footer-socials footer-socials--icons">
                 {socials.map((link, index) => {
                   const platform = inferSocialPlatform(link.name, link.href);
                   return cms?.isAdmin && cms.editMode ? (
@@ -180,20 +180,18 @@ export default function Footer() {
                       href={link.href}
                       target="_blank"
                       rel="nofollow noopener noreferrer"
-                      className="footer-social"
+                      className="footer-social footer-social--icon-only"
                       aria-label={platform}
+                      title={platform}
                     >
                       <SocialIcon name={platform} />
-                      <span className="footer-social-name" aria-hidden="true">
-                        {platform}
-                      </span>
                     </a>
                   );
                 })}
               </div>
             </div>
 
-            <div>
+            <div className="footer-links-col">
               <EditableText path="landing.footerQuickLinksTitle" as="p" className="footer-col-title mb-4 text-lg font-bold">
                 {landing.footerQuickLinksTitle}
               </EditableText>
@@ -218,7 +216,7 @@ export default function Footer() {
               </ul>
             </div>
 
-            <div>
+            <div className="footer-links-col">
               <EditableText path="landing.footerServicesTitle" as="p" className="footer-col-title mb-4 text-lg font-bold">
                 {landing.footerServicesTitle}
               </EditableText>
@@ -243,7 +241,7 @@ export default function Footer() {
               </ul>
             </div>
 
-            <div>
+            <div className="footer-contact-col">
               <EditableText path="landing.footerContactTitle" as="p" className="footer-col-title mb-4 text-lg font-bold">
                 {landing.footerContactTitle}
               </EditableText>
@@ -300,16 +298,22 @@ export default function Footer() {
                     hrefPath="landing.footerContactPageHref"
                     label={landing.footerContactPageLink}
                     href={landing.footerContactPageHref}
-                    className="text-primary-soft transition-colors hover:text-white"
+                    className="text-primary transition-colors hover:text-white"
                   />
                 </li>
               </ul>
             </div>
+
+            <aside className="footer-share-aside">
+              <SocialShare layout="vertical" />
+            </aside>
           </div>
 
-          <SocialShare />
+          <div className="footer-share-mobile">
+            <SocialShare layout="horizontal" />
+          </div>
 
-          <div className="mt-12 border-t border-white/5 pt-6 text-center text-sm text-white/40">
+          <div className="footer-copyright mt-12 border-t border-white/5 pt-6 text-center text-sm text-white/40">
             © <span suppressHydrationWarning>{new Date().getFullYear()}</span>{" "}
             <EditableText path="landing.footerCopyright" as="span">
               {landing.footerCopyright}
