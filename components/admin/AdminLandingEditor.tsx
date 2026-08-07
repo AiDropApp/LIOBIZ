@@ -1,27 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import type { LandingContent } from "@/lib/cms-defaults";
-import type { SiteContent } from "@/lib/content-store";
+import type { SiteContent, ThemeSettings } from "@/lib/content-store";
+import { isVideoUrl } from "@/lib/media-types";
 import LandingSectionPanel from "@/components/admin/landing/LandingSectionPanel";
 import MediaUrlField from "@/components/admin/landing/MediaUrlField";
-import LandingItemCard from "@/components/admin/landing/LandingItemCard";
-import { isVideoUrl } from "@/lib/media-types";
-import { CMS_RICH_TEXT_HINT } from "@/lib/cms-rich-text";
-import type { PartnerItem, TestimonialItem } from "@/lib/landing-defaults";
 
 const SECTIONS = [
-  { id: "hero", emoji: "🏠", title: "هیرو", subtitle: "تیتر، دکمه‌ها، ویدیو/عکس پس‌زمینه" },
-  { id: "hero-stats", emoji: "📊", title: "آمار هیرو", subtitle: "اعداد و برچسب‌های زیر هیرو" },
-  { id: "about", emoji: "ℹ️", title: "درباره لیوبیز", subtitle: "متن‌ها و دو تصویر" },
-  { id: "services", emoji: "🛠️", title: "خدمات", subtitle: "عنوان سکشن و لیست خدمات" },
-  { id: "process", emoji: "🔄", title: "فرایند همکاری", subtitle: "مراحل و عناوین" },
-  { id: "plans", emoji: "💰", title: "پلن‌ها", subtitle: "سه پلن همکاری" },
-  { id: "faq", emoji: "❓", title: "FAQ", subtitle: "سوالات متداول" },
-  { id: "testimonials", emoji: "💬", title: "نظرات مشتریان", subtitle: "گواهی مشتریان" },
-  { id: "partners", emoji: "🤝", title: "برندهای همکار", subtitle: "لوگو + لینk" },
-  { id: "site-brand", emoji: "🏷️", title: "برند سایت", subtitle: "نام، لوگو، رنگ اصلی" },
-  { id: "footer", emoji: "📞", title: "فوتر", subtitle: "تماس، CTA، لینک‌ها" },
+  { id: "site-brand", emoji: "🎨", title: "برند و ظاهر", subtitle: "لوگو، رنگ، اندازه تیتر" },
+  { id: "redirects", emoji: "↪️", title: "ریدایرکت", subtitle: "ریدایرکت ۳۰۱" },
 ] as const;
 
 type SectionId = (typeof SECTIONS)[number]["id"];
@@ -30,43 +17,28 @@ function Field({
   label,
   value,
   onChange,
-  onBlur,
   multiline,
-  hint,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
-  onBlur?: (value: string) => void;
   multiline?: boolean;
-  hint?: string;
 }) {
   return (
     <label className="contact-field">
       <span>{label}</span>
       {multiline ? (
-        <textarea rows={3} value={value} onChange={(e) => onChange(e.target.value)} onBlur={() => onBlur?.(value)} />
+        <textarea rows={3} value={value} onChange={(e) => onChange(e.target.value)} />
       ) : (
-        <input value={value} onChange={(e) => onChange(e.target.value)} onBlur={() => onBlur?.(value)} />
-      )}
-      {multiline && (
-        <small className="text-muted">{hint || CMS_RICH_TEXT_HINT}</small>
+        <input value={value} onChange={(e) => onChange(e.target.value)} />
       )}
     </label>
   );
 }
 
-function emptyTestimonial(): TestimonialItem {
-  return { name: "", role: "", quote: "" };
-}
-
-function emptyPartner(): PartnerItem {
-  return { name: "", logo: "", href: "" };
-}
-
 export default function AdminLandingEditor() {
   const [content, setContent] = useState<SiteContent | null>(null);
-  const [open, setOpen] = useState<SectionId>("hero");
+  const [open, setOpen] = useState<SectionId>("site-brand");
   const [busy, setBusy] = useState(false);
   const [toast, setToast] = useState("");
 
@@ -95,7 +67,7 @@ export default function AdminLandingEditor() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "خطا");
       setContent(data.content);
-      flash("ذخیره شد — تغییرات روی سایت اعمال می‌شود.");
+      flash("ذخیره شد.");
     } catch (e) {
       flash(e instanceof Error ? e.message : "خطا");
     } finally {
@@ -103,22 +75,22 @@ export default function AdminLandingEditor() {
     }
   };
 
-  const patchLanding = (key: keyof LandingContent, value: string) => {
-    if (!content) return;
-    setContent({ ...content, landing: { ...content.landing, [key]: value } });
-  };
-
   if (!content) {
-    return <p className="text-muted p-4">در حال بارگذاری محتوای لندینگ...</p>;
+    return <p className="text-muted p-4">در حال بارگذاری…</p>;
   }
 
-  const { landing, pages, site, plans, faq, testimonials, partners, theme } = content;
+  const { site, theme, landing } = content;
 
   return (
     <section className="landing-admin">
       <div className="dash-section-head">
-        <h2>مدیریت لندینگ</h2>
-        <p>هر بخش = یک قسمت از صفحه اصلی. نمونه کار، بک‌استیج و همکاران خلاق از تب «رسانه» مدیریت می‌شوند.</p>
+        <h2>تنظیمات سایت</h2>
+        <p className="mb-3">
+          ویرایش متن، تصویر و سکشن‌ها روی خود صفحات انجام می‌شود: هر صفحه → «✏️ ویرایش این صفحه» در پایین.
+        </p>
+        <p className="text-sm text-muted">
+          این بخش فقط برای لوگو، رنگ تم، SEO و ریدایرکت‌های ۳۰۱ است. نمونه‌کار و بک‌استیج از تب «رسانه»، بلاگ از تب «بلاگ».
+        </p>
         <a href="/" target="_blank" rel="noreferrer" className="btn-outline mt-3 inline-flex text-sm">
           پیش‌نمایش سایت ↗
         </a>
@@ -126,7 +98,7 @@ export default function AdminLandingEditor() {
 
       {toast && <div className="admin-toast">{toast}</div>}
 
-      <nav className="landing-section-nav" aria-label="بخش‌های لندینگ">
+      <nav className="landing-section-nav" aria-label="تنظیمات سایت">
         <div className="landing-section-nav-track">
           {SECTIONS.map((s) => (
             <button
@@ -145,391 +117,51 @@ export default function AdminLandingEditor() {
       </nav>
 
       <div className="landing-sections-stack">
-        {open === "hero" && (
+        {open === "site-brand" && (
           <LandingSectionPanel
-            id="hero"
-            emoji="🏠"
-            title="هیرو"
-            subtitle="بخش بالای صفحه (#home)"
+            id="site-brand"
+            emoji="🎨"
+            title="برند و ظاهر"
+            subtitle="لوگو، رنگ، اندازه تیتر"
             open
             onToggle={() => undefined}
-            onSave={() => save({ landing })}
+            onSave={() =>
+              save({
+                site,
+                theme,
+                landing: {
+                  ...landing,
+                  heroMediaType: isVideoUrl(landing.heroMediaUrl) ? "video" : "image",
+                },
+              })
+            }
             saving={busy}
           >
-            <Field label="بج" value={landing.heroBadge} onChange={(v) => patchLanding("heroBadge", v)} />
-            <Field label="تیتر (قبل هایلایت)" value={landing.heroTitle} onChange={(v) => patchLanding("heroTitle", v)} />
-            <Field label="کلمه هایلایت" value={landing.heroTitleHighlight} onChange={(v) => patchLanding("heroTitleHighlight", v)} />
-            <Field label="توضیح" value={landing.heroDescription} onChange={(v) => patchLanding("heroDescription", v)} multiline />
-            <Field label="دکمه اصلی" value={landing.heroPrimaryCta} onChange={(v) => patchLanding("heroPrimaryCta", v)} />
-            <Field label="لینک دکمه اصلی" value={landing.heroPrimaryHref} onChange={(v) => patchLanding("heroPrimaryHref", v)} />
-            <Field label="دکمه دوم" value={landing.heroSecondaryCta} onChange={(v) => patchLanding("heroSecondaryCta", v)} />
-            <Field label="لینک دکمه دوم" value={landing.heroSecondaryHref} onChange={(v) => patchLanding("heroSecondaryHref", v)} />
+            <Field label="نام کوتاه برند" value={site.name} onChange={(v) => setContent({ ...content, site: { ...site, name: v } })} />
+            <Field label="عنوان SEO (title)" value={site.title} onChange={(v) => setContent({ ...content, site: { ...site, title: v } })} />
+            <Field
+              label="توضیح SEO"
+              value={site.description}
+              onChange={(v) => setContent({ ...content, site: { ...site, description: v } })}
+              multiline
+            />
             <MediaUrlField
-              label="ویدیو / عکس پس‌زمینه هیرو"
+              label="ویدیو / تصویر پس‌زمینه هیرو"
               value={landing.heroMediaUrl}
-              onChange={(url) => {
-                const isVideo = isVideoUrl(url);
+              onChange={(url) =>
                 setContent({
                   ...content,
                   landing: {
                     ...landing,
                     heroMediaUrl: url,
-                    heroMediaType: isVideo ? "video" : "image",
+                    heroMediaType: isVideoUrl(url) ? "video" : "image",
                   },
-                });
-              }}
+                })
+              }
               uploadKind="hero"
-              hint="لینک Google Drive، my.files.ir، یوتیوب یا فایل مستقیم mp4"
+              accept="image/*,video/*"
+              hint="لینk مستقیم، یوتیوب، یا آپلود — روی صفحه اصلی در حالت «ویرایش صفحه» هم از کتابخانه قابل تغییر است"
             />
-          </LandingSectionPanel>
-        )}
-
-        {open === "hero-stats" && (
-          <LandingSectionPanel
-            id="hero-stats"
-            emoji="📊"
-            title="آمار هیرو"
-            subtitle="نوار آمار زیر ویدیو"
-            open
-            onToggle={() => undefined}
-            onSave={() => save({ landing: { ...landing, heroStats: landing.heroStats } })}
-            saving={busy}
-          >
-            {landing.heroStats.map((stat, i) => (
-              <div key={i} className="landing-item-card">
-                <Field
-                  label={`مقدار ${i + 1}`}
-                  value={stat.value}
-                  onChange={(v) => {
-                    const heroStats = [...landing.heroStats];
-                    heroStats[i] = { ...heroStats[i], value: v };
-                    setContent({ ...content, landing: { ...landing, heroStats } });
-                  }}
-                />
-                <Field
-                  label="برچسب"
-                  value={stat.label}
-                  onChange={(v) => {
-                    const heroStats = [...landing.heroStats];
-                    heroStats[i] = { ...heroStats[i], label: v };
-                    setContent({ ...content, landing: { ...landing, heroStats } });
-                  }}
-                />
-              </div>
-            ))}
-          </LandingSectionPanel>
-        )}
-
-        {open === "about" && (
-          <LandingSectionPanel
-            id="about"
-            emoji="ℹ️"
-            title="درباره لیوبیز"
-            subtitle="سکشن #about-liobiz"
-            open
-            onToggle={() => undefined}
-            onSave={() => save({ landing })}
-            saving={busy}
-          >
-            <Field label="برچسب" value={landing.aboutLabel} onChange={(v) => patchLanding("aboutLabel", v)} />
-            <Field label="تیتر" value={landing.aboutTitle} onChange={(v) => patchLanding("aboutTitle", v)} />
-            <Field label="متن ۱" value={landing.aboutText1} onChange={(v) => patchLanding("aboutText1", v)} multiline />
-            <Field label="متن ۲" value={landing.aboutText2} onChange={(v) => patchLanding("aboutText2", v)} multiline />
-            <Field label="بج روی تصویر" value={landing.aboutBadge} onChange={(v) => patchLanding("aboutBadge", v)} />
-            <MediaUrlField label="تصویر اصلی" value={landing.aboutImage1} onChange={(v) => patchLanding("aboutImage1", v)} uploadKind="about" accept="image/*" />
-            <MediaUrlField label="تصویر شناور" value={landing.aboutImage2} onChange={(v) => patchLanding("aboutImage2", v)} uploadKind="about" accept="image/*" />
-          </LandingSectionPanel>
-        )}
-
-        {open === "services" && (
-          <LandingSectionPanel
-            id="services"
-            emoji="🛠️"
-            title="خدمات"
-            subtitle="سکشن #services"
-            open
-            onToggle={() => undefined}
-            onSave={() => save({ landing, pages: { ...pages, services: pages.services } })}
-            saving={busy}
-          >
-            <Field label="برچسب" value={landing.servicesLabel} onChange={(v) => patchLanding("servicesLabel", v)} />
-            <Field label="تیتر" value={landing.servicesTitle} onChange={(v) => patchLanding("servicesTitle", v)} />
-            <Field label="توضیح" value={landing.servicesIntro} onChange={(v) => patchLanding("servicesIntro", v)} multiline />
-            {pages.services.map((svc, i) => (
-              <div key={svc.id} className="landing-item-card">
-                <strong>خدمت {i + 1}</strong>
-                <Field label="عنوان" value={svc.title} onChange={(v) => {
-                  const services = [...pages.services];
-                  services[i] = { ...services[i], title: v };
-                  setContent({ ...content, pages: { ...pages, services } });
-                }} />
-                <Field label="توضیح" value={svc.description} onChange={(v) => {
-                  const services = [...pages.services];
-                  services[i] = { ...services[i], description: v };
-                  setContent({ ...content, pages: { ...pages, services } });
-                }} multiline />
-                <Field label="لینک" value={svc.href} onChange={(v) => {
-                  const services = [...pages.services];
-                  services[i] = { ...services[i], href: v };
-                  setContent({ ...content, pages: { ...pages, services } });
-                }} />
-              </div>
-            ))}
-          </LandingSectionPanel>
-        )}
-
-        {open === "process" && (
-          <LandingSectionPanel
-            id="process"
-            emoji="🔄"
-            title="فرایند همکاری"
-            subtitle="سکشن #process"
-            open
-            onToggle={() => undefined}
-            onSave={() => save({ landing, pages: { ...pages, processSteps: pages.processSteps } })}
-            saving={busy}
-          >
-            <Field label="برچسب" value={landing.processLabel} onChange={(v) => patchLanding("processLabel", v)} />
-            <Field label="تیتر" value={landing.processTitle} onChange={(v) => patchLanding("processTitle", v)} />
-            <Field label="لینک جزئیات" value={landing.processLinkText} onChange={(v) => patchLanding("processLinkText", v)} />
-            <Field label="آدرس لینک" value={landing.processLinkHref} onChange={(v) => patchLanding("processLinkHref", v)} />
-            {pages.processSteps.map((step, i) => (
-              <div key={step.id} className="landing-item-card">
-                <strong>مرحله {step.id}</strong>
-                <Field label="عنوان" value={step.title} onChange={(v) => {
-                  const processSteps = [...pages.processSteps];
-                  processSteps[i] = { ...processSteps[i], title: v };
-                  setContent({ ...content, pages: { ...pages, processSteps } });
-                }} />
-                <Field label="توضیح" value={step.description} onChange={(v) => {
-                  const processSteps = [...pages.processSteps];
-                  processSteps[i] = { ...processSteps[i], description: v };
-                  setContent({ ...content, pages: { ...pages, processSteps } });
-                }} multiline />
-              </div>
-            ))}
-          </LandingSectionPanel>
-        )}
-
-        {open === "plans" && (
-          <LandingSectionPanel
-            id="plans"
-            emoji="💰"
-            title="پلن‌ها"
-            subtitle="سکشن #plans"
-            open
-            onToggle={() => undefined}
-            onSave={() => save({ landing, plans })}
-            saving={busy}
-          >
-            <Field label="برچسب" value={landing.plansLabel} onChange={(v) => patchLanding("plansLabel", v)} />
-            <Field label="تیتر" value={landing.plansTitle} onChange={(v) => patchLanding("plansTitle", v)} />
-            <Field label="توضیح" value={landing.plansIntro} onChange={(v) => patchLanding("plansIntro", v)} multiline />
-            {plans.map((plan, i) => (
-              <div key={plan.id} className="landing-item-card">
-                <strong>{plan.name}</strong>
-                <Field label="نام" value={plan.name} onChange={(v) => {
-                  const next = [...plans];
-                  next[i] = { ...next[i], name: v };
-                  setContent({ ...content, plans: next });
-                }} />
-                <Field label="توضیح" value={plan.description} onChange={(v) => {
-                  const next = [...plans];
-                  next[i] = { ...next[i], description: v };
-                  setContent({ ...content, plans: next });
-                }} multiline />
-                <Field label="قیمت" value={plan.price} onChange={(v) => {
-                  const next = [...plans];
-                  next[i] = { ...next[i], price: v };
-                  setContent({ ...content, plans: next });
-                }} />
-                <label className="contact-field flex-row items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={plan.featured}
-                    onChange={(e) => {
-                      const next = [...plans];
-                      next[i] = { ...next[i], featured: e.target.checked };
-                      setContent({ ...content, plans: next });
-                    }}
-                  />
-                  <span>پلن پیشنهادی (هایلایت)</span>
-                </label>
-                <Field
-                  label="ویژگی‌ها (هر خط یک مورد)"
-                  value={plan.features.join("\n")}
-                  onChange={(v) => {
-                    const next = [...plans];
-                    next[i] = { ...next[i], features: v.split("\n").filter(Boolean) };
-                    setContent({ ...content, plans: next });
-                  }}
-                  multiline
-                />
-              </div>
-            ))}
-          </LandingSectionPanel>
-        )}
-
-        {open === "faq" && (
-          <LandingSectionPanel
-            id="faq"
-            emoji="❓"
-            title="FAQ"
-            subtitle="سوالات متداول"
-            open
-            onToggle={() => undefined}
-            onSave={() => save({ landing, faq })}
-            saving={busy}
-          >
-            <Field label="برچسب" value={landing.faqLabel} onChange={(v) => patchLanding("faqLabel", v)} />
-            <Field label="تیتر" value={landing.faqTitle} onChange={(v) => patchLanding("faqTitle", v)} />
-            <Field label="توضیح" value={landing.faqIntro} onChange={(v) => patchLanding("faqIntro", v)} multiline />
-            {faq.map((item, i) => (
-              <div key={i} className="landing-item-card">
-                <Field label="سؤال" value={item.q} onChange={(v) => {
-                  const next = [...faq];
-                  next[i] = { ...next[i], q: v };
-                  setContent({ ...content, faq: next });
-                }} />
-                <Field label="پاسخ" value={item.a} onChange={(v) => {
-                  const next = [...faq];
-                  next[i] = { ...next[i], a: v };
-                  setContent({ ...content, faq: next });
-                }} multiline />
-              </div>
-            ))}
-          </LandingSectionPanel>
-        )}
-
-        {open === "testimonials" && (
-          <LandingSectionPanel
-            id="testimonials"
-            emoji="💬"
-            title="نظرات مشتریان"
-            subtitle="سکشن #testimonials"
-            open
-            onToggle={() => undefined}
-            onSave={() => save({ landing, testimonials })}
-            saving={busy}
-          >
-            <Field label="برچسب" value={landing.testimonialsLabel} onChange={(v) => patchLanding("testimonialsLabel", v)} />
-            <Field label="تیتر" value={landing.testimonialsTitle} onChange={(v) => patchLanding("testimonialsTitle", v)} />
-            <Field label="توضیح" value={landing.testimonialsIntro} onChange={(v) => patchLanding("testimonialsIntro", v)} multiline />
-            <p className="landing-section-hint">{testimonials.length} نظر — پس از ویرایش «ذخیره این بخش» را بزنید</p>
-            {testimonials.map((t, i) => (
-              <LandingItemCard
-                key={`testimonial-${i}`}
-                index={i + 1}
-                title={t.name || `نظر ${i + 1}`}
-                subtitle={t.role || "بدون سمت"}
-                onRemove={() => {
-                  const next = testimonials.filter((_, idx) => idx !== i);
-                  setContent({ ...content, testimonials: next });
-                }}
-              >
-                <Field label="نام" value={t.name} onChange={(v) => {
-                  const next = [...testimonials];
-                  next[i] = { ...next[i], name: v };
-                  setContent({ ...content, testimonials: next });
-                }} />
-                <Field label="سمت" value={t.role} onChange={(v) => {
-                  const next = [...testimonials];
-                  next[i] = { ...next[i], role: v };
-                  setContent({ ...content, testimonials: next });
-                }} />
-                <Field label="نظر" value={t.quote} onChange={(v) => {
-                  const next = [...testimonials];
-                  next[i] = { ...next[i], quote: v };
-                  setContent({ ...content, testimonials: next });
-                }} multiline />
-              </LandingItemCard>
-            ))}
-            <button
-              type="button"
-              className="landing-add-btn"
-              onClick={() =>
-                setContent({
-                  ...content,
-                  testimonials: [...testimonials, emptyTestimonial()],
-                })
-              }
-            >
-              + افزودن نظر جدید
-            </button>
-          </LandingSectionPanel>
-        )}
-
-        {open === "partners" && (
-          <LandingSectionPanel
-            id="partners"
-            emoji="🤝"
-            title="برندهای همکار"
-            subtitle="سکشن Partners"
-            open
-            onToggle={() => undefined}
-            onSave={() => save({ landing, partners })}
-            saving={busy}
-          >
-            <Field label="برچسب" value={landing.partnersLabel} onChange={(v) => patchLanding("partnersLabel", v)} />
-            <Field label="تیتر" value={landing.partnersTitle} onChange={(v) => patchLanding("partnersTitle", v)} />
-            <p className="landing-section-hint">{partners.length} برند — لینk اختیاری؛ اگر پر شود لوگو قابل کلیک می‌شود</p>
-            {partners.map((p, i) => (
-              <LandingItemCard
-                key={`partner-${i}`}
-                index={i + 1}
-                title={p.name || p.logo || `برند ${i + 1}`}
-                subtitle={p.href ? "دارای لینk" : "بدون لینk"}
-                onRemove={() => {
-                  const next = partners.filter((_, idx) => idx !== i);
-                  setContent({ ...content, partners: next });
-                }}
-              >
-                <Field label="نام برند" value={p.name} onChange={(v) => {
-                  const next = [...partners];
-                  next[i] = { ...next[i], name: v };
-                  setContent({ ...content, partners: next });
-                }} />
-                <Field label="متن نمایشی (روی لوگو)" value={p.logo} onChange={(v) => {
-                  const next = [...partners];
-                  next[i] = { ...next[i], logo: v };
-                  setContent({ ...content, partners: next });
-                }} />
-                <Field label="لینk وب‌سایت (اختیاری)" value={p.href ?? ""} onChange={(v) => {
-                  const next = [...partners];
-                  next[i] = { ...next[i], href: v };
-                  setContent({ ...content, partners: next });
-                }} />
-              </LandingItemCard>
-            ))}
-            <button
-              type="button"
-              className="landing-add-btn"
-              onClick={() =>
-                setContent({
-                  ...content,
-                  partners: [...partners, emptyPartner()],
-                })
-              }
-            >
-              + افزودن برند همکار
-            </button>
-          </LandingSectionPanel>
-        )}
-
-        {open === "site-brand" && (
-          <LandingSectionPanel
-            id="site-brand"
-            emoji="🏷️"
-            title="برند سایت"
-            subtitle="نام، لوگو، رنگ — روی هدر و کل سایت"
-            open
-            onToggle={() => undefined}
-            onSave={() => save({ site, theme })}
-            saving={busy}
-          >
-            <Field label="نام کوتاه برند" value={site.name} onChange={(v) => setContent({ ...content, site: { ...site, name: v } })} />
-            <Field label="عنوان SEO (title)" value={site.title} onChange={(v) => setContent({ ...content, site: { ...site, title: v } })} />
-            <Field label="توضیح SEO" value={site.description} onChange={(v) => setContent({ ...content, site: { ...site, description: v } })} multiline />
             <MediaUrlField
               label="لوگو سایت"
               value={site.logoUrl}
@@ -543,86 +175,86 @@ export default function AdminLandingEditor() {
               <input
                 type="color"
                 value={theme.primaryColor}
-                onChange={(e) =>
-                  setContent({ ...content, theme: { ...theme, primaryColor: e.target.value } })
-                }
+                onChange={(e) => setContent({ ...content, theme: { ...theme, primaryColor: e.target.value } })}
               />
+            </label>
+            <label className="contact-field">
+              <span>اندازه تیترهای سکشن</span>
+              <select
+                value={theme.headingScale}
+                onChange={(e) =>
+                  setContent({
+                    ...content,
+                    theme: { ...theme, headingScale: e.target.value as ThemeSettings["headingScale"] },
+                  })
+                }
+              >
+                <option value="sm">کوچک</option>
+                <option value="md">متوسط</option>
+                <option value="lg">بزرگ</option>
+              </select>
             </label>
           </LandingSectionPanel>
         )}
 
-        {open === "footer" && (
+        {open === "redirects" && (
           <LandingSectionPanel
-            id="footer"
-            emoji="📞"
-            title="فوتر"
-            subtitle="پایین صفحه + تماس"
+            id="redirects"
+            emoji="↪️"
+            title="ریدایرکت ۳۰۱"
+            subtitle="آدرس‌های قدیمی → جدید"
             open
             onToggle={() => undefined}
-            onSave={() =>
-              save({
-                landing,
-                site,
-                footerQuickLinks: content.footerQuickLinks,
-                footerServiceLinks: content.footerServiceLinks,
-              })
-            }
+            onSave={() => save({ redirects: content.redirects || [] })}
             saving={busy}
           >
-            <Field label="CTA — تیتر" value={landing.footerCtaTitle} onChange={(v) => patchLanding("footerCtaTitle", v)} />
-            <Field label="CTA — متن" value={landing.footerCtaText} onChange={(v) => patchLanding("footerCtaText", v)} multiline />
-            <Field label="CTA — دکمه" value={landing.footerCtaButton} onChange={(v) => patchLanding("footerCtaButton", v)} />
-            <Field label="CTA — لینک" value={landing.footerCtaHref} onChange={(v) => patchLanding("footerCtaHref", v)} />
-            <Field label="کپی‌رایت" value={landing.footerCopyright} onChange={(v) => patchLanding("footerCopyright", v)} />
-            <Field label="تلفن" value={site.phone} onChange={(v) => setContent({ ...content, site: { ...site, phone: v } })} />
-            <Field label="ایمیل" value={site.email} onChange={(v) => setContent({ ...content, site: { ...site, email: v } })} />
-            <Field label="آدرس" value={site.address} onChange={(v) => setContent({ ...content, site: { ...site, address: v } })} />
-            <Field label="متن معرفی فوتر" value={site.footerText} onChange={(v) => setContent({ ...content, site: { ...site, footerText: v } })} multiline />
-            <h4 className="mt-4 font-bold">شبکه‌های اجتماعی</h4>
-            {site.socials.map((s, i) => (
-              <div key={i} className="landing-item-card">
-                <Field label="نام" value={s.name} onChange={(v) => {
-                  const socials = [...site.socials];
-                  socials[i] = { ...socials[i], name: v };
-                  setContent({ ...content, site: { ...site, socials } });
-                }} />
-                <Field label="لینk" value={s.href} onChange={(v) => {
-                  const socials = [...site.socials];
-                  socials[i] = { ...socials[i], href: v };
-                  setContent({ ...content, site: { ...site, socials } });
-                }} />
+            <p className="text-sm text-muted">پس از ذخیره، deploy/rebuild لازم است.</p>
+            {(content.redirects || []).map((rule, index) => (
+              <div key={`${rule.from}-${index}`} className="landing-item-card grid gap-2 sm:grid-cols-[1fr_1fr_auto]">
+                <Field
+                  label="از"
+                  value={rule.from}
+                  onChange={(v) => {
+                    const redirects = [...(content.redirects || [])];
+                    redirects[index] = { ...redirects[index], from: v };
+                    setContent({ ...content, redirects });
+                  }}
+                />
+                <Field
+                  label="به"
+                  value={rule.to}
+                  onChange={(v) => {
+                    const redirects = [...(content.redirects || [])];
+                    redirects[index] = { ...redirects[index], to: v };
+                    setContent({ ...content, redirects });
+                  }}
+                />
+                <button
+                  type="button"
+                  className="btn-outline self-end"
+                  onClick={() =>
+                    setContent({
+                      ...content,
+                      redirects: (content.redirects || []).filter((_, i) => i !== index),
+                    })
+                  }
+                >
+                  حذف
+                </button>
               </div>
             ))}
-            <h4 className="mt-4 font-bold">لینک‌های سریع</h4>
-            {content.footerQuickLinks.map((l, i) => (
-              <div key={i} className="landing-item-card">
-                <Field label="عنوان" value={l.label} onChange={(v) => {
-                  const footerQuickLinks = [...content.footerQuickLinks];
-                  footerQuickLinks[i] = { ...footerQuickLinks[i], label: v };
-                  setContent({ ...content, footerQuickLinks });
-                }} />
-                <Field label="لینk" value={l.href} onChange={(v) => {
-                  const footerQuickLinks = [...content.footerQuickLinks];
-                  footerQuickLinks[i] = { ...footerQuickLinks[i], href: v };
-                  setContent({ ...content, footerQuickLinks });
-                }} />
-              </div>
-            ))}
-            <h4 className="mt-4 font-bold">لینk خدمات فوتر</h4>
-            {content.footerServiceLinks.map((l, i) => (
-              <div key={i} className="landing-item-card">
-                <Field label="عنوان" value={l.label} onChange={(v) => {
-                  const footerServiceLinks = [...content.footerServiceLinks];
-                  footerServiceLinks[i] = { ...footerServiceLinks[i], label: v };
-                  setContent({ ...content, footerServiceLinks });
-                }} />
-                <Field label="لینk" value={l.href} onChange={(v) => {
-                  const footerServiceLinks = [...content.footerServiceLinks];
-                  footerServiceLinks[i] = { ...footerServiceLinks[i], href: v };
-                  setContent({ ...content, footerServiceLinks });
-                }} />
-              </div>
-            ))}
+            <button
+              type="button"
+              className="landing-add-btn"
+              onClick={() =>
+                setContent({
+                  ...content,
+                  redirects: [...(content.redirects || []), { from: "", to: "", permanent: true }],
+                })
+              }
+            >
+              + افزودن ریدایرکت
+            </button>
           </LandingSectionPanel>
         )}
       </div>

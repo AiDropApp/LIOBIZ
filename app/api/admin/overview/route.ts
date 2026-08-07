@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { desc } from "drizzle-orm";
 import { AUTH_COOKIE, findUserById, parseAuthCookie } from "@/lib/auth";
 import { getDb, users, orders, tickets, contactMessages } from "@/lib/db";
-import { readSiteContent } from "@/lib/content-store";
+import { readPublicSiteContent } from "@/lib/content-store";
 
 export const runtime = "nodejs";
 
@@ -28,7 +28,7 @@ export async function GET() {
   const allTickets = db.select().from(tickets).all();
   const openTickets = allTickets.filter((t) => t.status !== "closed").length;
   const newOrders = allOrders.filter((o) => o.status === "new").length;
-  const content = await readSiteContent();
+  const content = await readPublicSiteContent();
 
   return NextResponse.json({
     stats: {
@@ -49,6 +49,7 @@ export async function GET() {
       phone: u.phone,
       company: u.company,
       blocked: Boolean(u.blocked),
+      blockReason: u.blockReason || null,
       createdAt: u.createdAt,
     })),
   });

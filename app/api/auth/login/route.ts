@@ -6,10 +6,20 @@ import {
   toSession,
   verifyPassword,
 } from "@/lib/auth";
+import { checkRateLimit, clientIp } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
+  const ip = clientIp(request);
+  const limited = checkRateLimit(`login:${ip}`, 12, 15 * 60 * 1000);
+  if (!limited.ok) {
+    return NextResponse.json(
+      { message: "تلاش‌های زیاد. چند دقیقه بعد دوباره امتحان کنید." },
+      { status: 429 },
+    );
+  }
+
   const body = await request.json().catch(() => null);
   const email = String(body?.email || "").trim().toLowerCase();
   const password = String(body?.password || "").trim();
@@ -24,7 +34,15 @@ export async function POST(request: Request) {
   }
 
   if (user.blocked) {
-    return NextResponse.json({ message: "حساب شما توسط مدیر مسدود شده است." }, { status: 403 });
+    const reason = user.blockReason?.trim();
+    return NextResponse.json(
+      {
+        message: reason
+          ? `حساب شما مسدود شده است. دلیل: ${reason}`
+          : "حساب شما توسط مدیر مسدود شده است.",
+      },
+      { status: 403 },
+    );
   }
 
   const session = toSession(user);

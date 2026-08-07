@@ -6,38 +6,45 @@ import Image from "next/image";
 import HeroContent from "./content/HeroContent";
 import HeroStats from "./content/HeroStats";
 import usePrefersReducedMotion from "@/hooks/usePrefersReducedMotion";
+import { useHomeLanding } from "@/hooks/useHomeLanding";
 import type { LandingContent } from "@/lib/cms-defaults";
-import { defaultLanding } from "@/lib/cms-defaults";
+import { useCmsEdit } from "@/components/cms-edit/CmsEditProvider";
+import EditableImage from "@/components/cms-edit/EditableImage";
 import {
   isVideoUrl,
   needsIframeVideoEmbed,
   toPlayableVideoUrl,
 } from "@/lib/media-types";
+import { blockMediaContextMenu, MEDIA_PROTECT_CLASS, protectedVideoProps } from "@/lib/media-protect";
 
 export default function Hero({ initialLanding }: { initialLanding?: LandingContent }) {
+  const cms = useCmsEdit();
   const reducedMotion = usePrefersReducedMotion();
-  const [landing, setLanding] = useState<LandingContent>(initialLanding ?? defaultLanding);
+  const landing = useHomeLanding(initialLanding);
+  const activeLanding = landing;
 
-  useEffect(() => {
-    if (initialLanding) return;
-    fetch("/api/content", { cache: "no-store" })
-      .then((r) => r.json())
-      .then((data) => {
-        if (data?.landing) setLanding({ ...defaultLanding, ...data.landing });
-      })
-      .catch(() => undefined);
-  }, [initialLanding]);
-
-  const rawMedia = landing.heroMediaUrl.trim();
-  const media = rawMedia.includes("/videos/header.mp4") ? "" : rawMedia;
-  const isVideo = Boolean(media) && (landing.heroMediaType === "video" || isVideoUrl(media));
+  const rawMedia = activeLanding.heroMediaUrl.trim();
+  const media = rawMedia;
+  const isVideo = Boolean(media) && (activeLanding.heroMediaType === "video" || isVideoUrl(media));
   const useIframe = isVideo && needsIframeVideoEmbed(media);
   const playable = isVideo ? toPlayableVideoUrl(media) : media;
 
   return (
     <section id="home" className="hero-section">
       <div className="hero-panel">
-        <div className="hero-video-stage" aria-hidden="true">
+        <div
+          className={`hero-video-stage ${MEDIA_PROTECT_CLASS}`}
+          aria-hidden="true"
+          onContextMenu={blockMediaContextMenu}
+        >
+        <EditableImage
+          path="landing.heroMediaUrl"
+          src={media}
+          alt=""
+          uploadKind="hero"
+          className="hero-video object-cover"
+          fill
+        >
           {isVideo ? (
             useIframe ? (
               <iframe
@@ -57,13 +64,15 @@ export default function Hero({ initialLanding }: { initialLanding?: LandingConte
                 muted
                 loop
                 playsInline
-                preload="auto"
+                preload="none"
                 key={playable}
+                {...protectedVideoProps}
               />
             )
           ) : media ? (
             <Image src={media} alt="" fill className="hero-video object-cover" priority sizes="100vw" />
           ) : null}
+        </EditableImage>
           <div className="hero-video-scrim" />
         </div>
 
@@ -78,7 +87,7 @@ export default function Hero({ initialLanding }: { initialLanding?: LandingConte
               <HeroContent
                 reducedMotion={reducedMotion}
                 delay={reducedMotion ? 0 : 0.12}
-                landing={landing}
+                landing={activeLanding}
               />
             </motion.div>
           </div>

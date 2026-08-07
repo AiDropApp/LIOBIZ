@@ -167,6 +167,12 @@
   background: rgba(255, 255, 255, 0.92);
   border-bottom: 1px solid rgba(17, 24, 39, 0.08);
   backdrop-filter: blur(12px);
+  min-width: 0;
+}
+
+.dash-topbar-logo {
+  flex: 0 1 auto;
+  min-width: 0;
 }
 
 @media (min-width: 1024px) {
@@ -200,12 +206,50 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 0.75rem;
   border: 1px solid rgba(17, 24, 39, 0.12);
   background: #fff;
   color: #111;
+}
+
+@media (max-width: 1023px) {
+  .dash-topbar {
+    display: flex !important;
+    flex-wrap: nowrap;
+    overflow: visible;
+  }
+
+  .dash-topbar-logo {
+    max-width: 38vw;
+  }
+
+  .dash-topbar-logo .header-logo {
+    min-width: 0;
+    max-width: 100%;
+    flex-shrink: 1;
+  }
+
+  .dash-topbar-copy {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .dash-topbar-copy strong {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .dash-menu-btn {
+    display: inline-flex !important;
+    flex-shrink: 0;
+    margin-inline-start: auto;
+    position: relative;
+    z-index: 121;
+  }
 }
 
 .dash-drawer-backdrop {
@@ -1354,6 +1398,96 @@ button.dash-stat-card {
   background: #fff;
   padding: 0.55rem 0.75rem;
   font-size: 0.84rem;
+}
+
+.dash-order-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.dash-order-head {
+  min-width: 0;
+  flex: 1;
+}
+
+.dash-order-status-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.dash-order-upload {
+  white-space: nowrap;
+}
+
+.dash-order-files {
+  margin-top: 1rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid rgba(17, 24, 39, 0.08);
+}
+
+.dash-order-files-title {
+  margin-bottom: 0.55rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #6b7280;
+}
+
+.dash-order-files-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dash-order-file-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  max-width: 100%;
+  padding: 0.4rem 0.65rem;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(17, 24, 39, 0.1);
+  background: rgba(17, 24, 39, 0.03);
+  color: #374151;
+  text-decoration: none;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.dash-order-file-chip:hover {
+  background: rgba(255, 106, 0, 0.08);
+  border-color: rgba(255, 106, 0, 0.25);
+}
+
+.dash-order-file-name {
+  font-size: 0.8rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 16rem;
+}
+
+.dash-order-file-kind {
+  flex-shrink: 0;
+  border-radius: 999px;
+  padding: 0.12rem 0.45rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  background: rgba(59, 130, 246, 0.12);
+  color: #2563eb;
+}
+
+.dash-order-file-kind.is-delivery {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+
+.dash-order-file-kind.is-request {
+  background: rgba(245, 158, 11, 0.12);
+  color: #d97706;
 }
 
 .dash-progress {
@@ -2675,7 +2809,7 @@ button.dash-mini-item {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
-  text-align: right;
+  text-align: start;
   min-width: 0;
   overflow: hidden;
   height: 100%;
@@ -2710,18 +2844,22 @@ button.dash-mini-item {
   color: #9ca3af;
   font-size: 0.78rem;
   font-style: italic;
+  direction: rtl;
+  text-align: right;
+  white-space: normal;
 }
 
-.admin-media-library-folder {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.2rem;
+.admin-media-library-path {
+  display: block;
+  width: 100%;
   font-size: 0.75rem;
   color: #6b7280;
   background: rgba(17, 24, 39, 0.04);
   padding: 0.1rem 0.45rem;
-  border-radius: 999px;
-  width: fit-content;
+  border-radius: 0.35rem;
+  box-sizing: border-box;
+  unicode-bidi: isolate;
+  text-align: start;
 }
 
 .admin-media-library {
@@ -2972,33 +3110,15 @@ button.dash-mini-item {
 
 .admin-media-library-meta {
   flex: 1;
-  display: grid;
-  gap: 0.15rem;
-  align-content: start;
-  min-height: 3.25rem;
-}
-
-.admin-media-library-meta strong {
-  display: block;
-  font-size: 0.85rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.admin-media-library-meta small {
-  color: #6b7280;
-  font-size: 0.75rem;
+  min-width: 0;
 }
 
 .admin-media-library-meta p {
   margin: 0;
-  font-size: 0.75rem;
-  color: #6b7280;
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  overflow: visible;
+  display: block;
+  -webkit-line-clamp: unset;
+  -webkit-box-orient: unset;
 }
 
 .admin-media-library-actions {

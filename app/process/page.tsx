@@ -1,41 +1,23 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import {
-  Search,
-  PenTool,
-  Rocket,
-  BarChart3,
-  Headphones,
-  TrendingUp,
-  type LucideIcon,
-} from "lucide-react";
 import SiteShell from "@/components/SiteShell";
-import PageHero from "@/components/PageHero";
+import ProcessPageContent from "@/components/pages/ProcessPageContent";
 import { PROCESS_STEPS } from "@/lib/constants";
 import { readSiteContent } from "@/lib/content-store";
-
-const iconMap: Record<string, LucideIcon> = {
-  search: Search,
-  "pen-tool": PenTool,
-  rocket: Rocket,
-  "bar-chart": BarChart3,
-  headphones: Headphones,
-  "trending-up": TrendingUp,
-};
+import { buildPageMetadata } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
   const content = await readSiteContent();
-  return {
+  return buildPageMetadata({
     title: `${content.pages.process.title} | لیوبیز`,
     description: content.pages.process.intro,
-  };
+    pathname: "/process",
+  });
 }
 
 export default async function ProcessPage() {
   const content = await readSiteContent();
-  const process = content.pages.process;
   const steps =
     content.pages.processSteps?.length > 0
       ? content.pages.processSteps.map((s, i) => ({
@@ -49,33 +31,7 @@ export default async function ProcessPage() {
   return (
     <SiteShell>
       <div className="container mx-auto px-4 pb-20 lg:px-8 lg:pb-28">
-        <PageHero label={process.label} title={process.title} intro={process.intro} />
-
-        <div className="grid gap-5 md:grid-cols-2">
-          {steps.map((step) => {
-            const Icon = iconMap[step.icon] ?? Search;
-            return (
-              <article key={step.id} className="service-deliverable lux-card grid gap-4">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/15 text-primary">
-                  <Icon size={24} strokeWidth={1.75} />
-                </div>
-                <div>
-                  <div className="mb-1 flex items-center gap-3">
-                    <span className="service-step-num">{step.id}</span>
-                    <h2 className="text-xl font-bold">{step.title}</h2>
-                  </div>
-                  <p className="leading-relaxed text-muted">{step.description}</p>
-                </div>
-              </article>
-            );
-          })}
-        </div>
-
-        <div className="mt-12 text-center">
-          <Link href="/contact" className="btn-accent px-8 py-3.5">
-            شروع همکاری
-          </Link>
-        </div>
+        <ProcessPageContent process={content.pages.process} steps={steps} />
       </div>
     </SiteShell>
   );

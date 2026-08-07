@@ -3,21 +3,42 @@ import path from "path";
 import { getDataDir } from "@/lib/paths";
 import type { MediaCard, MediaCategory, MediaCenterStore, MediaSection } from "@/lib/filesir/types";
 import { EMPTY_MEDIA_STORE } from "@/lib/filesir/types";
+import { clearAutoSeoCaption } from "@/lib/media-center/auto-seo";
 import { collectCardEntryIds } from "@/lib/media-center/asset-utils";
 import { snapshotJsonFile } from "@/lib/json-snapshot";
 
 const STORE_PATH = path.join(getDataDir(), "media-center.json");
 
+import { isCorruptedLabel } from "@/lib/text-sanitize";
+
+export function sanitizeMediaCenterStore(store: MediaCenterStore): MediaCenterStore {
+  const badIds = new Set(
+    store.categories.filter((c) => isCorruptedLabel(c.name)).map((c) => c.id),
+  );
+  if (badIds.size === 0) return store;
+
+  const categories = store.categories.filter((c) => !badIds.has(c.id));
+  const cards = store.cards.map((card) =>
+    card.categoryId && badIds.has(card.categoryId) ? { ...card, categoryId: null } : card,
+  );
+  return { ...store, categories, cards };
+}
+
 export async function readMediaCenterStore(): Promise<MediaCenterStore> {
   try {
     const raw = await fs.readFile(STORE_PATH, "utf8");
     const parsed = JSON.parse(raw) as MediaCenterStore;
-    return {
+    const merged = {
       ...EMPTY_MEDIA_STORE,
       ...parsed,
       version: 1,
       storageMode: parsed.storageMode === "filesir" ? "filesir" : "local",
-    };
+    } as MediaCenterStore;
+    const sanitized = sanitizeMediaCenterStore(merged);
+    if (sanitized.categories.length !== merged.categories.length) {
+      await writeMediaCenterStore(sanitized);
+    }
+    return sanitized;
   } catch {
     return { ...EMPTY_MEDIA_STORE };
   }
@@ -97,7 +118,12 @@ export async function deleteCategory(id: string) {
   }
   const removeIds = new Set([id, ...childIds]);
   store.categories = store.categories.filter((c) => !removeIds.has(c.id));
-  store.cards = store.cards.filter((c) => !c.categoryId || !removeIds.has(c.categoryId));
+  // Preserve cards and file metadata — only unlink category reference
+  for (const card of store.cards) {
+    if (card.categoryId && removeIds.has(card.categoryId)) {
+      card.categoryId = null;
+    }
+  }
   await writeMediaCenterStore(store);
   return store;
 }
@@ -107,7 +133,14 @@ export async function upsertCard(input: Partial<MediaCard> & { section: MediaSec
   const now = new Date().toISOString();
   if (input.id && store.cards.some((c) => c.id === input.id)) {
     const idx = store.cards.findIndex((c) => c.id === input.id);
-    store.cards[idx] = { ...store.cards[idx], ...input, id: input.id, updatedAt: now };
+    const prev = store.cards[idx];
+    store.cards[idx] = {
+      ...prev,
+      ...input,
+      id: input.id,
+      caption: clearAutoSeoCaption(input.caption ?? prev.caption),
+      updatedAt: now,
+    };
   } else {
     store.cards.push({
       id: newId("card"),

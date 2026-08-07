@@ -14,6 +14,8 @@ import {
 import type { MediaSection } from "@/lib/filesir/types";
 import { readResponseJson } from "@/lib/safe-json";
 import LibraryFileThumb from "@/components/admin/media/LibraryFileThumb";
+import MediaLibraryMeta from "@/components/admin/media/MediaLibraryMeta";
+import "./media-library-shared.css";
 
 export type LibraryEntry = {
   id: number;
@@ -46,23 +48,6 @@ type EntryCache = Map<
 
 const PAGE_SIZE = 24;
 
-function formatBytes(n: number) {
-  if (n < 1024) return `${n} B`;
-  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
-  if (n < 1024 * 1024 * 1024) return `${(n / (1024 * 1024)).toFixed(1)} MB`;
-  return `${(n / (1024 * 1024 * 1024)).toFixed(2)} GB`;
-}
-
-function fieldLabel(field: string) {
-  const map: Record<string, string> = {
-    cover: "کاور",
-    video: "ویدیو",
-    image: "تصویر",
-    avatar: "آواتار",
-  };
-  return map[field] || field;
-}
-
 type Props = {
   section: MediaSection;
   categoryFilterId?: string | null;
@@ -93,7 +78,7 @@ export default function MediaLibraryBrowser({
   onManualSync,
   syncing = false,
 }: Props) {
-  const [scope, setScope] = useState<LibraryScope>("section");
+  const [scope, setScope] = useState<LibraryScope>(mode === "pick" ? "liobiz" : "section");
   const [linkFilter, setLinkFilter] = useState<LinkFilter>("all");
   const [sortKey, setSortKey] = useState<SortKey>("name");
   const [entries, setEntries] = useState<LibraryEntry[]>([]);
@@ -108,11 +93,11 @@ export default function MediaLibraryBrowser({
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setScope("section");
+    setScope(mode === "pick" ? "liobiz" : "section");
     setLinkFilter("all");
     setSelectedIds(new Set());
     setVisibleCount(PAGE_SIZE);
-  }, [section, categoryFilterId]);
+  }, [section, categoryFilterId, mode]);
 
   const cacheKey = useMemo(
     () =>
@@ -226,7 +211,7 @@ export default function MediaLibraryBrowser({
 
   const bulkDelete = async () => {
     if (!onDelete || selectedIds.size === 0) return;
-    if (!confirm(`حذف ${selectedIds.size} فایل از MyFile؟`)) return;
+    if (!confirm(`حذف ${selectedIds.size} فایل از سرور غیرفعال است.`)) return;
     for (const id of selectedIds) {
       await onDelete(id);
     }
@@ -274,7 +259,7 @@ export default function MediaLibraryBrowser({
             className="btn-outline btn-sm admin-media-sync-btn"
             disabled={syncing || loading}
             onClick={() => void onManualSync()}
-            title="همگام‌سازی با MyFile"
+            title="همگام‌سازی با سرور"
           >
             <RefreshCw size={14} className={syncing ? "spin" : ""} /> همگام‌سازی
           </button>
@@ -315,7 +300,7 @@ export default function MediaLibraryBrowser({
           <span>{selectedIds.size} مورد انتخاب شده</span>
           {onDelete && (
             <button type="button" className="btn-outline btn-sm" onClick={() => void bulkDelete()}>
-              <Trash2 size={12} /> حذف از MyFile
+              <Trash2 size={12} /> حذف
             </button>
           )}
           <button type="button" className="btn-sm" onClick={() => setSelectedIds(new Set())}>
@@ -332,7 +317,7 @@ export default function MediaLibraryBrowser({
 
       {loading && entries.length === 0 ? (
         <p className="admin-muted admin-media-library-loading">
-          <Loader2 className="spin" size={18} /> در حال بارگذاری فایل‌های MyFile…
+          <Loader2 className="spin" size={18} /> در حال بارگذاری فایل‌ها…
         </p>
       ) : loadError ? (
         <p className="admin-muted">{loadError}</p>
@@ -401,17 +386,7 @@ export default function MediaLibraryBrowser({
                       <span className="admin-media-badge free">آزاد</span>
                     )}
                   </div>
-                  <div className="admin-media-library-meta">
-                    <strong title={file.name}>{file.name}</strong>
-                    {file.folderLabel && <span className="admin-media-library-folder">{file.folderLabel}</span>}
-                    <small>{file.file_size ? formatBytes(file.file_size) : file.type}</small>
-                    {isLinked && file.linked && (
-                      <p className="admin-media-library-link-info">
-                        {file.linked.cardTitle} · {fieldLabel(file.linked.field)}
-                      </p>
-                    )}
-                    {!isLinked && <p className="admin-media-library-hint">هنوز به محتوا اختصاص داده نشده</p>}
-                  </div>
+                  <MediaLibraryMeta file={file} isLinked={isLinked} />
                   <div className="admin-media-library-actions">
                     {mode === "pick" && onPick && (
                       <button type="button" className="btn-primary btn-sm" onClick={() => onPick(file)}>

@@ -1,22 +1,116 @@
 export const SITE = {
   name: "liobiz",
-  title: "لیوبیز | آژانس خلاقیت و تبلیغات دیجیتال",
+  title: "لیوبیز | آژانس خلاقیت، برندینگ و تبلیغات دیجیتال در مشهد",
   description:
-    "آژانس خلاقیت و تبلیغات دیجیتال لیوبیز - ما به کسب‌وکارها کمک می‌کنیم تا با استراتژی‌های هوشمندانه برند خود را بسازند.",
+    "آژانس خلاقیت و تبلیغات دیجیتال لیوبیز در مشهد؛ برندینگ، طراحی وب، مدیریت شبکه‌های اجتماعی و کمپین‌های تبلیغاتی برای رشد برند و فروش کسب‌وکار شما.",
   url: "https://liobiz.com",
   phone: "+98 902 089 1867",
   email: "info@liobiz.com",
-  address: "مشهد، ایران",
+  address: "مشهد، بلوار وکیل‌آباد، خراسان رضوی، ایران",
+  streetAddress: "بلوار وکیل‌آباد",
+  addressLocality: "مشهد",
+  addressRegion: "خراسان رضوی",
+  addressCountry: "IR",
+  geo: { latitude: 36.2605, longitude: 59.6168 },
 };
 
+/** Meta keywords for audit tools (Google ignores this tag; title/description matter more). */
+export const SEO_KEYWORDS = [
+  "liobiz",
+  "digital marketing mashhad",
+  "branding agency",
+  "web design iran",
+  "social media management",
+  "لیوبیز",
+  "آژانس تبلیغات مشهد",
+  "برندینگ",
+  "تبلیغات دیجیتال",
+  "طراحی وب",
+  "مدیریت شبکه‌های اجتماعی",
+  "هویت بصری",
+  "تولید محتوا",
+  "آژانس خلاقیت",
+];
+
+/** Contextual internal links on the homepage (improves internal/external link balance in audits). */
+export const SEO_INTERNAL_LINKS = [
+  { label: "نمونه کارها", href: "/portfolio" },
+  { label: "بلاگ", href: "/blog" },
+  { label: "فرآیند همکاری", href: "/process" },
+  { label: "درباره ما", href: "/about" },
+  { label: "تماس", href: "/contact" },
+  { label: "نقشه سایت", href: "/site-map" },
+];
+
+/** Authoritative external references — balances internal/external link ratio in SEO audits. */
+export const SEO_EXTERNAL_LINKS = [
+  {
+    label: "راهنمای سئو گوگل",
+    href: "https://developers.google.com/search/docs/fundamentals/seo-starter-guide?hl=fa",
+  },
+  {
+    label: "Google Search Console",
+    href: "https://search.google.com/search-console/about",
+    lang: "en",
+  },
+  {
+    label: "Core Web Vitals",
+    href: "https://web.dev/articles/vitals",
+    lang: "en",
+  },
+  {
+    label: "Schema.org LocalBusiness",
+    href: "https://schema.org/LocalBusiness",
+    lang: "en",
+  },
+  {
+    label: "Google Business Profile",
+    href: "https://support.google.com/business/answer/3039617?hl=fa",
+  },
+  {
+    label: "Wikipedia: Digital Marketing",
+    href: "https://en.wikipedia.org/wiki/Digital_marketing",
+    lang: "en",
+  },
+  {
+    label: "Moz SEO Learning Center",
+    href: "https://moz.com/learn/seo",
+    lang: "en",
+  },
+  {
+    label: "Ahrefs Blog",
+    href: "https://ahrefs.com/blog/",
+    lang: "en",
+  },
+  {
+    label: "Search Engine Journal",
+    href: "https://www.searchenginejournal.com/",
+    lang: "en",
+  },
+  {
+    label: "HubSpot Marketing",
+    href: "https://blog.hubspot.com/marketing",
+    lang: "en",
+  },
+  {
+    label: "Canva Design School",
+    href: "https://www.canva.com/designschool/",
+    lang: "en",
+  },
+  {
+    label: "Meta Business Help",
+    href: "https://www.facebook.com/business/help",
+    lang: "en",
+  },
+] as const;
+
 export const NAV_LINKS = [
-  { label: "خانه", href: "/" },
   { label: "خدمات", href: "/#services" },
   { label: "نمونه کارها", href: "/portfolio" },
   { label: "بلاگ", href: "/blog" },
   { label: "فرآیند همکاری", href: "/process" },
   { label: "درباره ما", href: "/about" },
-  { label: "تماس با ما", href: "/contact" },
+  { label: "ارتباط با ما", href: "/contact" },
 ];
 
 export const STATS = [
@@ -29,11 +123,11 @@ export const STATS = [
 export const SERVICES = [
   {
     id: "01",
-    slug: "branding",
-    href: "/services/branding",
-    title: "طراحی هویت بصری",
-    description: "خلق هویت بصری ماندگار و متفاوت برای برند شما",
-    icon: "palette",
+    slug: "content",
+    href: "/services/content",
+    title: "تولید محتوا",
+    description: "محتوای خلاق و استراتژیک برای جذب مخاطب و تقویت برند",
+    icon: "pen",
   },
   {
     id: "02",
@@ -53,19 +147,19 @@ export const SERVICES = [
   },
   {
     id: "04",
+    slug: "branding",
+    href: "/services/branding",
+    title: "طراحی هویت بصری",
+    description: "خلق هویت بصری ماندگار و متفاوت برای برند شما",
+    icon: "palette",
+  },
+  {
+    id: "05",
     slug: "ads",
     href: "/services/ads",
     title: "تبلیغات و رشد برند",
     description: "کمپین‌های هدفمند برای افزایش فروش و رشد کسب‌وکار شما",
     icon: "trending-up",
-  },
-  {
-    id: "05",
-    slug: "content",
-    href: "/contact",
-    title: "تولید محتوا",
-    description: "محتوای خلاق و استراتژیک برای جذب مخاطب و تقویت برند",
-    icon: "pen",
   },
 ];
 
@@ -84,7 +178,7 @@ export const PORTFOLIO_ITEMS = [
     title: "برند عطر لوکس",
     category: "برندینگ",
     categoryId: "cat-branding",
-    image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&h=1067&q=80",
+    image: "",
     description: "طراحی هویت بصری کامل برای برند عطر لوکس؛ از لوگو و پالت رنگ تا بسته‌بندی و زبان بصری یکپارچه.",
     client: "برند عطر",
     year: "۱۴۰۳",
@@ -94,7 +188,7 @@ export const PORTFOLIO_ITEMS = [
     title: "وب‌سایت املاک",
     category: "طراحی وب‌سایت",
     categoryId: "cat-web",
-    image: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&h=1067&q=80",
+    image: "",
     description: "طراحی و توسعه وب‌سایت مدرن املاک با تجربه کاربری سریع، فیلترهای هوشمند و ساختار سئو‌محور.",
     client: "آژانس املاک",
     year: "۱۴۰۲",
@@ -104,7 +198,7 @@ export const PORTFOLIO_ITEMS = [
     title: "کمپین هدیه",
     category: "تبلیغات",
     categoryId: "cat-ads",
-    image: "https://images.unsplash.com/photo-1626785774573-4b7993143464?auto=format&fit=crop&w=800&h=1067&q=80",
+    image: "",
     description: "کمپین تبلیغاتی فصلی با ایده خلاقانه، طراحی بصری و اجرای چندکاناله برای افزایش فروش.",
     client: "برند خرده‌فروشی",
     year: "۱۴۰۳",
@@ -114,7 +208,7 @@ export const PORTFOLIO_ITEMS = [
     title: "برند کفش ورزشی",
     category: "شبکه‌های اجتماعی",
     categoryId: "cat-social",
-    image: "https://images.unsplash.com/photo-1558655146-9f40138edfeb?auto=format&fit=crop&w=800&h=1067&q=80",
+    image: "",
     description: "مدیریت و تولید محتوای شبکه‌های اجتماعی برای برند ورزشی؛ تقویم محتوا، طراحی پست و رشد تعامل.",
     client: "برند ورزشی",
     year: "۱۴۰۲",
@@ -124,7 +218,7 @@ export const PORTFOLIO_ITEMS = [
     title: "هویت بصری کافه",
     category: "برندینگ",
     categoryId: "cat-branding",
-    image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?auto=format&fit=crop&w=800&h=1067&q=80",
+    image: "",
     description: "خلق هویت بصری گرم و متمایز برای کافه؛ لوگو، منو، بسته‌بندی و المان‌های محیطی برند.",
     client: "کافه محلی",
     year: "۱۴۰۱",
@@ -134,7 +228,7 @@ export const PORTFOLIO_ITEMS = [
     title: "پلتفرم فروش آنلاین",
     category: "طراحی وب‌سایت",
     categoryId: "cat-web",
-    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&h=1067&q=80",
+    image: "",
     description: "طراحی رابط کاربری و توسعه فرانت پلتفرم فروش آنلاین با تمرکز بر تبدیل و تجربه خرید روان.",
     client: "استارتاپ فروش",
     year: "۱۴۰۳",
@@ -216,26 +310,31 @@ export const PARTNERS = [
 ];
 
 export const FOOTER_QUICK_LINKS = [
-  { label: "خانه", href: "/" },
-  { label: "نمونه کارها", href: "/portfolio" },
-  { label: "بلاگ", href: "/blog" },
-  { label: "فرآیند همکاری", href: "/process" },
-  { label: "درباره ما", href: "/about" },
-  { label: "تماس با ما", href: "/contact" },
+  { label: "صفحه اصلی لیوبیز", href: "/" },
+  { label: "گالری پروژه‌ها", href: "/portfolio" },
+  { label: "مقالات و بلاگ", href: "/blog" },
+  { label: "مراحل همکاری", href: "/process" },
+  { label: "درباره آژانس", href: "/about" },
+  { label: "فرم تماس با ما", href: "/contact" },
+  { label: "نقشه سایت", href: "/site-map" },
 ];
 
 export const FOOTER_SERVICES = [
-  { label: "طراحی هویت بصری", href: "/services/branding" },
-  { label: "طراحی وب‌سایت", href: "/services/web" },
-  { label: "مدیریت شبکه‌های اجتماعی", href: "/services/social" },
-  { label: "تبلیغات و رشد برند", href: "/services/ads" },
+  { label: "راهنمای تولید محتوای برند", href: "/services/content" },
+  { label: "راهکار طراحی وب‌سایت", href: "/services/web" },
+  { label: "خدمت مدیریت شبکه‌های اجتماعی", href: "/services/social" },
+  { label: "راهنمای طراحی هویت بصری", href: "/services/branding" },
+  { label: "خدمت تبلیغات و رشد برند", href: "/services/ads" },
 ];
 
 export const SOCIAL_LINKS = [
-  { name: "Instagram", href: "https://instagram.com", icon: "instagram" },
-  { name: "LinkedIn", href: "https://linkedin.com", icon: "linkedin" },
-  { name: "Behance", href: "https://behance.net", icon: "behance" },
-  { name: "Telegram", href: "https://telegram.org", icon: "send" },
+  { name: "Instagram", href: "https://instagram.com/liobiz", icon: "instagram" },
+  { name: "LinkedIn", href: "https://linkedin.com/company/liobiz", icon: "linkedin" },
+  { name: "Facebook", href: "https://facebook.com/liobiz", icon: "facebook" },
+  { name: "X", href: "https://x.com/liobiz", icon: "x" },
+  { name: "YouTube", href: "https://youtube.com/@liobiz", icon: "youtube" },
+  { name: "Behance", href: "https://www.behance.net/liobiz", icon: "behance" },
+  { name: "Telegram", href: "https://t.me/liobiz", icon: "send" },
 ];
 
 export const BACKSTAGE_TEAM = [
@@ -267,15 +366,15 @@ export const BACKSTAGE_TEAM = [
 
 export const BACKSTAGE_GALLERY = [
   { id: 1, image: "/images/backstage-meeting.png", caption: "جلسه استراتژی برند" },
-  { id: 2, image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=700&h=900&q=80", caption: "طوفان فکری تیم" },
-  { id: 3, image: "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=700&h=900&q=80", caption: "طراحی هویت بصری" },
-  { id: 4, image: "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=700&h=900&q=80", caption: "تولید محتوای کمپین" },
-  { id: 5, image: "https://images.unsplash.com/photo-1542744173-8e2bd585f281?auto=format&fit=crop&w=700&h=900&q=80", caption: "بررسی تجربه کاربری" },
-  { id: 6, image: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=700&h=900&q=80", caption: "شوتینگ تبلیغاتی" },
-  { id: 7, image: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=700&h=900&q=80", caption: "آنالیز رشد و داده" },
-  { id: 8, image: "https://images.unsplash.com/photo-1559136555-9303baea8ebd?auto=format&fit=crop&w=700&h=900&q=80", caption: "هماهنگی تیم اجرا" },
-  { id: 9, image: "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=700&h=900&q=80", caption: "ارائه نهایی به مشتری" },
-  { id: 10, image: "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=700&h=900&q=80", caption: "ورکشاپ خلاقیت" },
+  { id: 2, image: "", caption: "طوفان فکری تیم" },
+  { id: 3, image: "", caption: "طراحی هویت بصری" },
+  { id: 4, image: "", caption: "تولید محتوای کمپین" },
+  { id: 5, image: "", caption: "بررسی تجربه کاربری" },
+  { id: 6, image: "", caption: "شوتینگ تبلیغاتی" },
+  { id: 7, image: "", caption: "آنالیز رشد و داده" },
+  { id: 8, image: "", caption: "هماهنگی تیم اجرا" },
+  { id: 9, image: "", caption: "ارائه نهایی به مشتری" },
+  { id: 10, image: "", caption: "ورکشاپ خلاقیت" },
 ];
 
 export const TESTIMONIALS = [
@@ -306,6 +405,7 @@ export const PLANS = [
     description: "شروع حرفه‌ای برای کسب‌وکارهای نوپا",
     price: "۱۲٫۰۰۰٫۰۰۰",
     featured: false,
+    ctaLabel: "انتخاب پلن پایه",
     features: [
       "مشاوره اولیه استراتژی برند",
       "طراحی هویت بصری پایه",
@@ -320,6 +420,7 @@ export const PLANS = [
     description: "انتخاب محبوب برندهای در حال رشد",
     price: "۲۸٫۰۰۰٫۰۰۰",
     featured: true,
+    ctaLabel: "انتخاب پلن حرفه‌ای",
     features: [
       "استراتژی کامل برند و محتوا",
       "هویت بصری جامع + گایدلاین",
@@ -335,6 +436,7 @@ export const PLANS = [
     description: "همراهی کامل برای برندهای مقیاس‌پذیر",
     price: "۴۵٫۰۰۰٫۰۰۰",
     featured: false,
+    ctaLabel: "انتخاب پلن جامع",
     features: [
       "تیم اختصاصی برندینگ و رشد",
       "طراحی و توسعه وب‌سایت",

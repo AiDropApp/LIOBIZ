@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  Cloud,
   FolderPlus,
   HardDrive,
   Library,
@@ -18,35 +17,26 @@ import {
   type MediaCard,
   type MediaCategory,
   type MediaSection,
-  type MediaStorageMode,
 } from "@/lib/filesir/types";
+import {
+  categoryDiskRelPath,
+  filterVisibleRootCategories,
+  filterVisibleSubCategories,
+  resolveCategoryIdFromLocalPath,
+} from "@/lib/media-center/category-path-utils";
 import { toAssetRefFromUpload, uploadMediaFile } from "@/lib/media-center/upload-client";
 import MediaLibraryBrowser, { type LibraryEntry } from "@/components/admin/media/MediaLibraryBrowser";
 import MediaPickerModal from "@/components/admin/media/MediaPickerModal";
 import { AdminAssetPreview } from "@/components/admin/media/AdminMediaCardThumb";
 import { readResponseJson } from "@/lib/safe-json";
 
-type SpaceUsage = { used: number; available: number | null; remaining: number | null };
-
-function formatBytes(n: number) {
-  if (n < 1024) return `${n} B`;
-  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
-  if (n < 1024 * 1024 * 1024) return `${(n / (1024 * 1024)).toFixed(1)} MB`;
-  return `${(n / (1024 * 1024 * 1024)).toFixed(2)} GB`;
-}
-
 export default function AdminMediaCenter({ onToast }: { onToast: (text: string) => void }) {
   const [section, setSection] = useState<MediaSection>("portfolio");
-  const [configured, setConfigured] = useState(true);
-  const [filesirConfigured, setFilesirConfigured] = useState(false);
-  const [bootstrapped, setBootstrapped] = useState(false);
-  const [storageMode, setStorageMode] = useState<MediaStorageMode>("local");
+  const [bootstrapped, setBootstrapped] = useState(true);
   const [busy, setBusy] = useState("");
   const [syncStatus, setSyncStatus] = useState("");
-  const [usage, setUsage] = useState<SpaceUsage | null>(null);
   const [categories, setCategories] = useState<MediaCategory[]>([]);
   const [cards, setCards] = useState<MediaCard[]>([]);
-  const [sectionFolderId, setSectionFolderId] = useState<number | undefined>();
   const [selectedMainCategoryId, setSelectedMainCategoryId] = useState<string | "all">("all");
   const [selectedSubCategoryId, setSelectedSubCategoryId] = useState<string | "all">("all");
   const [search, setSearch] = useState("");
@@ -65,13 +55,13 @@ export default function AdminMediaCenter({ onToast }: { onToast: (text: string) 
 
   const sectionCategories = categories.filter((c) => c.section === section);
   const rootSectionCategories = useMemo(
-    () => sectionCategories.filter((c) => !c.parentId),
-    [sectionCategories],
+    () => filterVisibleRootCategories(categories, section),
+    [categories, section],
   );
   const subSectionCategories = useMemo(() => {
     if (selectedMainCategoryId === "all") return [];
-    return sectionCategories.filter((c) => c.parentId === selectedMainCategoryId);
-  }, [sectionCategories, selectedMainCategoryId]);
+    return filterVisibleSubCategories(categories, section, selectedMainCategoryId);
+  }, [categories, section, selectedMainCategoryId]);
   const selectedCategoryId = useMemo(() => {
     if (selectedSubCategoryId !== "all") return selectedSubCategoryId;
     if (selectedMainCategoryId !== "all") return selectedMainCategoryId;
@@ -94,8 +84,8 @@ export default function AdminMediaCenter({ onToast }: { onToast: (text: string) 
 
   const editorSubCategories = useMemo(() => {
     if (!editorMainCategoryId) return [];
-    return sectionCategories.filter((c) => c.parentId === editorMainCategoryId);
-  }, [sectionCategories, editorMainCategoryId]);
+    return filterVisibleSubCategories(categories, section, editorMainCategoryId);
+  }, [categories, section, editorMainCategoryId]);
 
   const editorPrimaryAsset = useMemo(() => {
     if (!editor) return null;
@@ -117,31 +107,21 @@ export default function AdminMediaCenter({ onToast }: { onToast: (text: string) 
     [cards, section],
   );
 
-  const currentFolderId = useMemo(() => {
-    if (selectedCategoryId !== "all") {
-      return sectionCategories.find((c) => c.id === selectedCategoryId)?.folderId;
-    }
-    return sectionFolderId;
-  }, [selectedCategoryId, sectionCategories, sectionFolderId]);
+  const selectedCategoryDiskPath = useMemo(() => {
+    if (selectedCategoryId === "all") return undefined;
+    return categoryDiskRelPath(categories, selectedCategoryId) ?? undefined;
+  }, [selectedCategoryId, categories]);
 
   const loadInit = useCallback(async () => {
     try {
       const res = await fetch(`/api/admin/media/init?section=${section}`, { cache: "no-store" });
       const data = await readResponseJson<{
-        configured?: boolean;
-        filesirConfigured?: boolean;
         bootstrapped?: boolean;
-        storageMode?: MediaStorageMode;
-        store?: { sectionFolderIds?: Record<string, number> };
         categories?: MediaCategory[];
         cards?: MediaCard[];
       }>(res);
       if (!res.ok) throw new Error(String((data as { message?: string }).message || "خطا در بارگذاری"));
-      setConfigured(Boolean(data.configured));
-      setFilesirConfigured(Boolean(data.filesirConfigured));
       setBootstrapped(Boolean(data.bootstrapped));
-      setStorageMode(data.storageMode === "filesir" ? "filesir" : "local");
-      setSectionFolderId(data.store?.sectionFolderIds?.[section]);
       setCategories((prev) => {
         const others = prev.filter((c) => c.section !== section);
         return [...others, ...(data.categories || [])];
@@ -152,57 +132,32 @@ export default function AdminMediaCenter({ onToast }: { onToast: (text: string) 
     }
   }, [section, onToast]);
 
-  const changeStorageMode = async (mode: MediaStorageMode) => {
-    if (mode === storageMode) return;
-    if (mode === "filesir" && !filesirConfigured) {
-      onToast("مای‌فایل پیکربندی نشده است.");
-      return;
+  const runLocalSync = useCallback(async (silent = false) => {
+    setSyncStatus("همگام‌سازی با سرور…");
+    try {
+      const res = await fetch("/api/admin/media/sync-local", { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(String(data.message || "همگام‌سازی ناموفق"));
+      await loadInit();
+      setLibraryKey((k) => k + 1);
+      if (!silent) onToast(String(data.message || "همگام‌سازی انجام شد."));
+      return data;
+    } catch (e) {
+      if (!silent) onToast(e instanceof Error ? e.message : "همگام‌سازی ناموفق");
+      return null;
+    } finally {
+      setSyncStatus("");
     }
-    setBusy("storage");
-    const res = await fetch("/api/admin/media/storage-mode", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ storageMode: mode }),
-    });
-    setBusy("");
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) return onToast(data.message || "تغییر حالت ذخیره ناموفق");
-    setStorageMode(mode);
-    onToast(mode === "local" ? "نمایش از سرور محلی فعال شد." : "نمایش از مای‌فایل فعال شد.");
-    setLibraryKey((k) => k + 1);
-    await loadInit();
-  };
-
-  const loadSpace = useCallback(async () => {
-    if (storageMode === "local") {
-      setUsage(null);
-      return;
-    }
-    const res = await fetch("/api/admin/media/space", { cache: "no-store" });
-    if (!res.ok) return;
-    const data = await res.json();
-    setUsage(data.usage || null);
-  }, [storageMode]);
+  }, [loadInit, onToast]);
 
   useEffect(() => {
     void loadInit();
-    const timer = window.setTimeout(() => {
-      void loadSpace();
-    }, 150);
-    return () => window.clearTimeout(timer);
-  }, [section, loadInit, loadSpace]);
+  }, [section, loadInit]);
 
-  const bootstrap = async () => {
-    setBusy("bootstrap");
-    const res = await fetch("/api/admin/media/bootstrap", { method: "POST" });
-    setBusy("");
-    const data = await res.json();
-    if (!res.ok) return onToast(data.message || "راه‌اندازی ناموفق");
-    onToast("پوشه‌های Files.ir آماده شد.");
-    setBootstrapped(true);
-    await Promise.all([loadInit(), loadSpace()]);
-    setLibraryKey((k) => k + 1);
-  };
+  useEffect(() => {
+    void runLocalSync(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- run once on mount
+  }, []);
 
   const openCategoryModal = () => {
     const defaultKind = selectedMainCategoryId !== "all" ? "sub" : "main";
@@ -232,7 +187,7 @@ export default function AdminMediaCenter({ onToast }: { onToast: (text: string) 
     setBusy("");
     const data = await res.json();
     if (!res.ok) return onToast(data.message || "خطا در ایجاد دسته");
-    onToast(`دسته «${name}» در MyFile و سایت ایجاد شد.`);
+    onToast(String(data.message || `دسته «${name}» روی سرور ایجاد شد.`));
     setCategoryModalOpen(false);
     await loadInit();
     const created = (data.categories as MediaCategory[] | undefined)?.find((c) =>
@@ -249,19 +204,7 @@ export default function AdminMediaCenter({ onToast }: { onToast: (text: string) 
   };
 
   const manualSync = async () => {
-    setSyncStatus("همگام‌سازی…");
-    try {
-      const res = await fetch("/api/admin/media/discover", { method: "POST" });
-      const data = await res.json();
-      if (!res.ok) throw new Error(String(data.message || "همگام‌سازی ناموفق"));
-      await Promise.all([loadInit(), loadSpace()]);
-      setLibraryKey((k) => k + 1);
-      onToast(String(data.message || "همگام‌سازی انجام شد."));
-    } catch (e) {
-      onToast(e instanceof Error ? e.message : "همگام‌سازی ناموفق");
-    } finally {
-      setSyncStatus("");
-    }
+    await runLocalSync(false);
   };
 
   const selectedCategoryForDelete = useMemo(
@@ -323,8 +266,6 @@ export default function AdminMediaCenter({ onToast }: { onToast: (text: string) 
   const attachFromEntry = async (entry: LibraryEntry, field: "cover" | "video" | "image" | "avatar") => {
     if (!editor) return;
     setBusy("attach");
-    const categoryFolderId =
-      editor.categoryId ? sectionCategories.find((c) => c.id === editor.categoryId)?.folderId : undefined;
     const res = await fetch("/api/admin/media/assets/from-entry", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -332,13 +273,11 @@ export default function AdminMediaCenter({ onToast }: { onToast: (text: string) 
         entryId: entry.id,
         section,
         categoryId: editor.categoryId,
-        targetFolderId: categoryFolderId ?? sectionFolderId,
         fileName: entry.name,
         type: entry.type,
         mime: entry.mime,
         description: editor.description,
         localPath: entry.localPath,
-        move: storageMode === "filesir",
       }),
     });
     setBusy("");
@@ -367,10 +306,10 @@ export default function AdminMediaCenter({ onToast }: { onToast: (text: string) 
     const card = cards.find((c) => c.id === link.cardId);
     if (!card) {
       onToast("کارت مرتبط یافت نشد. بروزرسانی کنید.");
-      loadInit();
+      void loadInit();
       return;
     }
-    setEditor({ ...card, description: card.description || entry.description || "" });
+    setEditor({ ...card });
   };
 
   const buildCardDraftFromAsset = (
@@ -412,22 +351,13 @@ export default function AdminMediaCenter({ onToast }: { onToast: (text: string) 
   };
 
   const uploadToCurrentFolder = async (file: File) => {
-    const targetFolderId = currentFolderId ?? sectionFolderId;
-    if (storageMode === "filesir" && !targetFolderId) {
-      onToast("ابتدا پوشه بخش را راه‌اندازی کنید.");
-      return;
-    }
     try {
       setUploadPct(0);
       setUploadStage("شروع…");
       const result = await uploadMediaFile(file, {
         section,
-        categoryFolderId: targetFolderId,
-        storageMode,
-        categoryName:
-          selectedCategoryId !== "all"
-            ? sectionCategories.find((c) => c.id === selectedCategoryId)?.name
-            : undefined,
+        categoryId: selectedCategoryId !== "all" ? selectedCategoryId : undefined,
+        categoryDiskPath: selectedCategoryDiskPath,
         onProgress: ({ percent, stage }) => {
           setUploadPct(percent);
           setUploadStage(stage);
@@ -453,14 +383,11 @@ export default function AdminMediaCenter({ onToast }: { onToast: (text: string) 
 
   const createCardFromEntry = async (entry: LibraryEntry) => {
     setBusy("attach");
-    const categoryFromFolder = entry.folderId
-      ? sectionCategories.find((c) => c.folderId === entry.folderId)?.id ?? null
+    const categoryFromPath = entry.localPath
+      ? resolveCategoryIdFromLocalPath(categories, section, entry.localPath)
       : null;
     const categoryId =
-      selectedCategoryId !== "all" ? selectedCategoryId : categoryFromFolder;
-    const categoryFolderId = categoryId
-      ? sectionCategories.find((c) => c.id === categoryId)?.folderId
-      : entry.folderId ?? sectionFolderId;
+      selectedCategoryId !== "all" ? selectedCategoryId : categoryFromPath;
     const res = await fetch("/api/admin/media/assets/from-entry", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -468,13 +395,11 @@ export default function AdminMediaCenter({ onToast }: { onToast: (text: string) 
         entryId: entry.id,
         section,
         categoryId,
-        targetFolderId: categoryFolderId ?? sectionFolderId,
         fileName: entry.name,
         type: entry.type,
         mime: entry.mime,
         description: entry.description || "",
         localPath: entry.localPath,
-        move: false,
       }),
     });
     setBusy("");
@@ -514,13 +439,23 @@ export default function AdminMediaCenter({ onToast }: { onToast: (text: string) 
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(isNew ? { ...payload, id: undefined } : payload),
     });
-    setBusy("");
     const data = await res.json();
+    setBusy("");
     if (!res.ok) return onToast(data.message || "ذخیره ناموفق");
-    onToast("ذخیره شد — کارت روی سایت ثبت و فایل در پوشه دسته MyFile قرار گرفت.");
+
+    if (data.card) {
+      setCards((prev) => prev.map((c) => (c.id === data.card.id ? data.card : c)));
+    } else if (Array.isArray(data.cards)) {
+      setCards((prev) => {
+        const others = prev.filter((c) => c.section !== section);
+        return [...others, ...data.cards];
+      });
+    }
+
+    onToast("ذخیره شد — تغییرات روی سایت اعمال شد.");
     setEditor(null);
-    loadInit();
     setLibraryKey((k) => k + 1);
+    await loadInit();
   };
 
   const uploadForField = async (file: File, field: "cover" | "video" | "image" | "avatar") => {
@@ -528,11 +463,13 @@ export default function AdminMediaCenter({ onToast }: { onToast: (text: string) 
     try {
       setUploadPct(0);
       setUploadStage("شروع…");
-      const categoryFolderId =
-        editor.categoryId ? sectionCategories.find((c) => c.id === editor.categoryId)?.folderId : undefined;
+      const categoryDiskPath = editor.categoryId
+        ? categoryDiskRelPath(categories, editor.categoryId) ?? undefined
+        : undefined;
       const result = await uploadMediaFile(file, {
         section,
-        categoryFolderId,
+        categoryId: editor.categoryId ?? undefined,
+        categoryDiskPath,
         onProgress: ({ percent, stage }) => {
           setUploadPct(percent);
           setUploadStage(stage);
@@ -561,22 +498,12 @@ export default function AdminMediaCenter({ onToast }: { onToast: (text: string) 
     }
   };
 
-  const deleteEntry = async (entryId: number) => {
-    if (!confirm("حذف فایل از MyFile؟ کارت‌های مرتبط هم از سایت حذف می‌شوند.")) return;
-    const res = await fetch("/api/admin/media/entries/actions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "delete", entryIds: [entryId], deleteForever: true }),
-    });
-    const data = await res.json();
-    if (!res.ok) return onToast(data.message || "حذف ناموفق");
-    onToast(String(data.message || "فایل حذف شد."));
-    await loadInit();
-    setLibraryKey((k) => k + 1);
+  const deleteEntry = async (_entryId: number) => {
+    onToast("حذف فایل از سرور غیرفعال است — فایل‌ها و توضیحات حفظ می‌شوند.");
   };
 
   const removeCard = async (id: string) => {
-    if (!confirm("این کارت و فایل‌های MyFile مرتبط از سایت حذف شوند؟")) return;
+    if (!confirm("این کارت از سایت حذف شود؟ فایل روی سرور حفظ می‌ماند.")) return;
     setBusy("del-card");
     const res = await fetch(`/api/admin/media/cards?id=${encodeURIComponent(id)}`, { method: "DELETE" });
     setBusy("");
@@ -596,27 +523,6 @@ export default function AdminMediaCenter({ onToast }: { onToast: (text: string) 
     }
   };
 
-  if (!configured && storageMode === "filesir") {
-    return (
-      <section className="admin-media">
-        <div className="admin-media-alert">
-          <Cloud size={28} />
-          <h2>Files.ir پیکربندی نشده</h2>
-          <p>
-            در <code>.env.local</code> مقدار <code>FILESIR_ACCESS_TOKEN</code> را قرار دهید (یا{" "}
-            <code>FILESIR_EMAIL</code> + <code>FILESIR_PASSWORD</code>).
-          </p>
-          <p>
-            راهنما: <code>docs/DEVELOPER-GUIDE.md</code>
-          </p>
-          <button type="button" className="btn-primary" onClick={() => void changeStorageMode("local")}>
-            استفاده از فایل‌های سرور
-          </button>
-        </div>
-      </section>
-    );
-  }
-
   return (
     <section className="admin-media" data-testid="admin-media-center">
       <div className="dash-hero">
@@ -626,41 +532,8 @@ export default function AdminMediaCenter({ onToast }: { onToast: (text: string) 
         </h2>
         <p>
           مدیریت Portfolio، Backstage و Creative Partners — متادیتا در{" "}
-          <code>data/media-center.json</code>
-          {storageMode === "local" ? " و فایل‌ها روی سرور محلی" : " و فایل‌ها روی مای‌فایل"}
+          <code>data/media-center.json</code> و فایل‌ها روی سرور
         </p>
-        <div className="admin-media-storage-box" role="group" aria-label="محل ذخیره رسانه">
-          <span className="admin-media-storage-label">نمایش و ذخیره از:</span>
-          <div className="admin-media-storage-toggle">
-            <button
-              type="button"
-              className={storageMode === "local" ? "is-active" : ""}
-              disabled={!!busy}
-              onClick={() => void changeStorageMode("local")}
-            >
-              <HardDrive size={14} /> سرور
-            </button>
-            <button
-              type="button"
-              className={storageMode === "filesir" ? "is-active" : ""}
-              disabled={!!busy || !filesirConfigured}
-              onClick={() => void changeStorageMode("filesir")}
-              title={!filesirConfigured ? "مای‌فایل پیکربندی نشده" : "استفاده از مای‌فایل"}
-            >
-              <Cloud size={14} /> مای‌فایل
-            </button>
-          </div>
-          <span className="admin-media-storage-hint">
-            تا وقتی خودتان عوض نکنید روی همین حالت می‌ماند.
-          </span>
-        </div>
-        {usage && storageMode === "filesir" && (
-          <p className="admin-media-usage">
-            <HardDrive size={14} /> فضا: {formatBytes(usage.used)}
-            {usage.available != null ? ` / ${formatBytes(usage.available)}` : ""}
-            {usage.remaining != null ? ` — باقی‌مانده ${formatBytes(usage.remaining)}` : ""}
-          </p>
-        )}
         {syncStatus ? (
           <p className="admin-media-sync-status">
             <Loader2 className="spin" size={14} /> {syncStatus}
@@ -669,28 +542,22 @@ export default function AdminMediaCenter({ onToast }: { onToast: (text: string) 
       </div>
 
       <div className="admin-media-toolbar">
-        {!bootstrapped && storageMode === "filesir" && (
-          <button type="button" className="btn-primary" disabled={!!busy} onClick={bootstrap}>
-            راه‌اندازی پوشه‌ها
-          </button>
-        )}
         <input
           className="admin-media-search"
           placeholder="جستجو در فایل‌ها…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        {bootstrapped && storageMode === "filesir" && (
-          <button
-            type="button"
-            className="btn-outline admin-media-sync-btn"
-            disabled={!!busy || !!syncStatus}
-            onClick={() => void manualSync()}
-            title="همگام‌سازی دستی با MyFile"
-          >
-            <RefreshCw size={14} className={syncStatus ? "spin" : ""} />
-          </button>
-        )}
+        <button
+          type="button"
+          className="btn-outline admin-media-sync-btn"
+          disabled={!!busy || !!syncStatus}
+          onClick={() => void manualSync()}
+          title="همگام‌سازی دسته‌ها با پوشه‌های سرور"
+        >
+          <RefreshCw size={14} className={syncStatus ? "spin" : ""} />
+          همگام‌سازی
+        </button>
       </div>
 
       <div className="admin-media-section-tabs">
@@ -751,14 +618,13 @@ export default function AdminMediaCenter({ onToast }: { onToast: (text: string) 
               type="button"
               className="btn-sm"
               onClick={openCategoryModal}
-              disabled={storageMode === "filesir" && !bootstrapped}
             >
               <FolderPlus size={14} /> دسته جدید
             </button>
             <button
               type="button"
               className="btn-sm admin-media-category-delete"
-              disabled={(storageMode === "filesir" && !bootstrapped) || busy === "cat-del"}
+              disabled={busy === "cat-del"}
               title={selectedCategoryId === "all" ? "ابتدا دسته اصلی یا زیردسته را انتخاب کنید" : "حذف دسته"}
               onClick={openDeleteCategoryModal}
             >
@@ -766,10 +632,7 @@ export default function AdminMediaCenter({ onToast }: { onToast: (text: string) 
             </button>
           </div>
 
-          {storageMode === "filesir" && !bootstrapped ? (
-            <p className="admin-muted">ابتدا پوشه‌ها را راه‌اندازی کنید.</p>
-          ) : (
-            <>
+          <>
               <div className="admin-media-actions">
                 <label className="btn-primary admin-media-file-btn">
                   <Upload size={14} /> آپلود
@@ -804,8 +667,7 @@ export default function AdminMediaCenter({ onToast }: { onToast: (text: string) 
                 syncing={Boolean(syncStatus)}
                 onToast={onToast}
               />
-            </>
-          )}
+          </>
         </div>
       </div>
 
@@ -824,8 +686,8 @@ export default function AdminMediaCenter({ onToast }: { onToast: (text: string) 
             <div className="admin-media-delete-modal-body">
               <p className="admin-media-delete-modal-hint">
                 دسته{" "}
-                <span className="admin-media-delete-modal-name">{selectedCategoryForDelete.name}</span> و کارت‌های
-                داخل آن از سایت و MyFile حذف می‌شوند. این عمل قابل بازگشت نیست.
+                <span className="admin-media-delete-modal-name">{selectedCategoryForDelete.name}</span>{" "}
+                از لیست دسته‌ها حذف می‌شود. فایل‌ها، کارت‌ها و توضیحات روی سرور حفظ می‌مانند.
               </p>
               <label className="admin-media-delete-modal-field">
                 <span>
@@ -877,7 +739,7 @@ export default function AdminMediaCenter({ onToast }: { onToast: (text: string) 
               </button>
             </div>
             <p className="admin-muted admin-media-category-modal-hint">
-              پوشه همزمان در MyFile (Files.ir) و در سایت ساخته می‌شود.
+              پوشه در مسیر <code>public/media</code> روی سرور ساخته می‌شود و در سایت ثبت می‌گردد.
             </p>
             <div className="admin-media-category-modal-type">
               <label className="admin-check">
@@ -931,7 +793,7 @@ export default function AdminMediaCenter({ onToast }: { onToast: (text: string) 
             </label>
             <div className="admin-media-drawer-actions">
               <button type="button" className="btn-primary" disabled={busy === "cat"} onClick={() => void submitCategory()}>
-                {busy === "cat" ? <Loader2 className="spin" size={16} /> : "ایجاد در MyFile"}
+                {busy === "cat" ? <Loader2 className="spin" size={16} /> : "ایجاد در سرور"}
               </button>
               <button type="button" className="btn-outline" onClick={() => setCategoryModalOpen(false)}>
                 انصراف
@@ -1116,9 +978,8 @@ export default function AdminMediaCenter({ onToast }: { onToast: (text: string) 
 
       <MediaPickerModal
         open={pickerField != null}
-        title="انتخاب از کتابخانه Files.ir"
+        title="انتخاب از کتابخانه سرور"
         section={section}
-        folderId={currentFolderId}
         onClose={() => setPickerField(null)}
         onSelect={(entry) => {
           if (pickerField) attachFromEntry(entry, pickerField);

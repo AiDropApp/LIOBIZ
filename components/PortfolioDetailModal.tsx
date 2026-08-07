@@ -1,10 +1,14 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import CmsMedia from "@/components/CmsMedia";
+import EditableText from "@/components/cms-edit/EditableText";
+import EditableCta from "@/components/cms-edit/EditableCta";
+import { useCmsEdit } from "@/components/cms-edit/CmsEditProvider";
+import { defaultLanding, type LandingContent } from "@/lib/cms-defaults";
 import type { PortfolioItem } from "@/lib/content-store";
 
 function portfolioMeta(item: PortfolioItem) {
@@ -21,11 +25,26 @@ function portfolioMeta(item: PortfolioItem) {
 
 export default function PortfolioDetailModal({
   item,
+  itemIndex,
   onClose,
 }: {
   item: PortfolioItem | null;
+  itemIndex: number | null;
   onClose: () => void;
 }) {
+  const cms = useCmsEdit();
+  const edit = cms?.isAdmin && cms.editMode && itemIndex != null && itemIndex >= 0;
+  const [landing, setLanding] = useState<LandingContent>(defaultLanding);
+
+  useEffect(() => {
+    fetch("/api/content", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.landing) setLanding({ ...defaultLanding, ...data.landing });
+      })
+      .catch(() => undefined);
+  }, []);
+
   useEffect(() => {
     if (!item) return;
     const prev = document.body.style.overflow;
@@ -44,8 +63,8 @@ export default function PortfolioDetailModal({
 
   const meta = item ? portfolioMeta(item) : null;
   const full = item?.imageFull?.trim() || "";
-  const detailImage =
-    full && full !== "/images/logo.png" ? full : item?.image || "";
+  const detailImage = full && full !== "/images/logo.png" ? full : item?.image || "";
+  const base = itemIndex != null && itemIndex >= 0 ? `portfolio.${itemIndex}` : null;
 
   return createPortal(
     <AnimatePresence>
@@ -99,30 +118,70 @@ export default function PortfolioDetailModal({
               </div>
 
               <div className="portfolio-detail-info">
-                <span className="portfolio-detail-category">{item.category}</span>
-                <h2 id="portfolio-detail-title" className="portfolio-detail-title">
-                  {item.title}
-                </h2>
-                <p className="portfolio-detail-desc">{meta.description}</p>
+                {edit && base ? (
+                  <EditableText path={`${base}.category`} className="portfolio-detail-category">
+                    {item.category}
+                  </EditableText>
+                ) : (
+                  <span className="portfolio-detail-category">{item.category}</span>
+                )}
+                {edit && base ? (
+                  <EditableText
+                    path={`${base}.title`}
+                    as="h2"
+                    className="portfolio-detail-title"
+                  >
+                    {item.title}
+                  </EditableText>
+                ) : (
+                  <h2 id="portfolio-detail-title" className="portfolio-detail-title">
+                    {item.title}
+                  </h2>
+                )}
+                {edit && base ? (
+                  <EditableText path={`${base}.description`} as="p" className="portfolio-detail-desc" multiline>
+                    {meta.description}
+                  </EditableText>
+                ) : (
+                  <p className="portfolio-detail-desc">{meta.description}</p>
+                )}
 
                 <dl className="portfolio-detail-meta">
                   <div>
-                    <dt>دسته‌بندی</dt>
-                    <dd>{item.category}</dd>
+                    <dt>
+                      <EditableText path="landing.portfolioModalCategoryLabel">{landing.portfolioModalCategoryLabel}</EditableText>
+                    </dt>
+                    <dd>{edit && base ? <EditableText path={`${base}.category`}>{item.category}</EditableText> : item.category}</dd>
                   </div>
                   <div>
-                    <dt>کارفرما</dt>
-                    <dd>{meta.client}</dd>
+                    <dt>
+                      <EditableText path="landing.portfolioModalClientLabel">{landing.portfolioModalClientLabel}</EditableText>
+                    </dt>
+                    <dd>
+                      {edit && base ? (
+                        <EditableText path={`${base}.client`}>{meta.client}</EditableText>
+                      ) : (
+                        meta.client
+                      )}
+                    </dd>
                   </div>
                   <div>
-                    <dt>سال</dt>
-                    <dd>{meta.year}</dd>
+                    <dt>
+                      <EditableText path="landing.portfolioModalYearLabel">{landing.portfolioModalYearLabel}</EditableText>
+                    </dt>
+                    <dd>
+                      {edit && base ? <EditableText path={`${base}.year`}>{meta.year}</EditableText> : meta.year}
+                    </dd>
                   </div>
                 </dl>
 
-                <a href="/contact" className="btn-primary portfolio-detail-cta">
-                  سفارش پروژه مشابه
-                </a>
+                <EditableCta
+                  labelPath="landing.portfolioModalCta"
+                  hrefPath="landing.portfolioModalCtaHref"
+                  label={landing.portfolioModalCta}
+                  href={landing.portfolioModalCtaHref}
+                  className="btn-primary portfolio-detail-cta"
+                />
               </div>
             </div>
           </motion.div>

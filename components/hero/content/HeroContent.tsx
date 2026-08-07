@@ -32,8 +32,11 @@ export default function HeroContent({
       </motion.div>
       <motion.div {...item(0.08)}>
         <HeroHeading
+          brand={landing?.heroTitleBrand}
           title={landing?.heroTitle}
           highlight={landing?.heroTitleHighlight}
+          part3={landing?.heroTitlePart3}
+          part4={landing?.heroTitlePart4}
         />
       </motion.div>
       <motion.div {...item(0.14)}>

@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { adminGuard } from "@/lib/admin-media-guard";
-import { isFilesIrConfigured } from "@/lib/filesir/config";
 import { MEDIA_SECTIONS, type MediaSection } from "@/lib/filesir/types";
 import { hasLocalMediaFiles } from "@/lib/media-center/local-library";
 import { readMediaCenterStore } from "@/lib/media-center/store";
+import { syncLocalMediaCenter } from "@/lib/media-center/sync-local";
 
 export const runtime = "nodejs";
 
@@ -17,33 +17,44 @@ export async function GET(request: Request) {
 
   const section = new URL(request.url).searchParams.get("section");
   const store = await readMediaCenterStore();
-  const storageMode = store.storageMode === "filesir" ? "filesir" : "local";
   const localReady = await hasLocalMediaFiles();
-  const filesirConfigured = isFilesIrConfigured();
+
+  // Ensure storage is always local for media center
+  if (store.storageMode !== "local") {
+    store.storageMode = "local";
+  }
 
   const categories = isSection(section)
     ? store.categories.filter((c) => c.section === section)
     : store.categories;
   const cards = isSection(section) ? store.cards.filter((c) => c.section === section) : store.cards;
 
-  const bootstrapped =
-    storageMode === "local"
-      ? Boolean(store.rootFolderId) || localReady || store.cards.length > 0 || store.categories.length > 0
-      : Boolean(store.rootFolderId);
+  const bootstrapped = localReady || store.cards.length > 0 || store.categories.length > 0;
 
   return NextResponse.json({
     ok: true,
-    configured: storageMode === "local" ? true : filesirConfigured,
-    filesirConfigured,
-    storageMode,
+    configured: true,
+    storageMode: "local",
     localReady,
     bootstrapped,
     store: {
-      rootFolderId: store.rootFolderId,
-      sectionFolderIds: store.sectionFolderIds,
-      storageMode,
+      storageMode: "local",
     },
     categories,
     cards,
   });
+}
+
+/** Auto-sync categories from disk on init when requested */
+export async function POST() {
+  const admin = await adminGuard();
+  if (admin instanceof Response) return admin;
+
+  try {
+    const result = await syncLocalMediaCenter();
+    return NextResponse.json({ ok: true, ...result });
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : "همگام‌سازی ناموفق";
+    return NextResponse.json({ message: msg }, { status: 500 });
+  }
 }

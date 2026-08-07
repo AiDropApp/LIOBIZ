@@ -4,13 +4,22 @@ import { AUTH_COOKIE, findUserById, parseAuthCookie } from "@/lib/auth";
 import { FilesIrError } from "@/lib/filesir/auth";
 import { isFilesIrConfigured } from "@/lib/filesir/config";
 
-export async function requireAdmin() {
-  const cookieStore = await cookies();
-  const session = parseAuthCookie(cookieStore.get(AUTH_COOKIE)?.value);
+function verifyAdminSession(session: ReturnType<typeof parseAuthCookie>) {
   if (session?.role !== "admin") return null;
   const admin = findUserById(session.userId);
   if (!admin || admin.blocked || admin.role !== "admin") return null;
   return admin;
+}
+
+export function requireAdminFromRequest(request: Request) {
+  const session = parseAuthCookie(request.headers.get("cookie"));
+  return verifyAdminSession(session);
+}
+
+export async function requireAdmin() {
+  const cookieStore = await cookies();
+  const session = parseAuthCookie(cookieStore.get(AUTH_COOKIE)?.value);
+  return verifyAdminSession(session);
 }
 
 export async function adminGuard() {

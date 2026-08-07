@@ -1,23 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
 import { motion } from "framer-motion";
-import ContentImage from "@/components/ContentImage";
-import CmsRichText from "@/components/CmsRichText";
-import { defaultLanding, type LandingContent } from "@/lib/cms-defaults";
+import EditableText from "@/components/cms-edit/EditableText";
+import EditableCta from "@/components/cms-edit/EditableCta";
+import EditableRichText from "@/components/cms-edit/EditableRichText";
+import EditableImage from "@/components/cms-edit/EditableImage";
+import { useHomeLanding } from "@/hooks/useHomeLanding";
+import type { LandingContent } from "@/lib/cms-defaults";
 
-export default function AboutLiobiz() {
-  const [landing, setLanding] = useState<LandingContent>(defaultLanding);
-
-  useEffect(() => {
-    fetch("/api/content", { cache: "no-store" })
-      .then((r) => r.json())
-      .then((data) => {
-        if (data?.landing) setLanding({ ...defaultLanding, ...data.landing });
-      })
-      .catch(() => undefined);
-  }, []);
+export default function AboutLiobiz({ initialLanding }: { initialLanding?: LandingContent }) {
+  const landing = useHomeLanding(initialLanding);
 
   return (
     <section id="about-liobiz" className="about-liobiz section-block">
@@ -29,23 +21,31 @@ export default function AboutLiobiz() {
             viewport={{ once: true }}
             className="order-2 text-center lg:order-1 lg:text-right"
           >
-            <span className="section-label">{landing.aboutLabel}</span>
-            <h2 className="section-title mt-2 text-[1.75rem] md:text-3xl lg:text-[2.35rem]">
+            <EditableText path="landing.aboutLabel" className="section-label">
+              {landing.aboutLabel}
+            </EditableText>
+            <EditableText path="landing.aboutTitle" as="h2" className="section-title mt-2 text-[1.75rem] md:text-3xl lg:text-[2.35rem]">
               {landing.aboutTitle}
-            </h2>
-            <CmsRichText
-              content={landing.aboutText1}
+            </EditableText>
+            <EditableRichText
+              path="landing.aboutText1"
+              fallback={landing.aboutText1}
               className="mx-auto mt-5 max-w-xl lg:mx-0"
               paragraphClassName="text-muted leading-8"
             />
-            <CmsRichText
-              content={landing.aboutText2}
+            <EditableRichText
+              path="landing.aboutText2"
+              fallback={landing.aboutText2}
               className="mx-auto mt-4 max-w-xl lg:mx-0"
               paragraphClassName="text-muted leading-8"
             />
-            <Link href="/about" className="btn-accent btn-accent--black mt-8">
-              بیشتر درباره ما
-            </Link>
+            <EditableCta
+              labelPath="landing.aboutLinkCta"
+              hrefPath="landing.aboutLinkHref"
+              label={landing.aboutLinkCta}
+              href={landing.aboutLinkHref}
+              className="btn-accent btn-accent--black mt-8"
+            />
           </motion.div>
 
           <motion.div
@@ -56,25 +56,30 @@ export default function AboutLiobiz() {
             className="about-liobiz-visual order-1 lg:order-2"
           >
             <div className="about-liobiz-main">
-              <ContentImage
+              <EditableImage
+                path="landing.aboutImage1"
                 src={landing.aboutImage1}
                 alt="فضای کار لیوبیز"
                 fill
                 className="object-cover"
                 sizes="(max-width: 1024px) 100vw, 48vw"
-                priority={false}
+                uploadKind="about"
               />
             </div>
             <div className="about-liobiz-float">
-              <ContentImage
+              <EditableImage
+                path="landing.aboutImage2"
                 src={landing.aboutImage2}
                 alt="جلسه تیم لیوبیز"
                 fill
                 className="object-cover"
                 sizes="280px"
+                uploadKind="about"
               />
             </div>
-            <div className="about-liobiz-badge">{landing.aboutBadge}</div>
+            <EditableText path="landing.aboutBadge" className="about-liobiz-badge">
+              {landing.aboutBadge}
+            </EditableText>
           </motion.div>
         </div>
       </div>

@@ -119,6 +119,9 @@ function ensureSchema(database: Database.Database) {
   if (!names.has("blocked")) {
     database.exec(`ALTER TABLE users ADD COLUMN blocked INTEGER NOT NULL DEFAULT 0`);
   }
+  if (!names.has("block_reason")) {
+    database.exec(`ALTER TABLE users ADD COLUMN block_reason TEXT`);
+  }
   if (!names.has("updated_at")) {
     database.exec(`ALTER TABLE users ADD COLUMN updated_at TEXT`);
   }

@@ -1,4 +1,5 @@
 import { normalizeMediaFields, type CmsMediaFields } from "@/lib/media-types";
+import { dedupeByName, isCorruptedLabel } from "@/lib/text-sanitize";
 
 export type PortfolioCategory = {
   id: string;
@@ -22,6 +23,7 @@ export type PortfolioItemBase = {
   year?: string;
 } & CmsMediaFields;
 
+/** Legacy CMS defaults — public UI uses media-center categories instead. */
 export const DEFAULT_PORTFOLIO_CATEGORIES: PortfolioCategory[] = [
   { id: "cat-web", name: "طراحی وب‌سایت", order: 0 },
   { id: "cat-branding", name: "برندینگ", order: 1 },
@@ -33,6 +35,27 @@ export function sortCategories(categories: PortfolioCategory[]): PortfolioCatego
   return [...categories].sort((a, b) => (a.order ?? 0) - (b.order ?? 0) || a.name.localeCompare(b.name, "fa"));
 }
 
+/** Drop broken encoding, duplicate names, and sort for filter chips. */
+export function normalizePortfolioCategories(raw: unknown): PortfolioCategory[] {
+  if (!Array.isArray(raw) || raw.length === 0) return [];
+
+  const cleaned: PortfolioCategory[] = [];
+  raw.forEach((entry, index) => {
+    if (!entry || typeof entry !== "object") return;
+    const item = entry as Partial<PortfolioCategory>;
+    const name = String(item.name || "").trim();
+    if (!name || isCorruptedLabel(name)) return;
+    cleaned.push({
+      id: String(item.id || "").trim() || `cat-${index + 1}`,
+      name,
+      coverImage: item.coverImage?.trim() || undefined,
+      order: Number.isFinite(Number(item.order)) ? Number(item.order) : index,
+    });
+  });
+
+  return sortCategories(dedupeByName(cleaned));
+}
+
 export function categoryNameById(categories: PortfolioCategory[], id?: string): string {
   if (!id) return "";
   return categories.find((c) => c.id === id)?.name || "";
@@ -40,12 +63,18 @@ export function categoryNameById(categories: PortfolioCategory[], id?: string): 
 
 /** Match portfolio items against a root category chip (includes all subcategories). */
 export function portfolioMatchesCategoryFilter(
-  item: Pick<PortfolioItemBase, "category">,
+  item: Pick<PortfolioItemBase, "category" | "categoryId">,
   filterName: string,
+  categories?: PortfolioCategory[],
 ): boolean {
   if (filterName === "همه") return true;
   const category = item.category?.trim() || "";
-  return category === filterName || category.startsWith(`${filterName} › `);
+  if (category === filterName || category.startsWith(`${filterName} › `)) return true;
+  if (categories?.length && item.categoryId) {
+    const matchCat = categories.find((c) => c.name === filterName);
+    if (matchCat && item.categoryId === matchCat.id) return true;
+  }
+  return false;
 }
 
 export function resolveCategoryCover(
@@ -67,30 +96,22 @@ function slugId(name: string, fallback: string) {
 }
 
 export function normalizeCategories(raw: unknown): PortfolioCategory[] {
-  if (!Array.isArray(raw) || raw.length === 0) {
-    return DEFAULT_PORTFOLIO_CATEGORIES.map((c) => ({ ...c }));
-  }
+  const normalized = normalizePortfolioCategories(raw);
+  if (normalized.length > 0) return normalized;
 
   const seen = new Set<string>();
   const categories: PortfolioCategory[] = [];
 
-  raw.forEach((entry, index) => {
-    if (!entry || typeof entry !== "object") return;
-    const item = entry as Partial<PortfolioCategory>;
-    const name = String(item.name || "").trim();
-    if (!name) return;
-    let id = String(item.id || "").trim() || slugId(name, `cat-${index + 1}`);
+  DEFAULT_PORTFOLIO_CATEGORIES.forEach((item, index) => {
+    const name = item.name.trim();
+    if (!name || isCorruptedLabel(name)) return;
+    let id = item.id.trim() || slugId(name, `cat-${index + 1}`);
     if (seen.has(id)) id = `${id}-${index + 1}`;
     seen.add(id);
-    categories.push({
-      id,
-      name,
-      coverImage: item.coverImage?.trim() || undefined,
-      order: Number.isFinite(Number(item.order)) ? Number(item.order) : index,
-    });
+    categories.push({ ...item, id, name, order: item.order ?? index });
   });
 
-  return categories.length > 0 ? sortCategories(categories) : DEFAULT_PORTFOLIO_CATEGORIES.map((c) => ({ ...c }));
+  return sortCategories(categories);
 }
 
 export function migratePortfolioItems(

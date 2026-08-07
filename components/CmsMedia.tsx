@@ -9,6 +9,12 @@ import {
   type MediaAspect,
   type MediaKind,
 } from "@/lib/media-types";
+import {
+  blockMediaContextMenu,
+  MEDIA_PROTECT_CLASS,
+  protectedImageProps,
+  protectedVideoProps,
+} from "@/lib/media-protect";
 
 type Props = {
   image: string;
@@ -23,12 +29,27 @@ type Props = {
   videoClassName?: string;
   wrapperClassName?: string;
   fitParent?: boolean;
-  /** Cover crop for cards; contain/natural for detail preview */
   objectFit?: "cover" | "contain";
-  /** Show media at its intrinsic size inside the preview (detail modal) */
   natural?: boolean;
   controls?: boolean;
 };
+
+function ProtectWrap({
+  className,
+  children,
+}: {
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      className={`${MEDIA_PROTECT_CLASS}${className ? ` ${className}` : ""}`}
+      onContextMenu={blockMediaContextMenu}
+    >
+      {children}
+    </div>
+  );
+}
 
 export default function CmsMedia({
   image,
@@ -55,7 +76,7 @@ export default function CmsMedia({
       const playable = toPlayableVideoUrl(videoSrc);
       if (needsIframeVideoEmbed(videoSrc)) {
         return (
-          <div className={`cms-media-natural ${wrapperClassName}`}>
+          <ProtectWrap className={`cms-media-natural ${wrapperClassName}`}>
             <iframe
               src={playable}
               title={alt}
@@ -64,29 +85,39 @@ export default function CmsMedia({
               allowFullScreen
               referrerPolicy="no-referrer-when-downgrade"
             />
-          </div>
+          </ProtectWrap>
         );
       }
       return (
-        <div className={`cms-media-natural ${wrapperClassName}`}>
+        <ProtectWrap className={`cms-media-natural ${wrapperClassName}`}>
           <video
             src={playable}
             poster={image || undefined}
             controls={controls}
             playsInline
-            preload="metadata"
+            preload={controls ? "metadata" : "none"}
             aria-label={alt}
             className={`cms-media-natural-media ${videoClassName} ${className}`}
-          />
-        </div>
+            {...protectedVideoProps}
+          >
+            {!controls ? (
+              <track kind="captions" src="/captions/decorative-fa.vtt" label="بدون گفتار" srcLang="fa" default />
+            ) : null}
+          </video>
+        </ProtectWrap>
       );
     }
 
     return (
-      <div className={`cms-media-natural ${wrapperClassName}`}>
+      <ProtectWrap className={`cms-media-natural ${wrapperClassName}`}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={image} alt={alt} className={`cms-media-natural-media ${className}`} />
-      </div>
+        <img
+          src={image}
+          alt={alt}
+          className={`cms-media-natural-media ${className}`}
+          {...protectedImageProps}
+        />
+      </ProtectWrap>
     );
   }
 
@@ -99,7 +130,7 @@ export default function CmsMedia({
     const playable = toPlayableVideoUrl(videoSrc);
     if (needsIframeVideoEmbed(videoSrc)) {
       return (
-        <div className={`${wrapperBase} ${wrapperClassName}`}>
+        <ProtectWrap className={`${wrapperBase} ${wrapperClassName}`}>
           <iframe
             src={playable}
             title={alt}
@@ -108,11 +139,11 @@ export default function CmsMedia({
             allowFullScreen
             referrerPolicy="no-referrer-when-downgrade"
           />
-        </div>
+        </ProtectWrap>
       );
     }
     return (
-      <div className={`${wrapperBase} ${wrapperClassName}`}>
+      <ProtectWrap className={`${wrapperBase} ${wrapperClassName}`}>
         <video
           src={playable}
           poster={image || undefined}
@@ -121,17 +152,22 @@ export default function CmsMedia({
           loop={!controls}
           controls={controls}
           playsInline
-          preload="metadata"
+          preload={controls ? "metadata" : "none"}
           aria-label={alt}
           className={`absolute inset-0 h-full w-full ${fitClass} ${videoClassName} ${className}`}
-        />
-      </div>
+          {...protectedVideoProps}
+        >
+          {!controls ? (
+            <track kind="captions" src="/captions/decorative-fa.vtt" label="بدون گفتار" srcLang="fa" default />
+          ) : null}
+        </video>
+      </ProtectWrap>
     );
   }
 
   if (fill) {
     return (
-      <div className={`${wrapperBase} ${wrapperClassName}`}>
+      <ProtectWrap className={`${wrapperBase} ${wrapperClassName}`}>
         <ContentImage
           src={image}
           alt={alt}
@@ -139,13 +175,15 @@ export default function CmsMedia({
           sizes={sizes}
           priority={priority}
           className={`${fitClass} ${className}`}
+          draggable={false}
+          onContextMenu={blockMediaContextMenu}
         />
-      </div>
+      </ProtectWrap>
     );
   }
 
   return (
-    <div className={`${wrapperBase} ${wrapperClassName}`}>
+    <ProtectWrap className={`${wrapperBase} ${wrapperClassName}`}>
       <ContentImage
         src={image}
         alt={alt}
@@ -153,7 +191,9 @@ export default function CmsMedia({
         sizes={sizes || "100vw"}
         priority={priority}
         className={`${fitClass} ${className}`}
+        draggable={false}
+        onContextMenu={blockMediaContextMenu}
       />
-    </div>
+    </ProtectWrap>
   );
 }

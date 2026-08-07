@@ -1,12 +1,16 @@
 export type RichTextBlock =
   | { type: "heading"; level: 1 | 2 | 3 | 4 | 5 | 6; text: string }
   | { type: "paragraph"; text: string }
+  | { type: "link"; text: string; href: string }
   | { type: "image"; alt: string; src: string }
-  | { type: "video"; src: string };
+  | { type: "video"; src: string }
+  | { type: "audio"; src: string };
 
 const HEADING_RE = /^(#{1,6})\s+(.+)$/;
 const IMAGE_RE = /^!\[([^\]]*)\]\(([^)]+)\)$/;
+const LINK_RE = /^\[([^\]]+)\]\(([^)]+)\)$/;
 const VIDEO_RE = /^::video\s+(\S+)$/;
+const AUDIO_RE = /^::audio\s+(\S+)$/;
 
 /** Parse simple CMS text: `# h1` … `###### h6`, blank lines split paragraphs. */
 export function parseCmsRichText(source?: string): RichTextBlock[] {
@@ -37,10 +41,22 @@ export function parseCmsRichText(source?: string): RichTextBlock[] {
       blocks.push({ type: "image", alt: imageMatch[1], src: imageMatch[2] });
       continue;
     }
+    const linkMatch = trimmed.match(LINK_RE);
+    if (linkMatch) {
+      flushParagraph();
+      blocks.push({ type: "link", text: linkMatch[1], href: linkMatch[2] });
+      continue;
+    }
     const videoMatch = trimmed.match(VIDEO_RE);
     if (videoMatch) {
       flushParagraph();
       blocks.push({ type: "video", src: videoMatch[1] });
+      continue;
+    }
+    const audioMatch = trimmed.match(AUDIO_RE);
+    if (audioMatch) {
+      flushParagraph();
+      blocks.push({ type: "audio", src: audioMatch[1] });
       continue;
     }
     if (!trimmed) {
@@ -55,4 +71,4 @@ export function parseCmsRichText(source?: string): RichTextBlock[] {
 }
 
 export const CMS_RICH_TEXT_HINT =
-  "برای عنوان از # (h1) تا ###### (h6) در ابتدای خط استفاده کنید. خط خالی = پاراگراف جدید. برای تصویر: ![توضیح](/api/media/filesir/123) — برای ویدیو: ::video /api/media/filesir/456";
+  "عنوان: # تا ###### — پاراگراف: خط خالی — لینک: [متن](/contact) — تصویر: ![alt](/media/...) — ویدیو: ::video URL — صوت: ::audio URL";

@@ -34,6 +34,7 @@ export type PlanItem = {
   description: string;
   price: string;
   featured: boolean;
+  ctaLabel?: string;
   features: string[];
 };
 export type FaqItem = { q: string; a: string };

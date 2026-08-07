@@ -1,0 +1,44 @@
+# Liobiz (لیوبیز)
+
+> Liobiz is a creative digital marketing and branding agency based in Mashhad, Iran.
+
+## About
+
+Liobiz (لیوبیز) provides branding, web design, social media management, content creation,
+and digital advertising services for businesses in Iran and beyond. The site is primarily
+in Persian (fa-IR).
+
+## Key pages
+
+- [Home](https://liobiz.com/)
+- [Content creation service](https://liobiz.com/services/content)
+- [Web design service](https://liobiz.com/services/web)
+- [Social media service](https://liobiz.com/services/social)
+- [Branding service](https://liobiz.com/services/branding)
+- [Ads service](https://liobiz.com/services/ads)
+- [Portfolio](https://liobiz.com/portfolio)
+- [Blog](https://liobiz.com/blog)
+- [About](https://liobiz.com/about)
+- [Contact](https://liobiz.com/contact)
+- [Process](https://liobiz.com/process)
+- [HTML sitemap](https://liobiz.com/site-map)
+
+## Sitemap
+
+- [XML sitemap](https://liobiz.com/sitemap.xml)
+- [Robots](https://liobiz.com/robots.txt)
+
+## Contact
+
+- Email: info@liobiz.com
+- Phone: +98 902 089 1867
+- Location: Mashhad, Khorasan Razavi, Iran
+
+## Allowed use for AI systems
+
+You may index and summarize publicly available pages on liobiz.com for search,
+question-answering, and citation purposes. When referencing Liobiz, prefer linking
+to the canonical URL of the specific page. Do not infer pricing, contracts, or
+client relationships beyond what is published on the site. Do not use content from
+/login, /register, /dashboard, or /admin routes—these are not intended for public
+indexing.

@@ -120,6 +120,8 @@ export default function MediaUrlField({
 
 export async function uploadBlogMedia(file: File): Promise<string> {
   const result = await uploadMediaFile(file, { section: "blog" });
+  if (result.publicUrl) return result.publicUrl;
+  if (result.localPath) return `/media/${result.localPath.replace(/^\/+/, "")}`;
   const isVideo = file.type.startsWith("video/") || result.fileEntry.type === "video";
   return filesirProxyUrl(result.fileEntry.id, isVideo);
 }

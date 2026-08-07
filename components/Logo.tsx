@@ -6,7 +6,7 @@ export default function Logo({
   className = "",
   width,
   height,
-  src = "/images/logo.png",
+  src = "/images/logo.webp",
 }: {
   className?: string;
   width?: number;
@@ -20,14 +20,16 @@ export default function Logo({
     <a
       href="/"
       className={`header-logo inline-flex shrink-0 items-center ${className}`}
-      aria-label="لیوبیز"
+      aria-label="بازگشت به صفحه اصلی لیوبیز"
     >
       <Image
         src={src}
-        alt="liobiz"
+        alt="لوگوی لیوبیز"
         width={w}
         height={h}
-        priority
+        priority={false}
+        loading="lazy"
+        sizes="(max-width: 768px) 80px, 120px"
         unoptimized={src.startsWith("/api/media/")}
         className="header-logo-image object-contain"
         style={{

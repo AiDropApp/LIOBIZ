@@ -99,7 +99,7 @@ export default function AuthForm({ mode }: { mode: Mode }) {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
+              placeholder="email@example.com"
               required
               dir="ltr"
               autoComplete="email"

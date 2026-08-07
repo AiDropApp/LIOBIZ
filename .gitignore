@@ -22,11 +22,17 @@
 .DS_Store
 *.pem
 
-# contact messages
+# contact messages + production CMS (server is source of truth — never commit)
 /data/contact-messages.json
+/data/media-center.json
+/data/site-content.json
+/data/snapshots/
+/data/filesir-local-map.json
+/data/filesir-migrate-report.json
 /data/liobiz.db
 /data/liobiz.db-*
 /data/backups/
+/data/pre-deploy-*/
 
 # debug
 npm-debug.log*

@@ -3,23 +3,34 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
-import { defaultLanding, type LandingContent } from "@/lib/cms-defaults";
-import CmsRichText from "@/components/CmsRichText";
+import LandingSectionHeader from "@/components/cms-edit/LandingSectionHeader";
+import EditableText from "@/components/cms-edit/EditableText";
+import CmsCardEditor from "@/components/cms-edit/CmsCardEditor";
+import type { LandingContent } from "@/lib/cms-defaults";
+import { useHomeDataOptional } from "@/components/HomeDataProvider";
+import { useHomeLanding } from "@/hooks/useHomeLanding";
 import { defaultFaq, type FaqItem } from "@/lib/landing-defaults";
 
-export default function FAQ() {
-  const [landing, setLanding] = useState<LandingContent>(defaultLanding);
-  const [faq, setFaq] = useState<FaqItem[]>(defaultFaq);
+export default function FAQ({
+  initialLanding,
+  initialFaq,
+}: {
+  initialLanding?: LandingContent;
+  initialFaq?: FaqItem[];
+} = {}) {
+  const home = useHomeDataOptional();
+  const landing = useHomeLanding(initialLanding);
+  const [faq, setFaq] = useState<FaqItem[]>(home?.faq ?? initialFaq ?? defaultFaq);
 
   useEffect(() => {
+    if (home?.faq || initialFaq) return;
     fetch("/api/content", { cache: "no-store" })
       .then((r) => r.json())
       .then((data) => {
-        if (data?.landing) setLanding({ ...defaultLanding, ...data.landing });
         if (Array.isArray(data?.faq)) setFaq(data.faq);
       })
       .catch(() => undefined);
-  }, []);
+  }, [home?.faq, initialFaq]);
 
   return (
     <section id="faq" className="section-block bg-white">
@@ -30,27 +41,45 @@ export default function FAQ() {
           viewport={{ once: true }}
           className="mb-12 text-center"
         >
-          <span className="section-label">{landing.faqLabel}</span>
-          <h2 className="section-title">{landing.faqTitle}</h2>
-          <CmsRichText content={landing.faqIntro} className="mx-auto mt-4 max-w-2xl" />
+          <LandingSectionHeader
+            labelPath="landing.faqLabel"
+            titlePath="landing.faqTitle"
+            introPath="landing.faqIntro"
+            label={landing.faqLabel}
+            title={landing.faqTitle}
+            intro={landing.faqIntro}
+          />
         </motion.div>
 
         <div className="faq-list">
           {faq.map((item, index) => (
-            <motion.details
+            <CmsCardEditor
               key={item.q}
-              className="faq-item"
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.35, delay: index * 0.05 }}
+              title={item.q}
+              className="faq-item-wrap"
+              fields={[
+                { type: "richtext", path: `faq.${index}.q`, label: "سؤال" },
+                { type: "richtext", path: `faq.${index}.a`, label: "پاسخ" },
+              ]}
             >
-              <summary>
-                <span>{item.q}</span>
-                <ChevronDown size={18} aria-hidden="true" />
-              </summary>
-              <p>{item.a}</p>
-            </motion.details>
+              <motion.details
+                className="faq-item"
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.35, delay: index * 0.05 }}
+              >
+                <summary>
+                  <EditableText path={`faq.${index}.q`} as="span" inline>
+                    {item.q}
+                  </EditableText>
+                  <ChevronDown size={18} aria-hidden="true" />
+                </summary>
+                <EditableText path={`faq.${index}.a`} as="div" className="leading-8 text-muted">
+                  {item.a}
+                </EditableText>
+              </motion.details>
+            </CmsCardEditor>
           ))}
         </div>
       </div>

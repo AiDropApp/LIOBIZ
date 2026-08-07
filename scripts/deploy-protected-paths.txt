@@ -1,0 +1,13 @@
+# Paths that must NEVER be overwritten by deploy (local → server).
+# Server is source of truth for these directories/files.
+
+data/
+data/media-center.json
+data/site-content.json
+data/liobiz.db
+data/backups/
+public/media/
+public/uploads/
+public/video/
+public/videos/
+.env.local

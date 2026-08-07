@@ -1,9 +1,8 @@
 #!/usr/bin/env tsx
-/** Nightly backup — run via cron: 0 3 * * * cd /var/www/liobiz && pnpm backup:auto */
+/** Nightly data backup — server only: 0 23 * * * cd /var/www/liobiz && pnpm backup:auto */
 import { readFileSync } from "fs";
 import path from "path";
-import { runAutoBackupIfNeeded, todayAutoBackupFilename } from "../lib/backup";
-import { uploadBackupToMyFiles } from "../lib/backup-myfiles";
+import { runAutoBackupIfNeeded } from "../lib/backup";
 
 function loadEnvLocal() {
   const envPath = path.join(process.cwd(), ".env.local");
@@ -33,24 +32,11 @@ loadEnvLocal();
 
 async function main() {
   const result = await runAutoBackupIfNeeded();
-  const filename = result.skipped ? todayAutoBackupFilename() : result.entry.filename;
 
   if (result.skipped) {
     console.log("[backup] skipped:", result.reason);
   } else {
     console.log("[backup] created:", result.entry.id, result.entry.sizeBytes, "bytes");
-  }
-
-  try {
-    const remote = await uploadBackupToMyFiles(filename);
-    if (remote.skipped) {
-      console.log("[backup] myfiles skipped:", remote.reason);
-    } else {
-      console.log("[backup] myfiles uploaded:", remote.filename, "entryId=", remote.entryId, "pruned=", remote.remoteDeleted);
-    }
-  } catch (err) {
-    console.error("[backup] myfiles upload failed:", err);
-    process.exit(1);
   }
 }
 

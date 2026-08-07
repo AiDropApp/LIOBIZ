@@ -5,17 +5,17 @@ import SiteShell from "@/components/SiteShell";
 import PageHero from "@/components/PageHero";
 import { SITE } from "@/lib/constants";
 import { buildSitemapSections, getSitemapUrls } from "@/lib/sitemap-data";
+import { buildPageMetadata } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
-  return {
+  return buildPageMetadata({
     title: `نقشه سایت | ${SITE.name}`,
-    description: "فهرست کامل صفحات، خدمات و مقالات سایت لیوبیز برای دسترسی سریع و ایندکس موتورهای جستجو.",
-    alternates: {
-      canonical: `${SITE.url.replace(/\/$/, "")}/site-map`,
-    },
-  };
+    description:
+      "فهرست کامل صفحات، خدمات و مقالات سایت لیوبیز برای دسترسی سریع و ایندکس موتورهای جستجو.",
+    pathname: "/site-map",
+  });
 }
 
 function formatDate(date?: Date) {

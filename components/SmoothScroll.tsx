@@ -1,36 +1,37 @@
 "use client";
 
-import { useEffect } from "react";
-import Lenis from "lenis";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useEffect, useState, type ComponentType, type ReactNode } from "react";
 
-gsap.registerPlugin(ScrollTrigger);
+/** Defer Lenis/GSAP smooth scroll until after idle — reduces initial JS work for PageSpeed. */
+export default function SmoothScroll({ children }: { children: ReactNode }) {
+  const [enabled, setEnabled] = useState(false);
 
-export default function SmoothScroll({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduced) return;
+    const narrow = window.matchMedia("(max-width: 767px)").matches;
+    if (reduced || narrow) return;
 
-    const lenis = new Lenis({
-      duration: 1.1,
-      smoothWheel: true,
-      touchMultiplier: 1.1,
-    });
-
-    lenis.on("scroll", ScrollTrigger.update);
-
-    const ticker = (time: number) => {
-      lenis.raf(time * 1000);
-    };
-    gsap.ticker.add(ticker);
-    gsap.ticker.lagSmoothing(0);
-
-    return () => {
-      gsap.ticker.remove(ticker);
-      lenis.destroy();
-    };
+    const activate = () => setEnabled(true);
+    if ("requestIdleCallback" in window) {
+      const id = window.requestIdleCallback(activate, { timeout: 3000 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const t = setTimeout(activate, 1500);
+    return () => clearTimeout(t);
   }, []);
 
-  return <>{children}</>;
+  if (!enabled) return <>{children}</>;
+
+  return <SmoothScrollInner>{children}</SmoothScrollInner>;
+}
+
+function SmoothScrollInner({ children }: { children: ReactNode }) {
+  const [Inner, setInner] = useState<ComponentType<{ children: ReactNode }> | null>(null);
+
+  useEffect(() => {
+    void import("./SmoothScrollInner").then((mod) => setInner(() => mod.default));
+  }, []);
+
+  if (!Inner) return <>{children}</>;
+  return <Inner>{children}</Inner>;
 }

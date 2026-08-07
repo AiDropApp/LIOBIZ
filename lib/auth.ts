@@ -7,6 +7,7 @@ import {
   AUTH_COOKIE,
   type AuthSession,
   type UserRole,
+  serializeAuthCookie,
 } from "@/lib/auth-session";
 
 export {
@@ -36,7 +37,7 @@ export function setAuthCookie(response: NextResponse, session: AuthSession) {
   // Do NOT pre-encode: Next.js cookies.set already percent-encodes the value.
   // Double-encoding broke liveSessionFromRequest (orders/tickets/notifications)
   // which reads the raw Cookie header (one decode less than cookies().get()).
-  response.cookies.set(AUTH_COOKIE, JSON.stringify(session), {
+  response.cookies.set(AUTH_COOKIE, serializeAuthCookie(session), {
     httpOnly: true,
     sameSite: "lax",
     path: "/",

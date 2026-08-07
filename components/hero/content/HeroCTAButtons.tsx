@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import EditableCta from "@/components/cms-edit/EditableCta";
 
 export default function HeroCTAButtons({
   primaryLabel,
@@ -15,12 +15,20 @@ export default function HeroCTAButtons({
 }) {
   return (
     <div className="hero-cta-row">
-      <Link className="btn-primary" href={primaryHref || "/contact"}>
-        {primaryLabel || "شروع همکاری"}
-      </Link>
-      <Link className="btn-outline" href={secondaryHref || "/#services"}>
-        {secondaryLabel || "مشاهده خدمات"}
-      </Link>
+      <EditableCta
+        labelPath="landing.heroPrimaryCta"
+        hrefPath="landing.heroPrimaryHref"
+        label={primaryLabel || "شروع همکاری"}
+        href={primaryHref || "/contact"}
+        className="btn-primary"
+      />
+      <EditableCta
+        labelPath="landing.heroSecondaryCta"
+        hrefPath="landing.heroSecondaryHref"
+        label={secondaryLabel || "مشاهده خدمات"}
+        href={secondaryHref || "/#services"}
+        className="btn-outline"
+      />
     </div>
   );
 }

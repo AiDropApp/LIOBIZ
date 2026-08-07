@@ -7,6 +7,7 @@ import {
   readMediaCenterStore,
   upsertCard,
 } from "@/lib/media-center/store";
+import { clearAutoSeoCaption } from "@/lib/media-center/auto-seo";
 import { syncCardAssetsToFolders } from "@/lib/media-center/sync-folders";
 
 export const runtime = "nodejs";
@@ -90,10 +91,22 @@ export async function PUT(request: Request) {
 
   const store = await upsertCard({
     ...existing,
-    ...body,
+    title: String(body?.title ?? existing.title).trim(),
+    description: typeof body?.description === "string" ? body.description : existing.description,
+    caption: clearAutoSeoCaption(
+      typeof body?.caption === "string" ? body.caption : existing.caption,
+    ),
+    categoryId: body?.categoryId !== undefined ? body.categoryId : existing.categoryId,
+    role: typeof body?.role === "string" ? body.role : existing.role,
+    city: typeof body?.city === "string" ? body.city : existing.city,
+    cover: body?.cover !== undefined ? body.cover : existing.cover,
+    video: body?.video !== undefined ? body.video : existing.video,
+    image: body?.image !== undefined ? body.image : existing.image,
+    avatar: body?.avatar !== undefined ? body.avatar : existing.avatar,
+    published: body?.published !== undefined ? body.published !== false : existing.published,
+    sortOrder: body?.sortOrder !== undefined ? Number(body.sortOrder) : existing.sortOrder,
     id,
     section: existing.section,
-    title: String(body?.title ?? existing.title).trim(),
   });
 
   const saved = store.cards.find((c) => c.id === id);

@@ -6,7 +6,8 @@ import { categoryPath } from "@/lib/media-center/categories";
 import { publicMediaUrl } from "@/lib/media-center/local-url";
 import { slugify } from "@/lib/media-center/store";
 import type { BackstageItem, PortfolioItem } from "@/lib/content-store";
-import type { PortfolioCategory } from "@/lib/portfolio";
+import { normalizePortfolioCategories, type PortfolioCategory } from "@/lib/portfolio";
+import { dedupeByName, isCorruptedLabel } from "@/lib/text-sanitize";
 import { existsSync } from "fs";
 import path from "path";
 import { getMediaRootDir } from "@/lib/media-center/local-map";
@@ -83,14 +84,16 @@ export function mediaCategoriesToPortfolio(
   categories: MediaCategory[],
   section: "portfolio" | "blog",
 ): PortfolioCategory[] {
-  return categories
+  const rows = categories
     .filter((c) => c.section === section && !c.parentId)
+    .filter((c) => !isCorruptedLabel(c.name))
     .sort((a, b) => a.sortOrder - b.sortOrder || a.name.localeCompare(b.name, "fa"))
     .map((c) => ({
       id: c.id,
-      name: c.name,
+      name: c.name.trim(),
       order: c.sortOrder,
     }));
+  return dedupeByName(rows);
 }
 
 function hasPlayableVideo(ref?: MediaAssetRef | null): boolean {
@@ -226,21 +229,39 @@ export function applyMediaCenterToSiteContent<T extends {
   blogPosts: BlogPost[];
 }>(content: T, store: MediaCenterStore): T {
   const published = store.cards.filter((c) => c.published);
+  const jsonPortfolio = [...content.portfolio];
+  const jsonBackstage = [...content.backstage];
+  const jsonPartners = [...content.creativePartners];
 
   const portfolioCards = published
     .filter((c) => c.section === "portfolio")
     .sort((a, b) => a.sortOrder - b.sortOrder);
   if (portfolioCards.length > 0) {
     const cats = mediaCategoriesToPortfolio(store.categories, "portfolio");
-    content.portfolioCategories = cats.length > 0 ? cats : content.portfolioCategories;
-    content.portfolio = portfolioCards.map((c) => cardToPortfolioItem(c, store.categories));
+    content.portfolioCategories = cats.length > 0 ? cats : normalizePortfolioCategories(content.portfolioCategories);
+    content.portfolio = portfolioCards.map((c, i) => {
+      const fromCard = cardToPortfolioItem(c, store.categories);
+      const jsonExtra = jsonPortfolio[i];
+      if (!jsonExtra) return fromCard;
+      return {
+        ...fromCard,
+        description: fromCard.description?.trim() || jsonExtra.description,
+        client: jsonExtra.client,
+        year: jsonExtra.year,
+      };
+    });
   }
 
   if (store.cards.some((c) => c.section === "backstage")) {
     const backstageCards = published
       .filter((c) => c.section === "backstage")
       .sort((a, b) => a.sortOrder - b.sortOrder)
-      .map((c) => cardToBackstageItem(c))
+      .map((c, i) => {
+        const fromCard = cardToBackstageItem(c);
+        const jsonExtra = jsonBackstage[i];
+        if (!jsonExtra?.caption?.trim()) return fromCard;
+        return { ...fromCard, caption: fromCard.caption?.trim() || jsonExtra.caption };
+      })
       .filter(backstageItemHasMedia);
     content.backstage = backstageCards;
   }
@@ -249,7 +270,18 @@ export function applyMediaCenterToSiteContent<T extends {
     .filter((c) => c.section === "creative-partners")
     .sort((a, b) => a.sortOrder - b.sortOrder);
   if (partnerCards.length > 0) {
-    content.creativePartners = partnerCards.map(cardToCreativePartner);
+    content.creativePartners = partnerCards.map((c, i) => {
+      const fromCard = cardToCreativePartner(c);
+      const jsonExtra = jsonPartners[i];
+      if (!jsonExtra) return fromCard;
+      return {
+        ...fromCard,
+        bio: fromCard.bio?.trim() || jsonExtra.bio,
+        quote: fromCard.quote?.trim() || jsonExtra.quote,
+        role: fromCard.role?.trim() || jsonExtra.role,
+        showcase: fromCard.showcase?.trim() || jsonExtra.showcase,
+      };
+    });
   }
 
   return content;

@@ -9,6 +9,7 @@ export const users = sqliteTable("users", {
   phone: text("phone"),
   company: text("company"),
   blocked: integer("blocked", { mode: "boolean" }).notNull().default(false),
+  blockReason: text("block_reason"),
   createdAt: text("created_at").notNull(),
   updatedAt: text("updated_at"),
 });

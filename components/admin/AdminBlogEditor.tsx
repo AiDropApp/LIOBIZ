@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { BlogPost } from "@/lib/blog-defaults";
 import { slugifyBlogTitle } from "@/lib/blog-defaults";
+import { normalizeBlogTags } from "@/lib/validation";
 import { CMS_RICH_TEXT_HINT } from "@/lib/cms-rich-text";
 import type { SiteContent } from "@/lib/content-store";
 import MediaUrlField, { uploadBlogMedia } from "@/components/admin/landing/MediaUrlField";
@@ -15,10 +16,12 @@ function emptyPost(): BlogPost {
     excerpt: "",
     content: "",
     coverImage: "",
+    coverAlt: "",
     author: "تیم لیوبیز",
     publishedAt: new Date().toISOString(),
     published: false,
     tags: [],
+    category: "",
   };
 }
 
@@ -26,6 +29,7 @@ export default function AdminBlogEditor() {
   const [content, setContent] = useState<SiteContent | null>(null);
   const [editing, setEditing] = useState<BlogPost | null>(null);
   const [contentUploadBusy, setContentUploadBusy] = useState(false);
+  const [tagInput, setTagInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [toast, setToast] = useState("");
 
@@ -43,19 +47,31 @@ export default function AdminBlogEditor() {
     setTimeout(() => setToast(""), 2500);
   };
 
+  const addTag = (raw: string) => {
+    const next = raw.trim();
+    if (!next || editing!.tags.includes(next)) return;
+    setEditing({ ...editing!, tags: [...editing!.tags, next] });
+  };
+
+  const removeTag = (tag: string) => {
+    setEditing({ ...editing!, tags: editing!.tags.filter((t) => t !== tag) });
+  };
+
   const appendContentLine = (line: string) => {
     if (!editing) return;
     const prefix = editing.content.trim() ? "\n\n" : "";
     setEditing({ ...editing, content: `${editing.content}${prefix}${line}` });
   };
 
-  const uploadContentMedia = async (file: File, kind: "image" | "video") => {
+  const uploadContentMedia = async (file: File, kind: "image" | "video" | "audio") => {
     setContentUploadBusy(true);
     try {
       const url = await uploadBlogMedia(file);
-      const alt = file.name.replace(/\.[^.]+$/, "") || "تصویر";
-      appendContentLine(kind === "image" ? `![${alt}](${url})` : `::video ${url}`);
-      flash(kind === "image" ? "تصویر به محتوا اضافه شد." : "ویدیو به محتوا اضافه شد.");
+      const alt = file.name.replace(/\.[^.]+$/, "") || "فایل";
+      const line =
+        kind === "image" ? `![${alt}](${url})` : kind === "video" ? `::video ${url}` : `::audio ${url}`;
+      appendContentLine(line);
+      flash("فایل به محتوا اضافه شد.");
     } catch (e) {
       flash(e instanceof Error ? e.message : "خطا در آپلود");
     } finally {
@@ -97,6 +113,8 @@ export default function AdminBlogEditor() {
       excerpt: editing.excerpt.trim(),
       content: editing.content.trim(),
       coverImage: editing.coverImage.trim(),
+      coverAlt: editing.coverAlt?.trim() || "",
+      category: editing.category?.trim() || "",
       author: editing.author.trim() || "تیم لیوبیز",
       tags: editing.tags.map((t) => t.trim()).filter(Boolean),
     };
@@ -112,7 +130,33 @@ export default function AdminBlogEditor() {
 
   const deletePost = async (id: string) => {
     if (!content || !confirm("این مقاله حذف شود؟")) return;
-    await savePosts(content.blogPosts.filter((p) => p.id !== id));
+    const post = content.blogPosts.find((p) => p.id === id);
+    const redirects = [...(content.redirects || [])];
+    if (post?.slug) {
+      const from = `/blog/${post.slug}`;
+      if (!redirects.some((r) => r.from === from)) {
+        redirects.push({ from, to: "/blog", permanent: true });
+      }
+    }
+    setBusy(true);
+    try {
+      const res = await fetch("/api/content/cms", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          blogPosts: content.blogPosts.filter((p) => p.id !== id),
+          redirects,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "خطا");
+      setContent(data.content);
+      flash("مقاله حذف شد — ریدایرکت ۳۰۱ به /blog اضافه شد.");
+    } catch (e) {
+      flash(e instanceof Error ? e.message : "خطا");
+    } finally {
+      setBusy(false);
+    }
   };
 
   if (!content) {
@@ -202,6 +246,20 @@ export default function AdminBlogEditor() {
                   }}
                 />
               </label>
+              <label className="btn-outline text-sm cursor-pointer">
+                {contentUploadBusy ? "در حال آپلود…" : "افزودن صوت به متن"}
+                <input
+                  type="file"
+                  accept="audio/*"
+                  hidden
+                  disabled={contentUploadBusy}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) uploadContentMedia(file, "audio");
+                    e.target.value = "";
+                  }}
+                />
+              </label>
             </div>
           </label>
 
@@ -209,28 +267,93 @@ export default function AdminBlogEditor() {
             label="تصویر کاور"
             value={editing.coverImage}
             onChange={(url) => setEditing({ ...editing, coverImage: url })}
-            filesirSection="blog"
+            uploadKind="blog"
             accept="image/*"
-            hint="فایل در پوشه blog در MyFile ذخیره می‌شود."
+            hint="فایل روی سرور ذخیره می‌شود. آدرس /media/... یا لینک مستقیم."
           />
+
+          <label className="contact-field">
+            <span>متن جایگزین تصویر (alt)</span>
+            <input
+              value={editing.coverAlt || ""}
+              onChange={(e) => setEditing({ ...editing, coverAlt: e.target.value })}
+              placeholder="توضیح تصویر برای سئو و دسترس‌پذیری"
+            />
+          </label>
+
+          <label className="contact-field">
+            <span>دسته‌بندی</span>
+            <input
+              list="blog-categories-list"
+              value={editing.category || ""}
+              onChange={(e) => setEditing({ ...editing, category: e.target.value })}
+              placeholder="مثلاً تولید محتوا"
+            />
+            <datalist id="blog-categories-list">
+              {(content.blogCategories || []).map((c) => (
+                <option key={c} value={c} />
+              ))}
+            </datalist>
+          </label>
+
+          <label className="contact-field">
+            <span>تاریخ انتشار</span>
+            <input
+              type="datetime-local"
+              value={editing.publishedAt ? editing.publishedAt.slice(0, 16) : ""}
+              onChange={(e) =>
+                setEditing({
+                  ...editing,
+                  publishedAt: e.target.value ? new Date(e.target.value).toISOString() : new Date().toISOString(),
+                })
+              }
+            />
+            <small className="text-muted">برای زمان‌بندی آینده، تاریخ آینده انتخاب کنید.</small>
+          </label>
 
           <label className="contact-field">
             <span>نویسنده</span>
             <input value={editing.author} onChange={(e) => setEditing({ ...editing, author: e.target.value })} />
           </label>
 
-          <label className="contact-field">
-            <span>برچسب‌ها (با کاما جدا کنید)</span>
+          <div className="contact-field">
+            <span>برچسب‌ها</span>
+            <div className="flex flex-wrap gap-2 mb-2">
+              {editing.tags.map((tag) => (
+                <button
+                  key={tag}
+                  type="button"
+                  className="blog-tag inline-flex items-center gap-1"
+                  onClick={() => removeTag(tag)}
+                  title="حذف برچسب"
+                >
+                  {tag} ×
+                </button>
+              ))}
+            </div>
             <input
-              value={editing.tags.join("، ")}
-              onChange={(e) =>
-                setEditing({
-                  ...editing,
-                  tags: e.target.value.split(/[,،]/).map((t) => t.trim()).filter(Boolean),
-                })
-              }
+              value={tagInput}
+              placeholder="برچسب — Enter یا کاما (,) برای افزودن"
+              onChange={(e) => setTagInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === "," || e.key === "،") {
+                  e.preventDefault();
+                  const parts = normalizeBlogTags(tagInput);
+                  if (parts.length > 1) {
+                    parts.forEach((t) => addTag(t));
+                  } else {
+                    addTag(tagInput);
+                  }
+                  setTagInput("");
+                }
+              }}
+              onBlur={() => {
+                if (!tagInput.trim()) return;
+                normalizeBlogTags(tagInput).forEach((t) => addTag(t));
+                setTagInput("");
+              }}
             />
-          </label>
+          </div>
 
           <label className="contact-field flex-row items-center gap-2">
             <input

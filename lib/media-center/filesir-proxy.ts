@@ -37,6 +37,8 @@ function forwardHeaders(source: Response, contentType?: string, thumb = false): 
       ? "public, max-age=86400, stale-while-revalidate=604800"
       : "public, max-age=2592000, stale-while-revalidate=86400",
   );
+  headers.set("Content-Disposition", "inline");
+  headers.set("X-Content-Type-Options", "nosniff");
   return headers;
 }
 
@@ -78,6 +80,8 @@ async function serveLocalFile(request: Request, localPath: string, mimeHint?: st
           "Content-Range": `bytes ${start}-${end}/${st.size}`,
           "Accept-Ranges": "bytes",
           "Cache-Control": "public, max-age=2592000, immutable",
+          "Content-Disposition": "inline",
+          "X-Content-Type-Options": "nosniff",
         },
       });
     }
@@ -91,6 +95,8 @@ async function serveLocalFile(request: Request, localPath: string, mimeHint?: st
       "Content-Length": String(st.size),
       "Accept-Ranges": "bytes",
       "Cache-Control": "public, max-age=2592000, immutable",
+      "Content-Disposition": "inline",
+      "X-Content-Type-Options": "nosniff",
     },
   });
 }

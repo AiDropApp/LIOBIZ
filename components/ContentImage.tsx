@@ -1,6 +1,7 @@
 "use client";
 
 import Image, { type ImageProps } from "next/image";
+import { isDirectVideoFileUrl, isVideoUrl } from "@/lib/media-types";
 
 type Props = Omit<ImageProps, "src"> & {
   src: string;
@@ -8,14 +9,21 @@ type Props = Omit<ImageProps, "src"> & {
 
 /** Uploaded files and SVGs skip Next optimizer (avoids sharp 400s). */
 export default function ContentImage({ src, alt, unoptimized, ...rest }: Props) {
-  const skipOptimizer =
-    src.startsWith("/uploads/") ||
-    src.startsWith("/media/") ||
-    src.startsWith("/api/media/") ||
-    src.startsWith("http://") ||
-    src.startsWith("https://") ||
-    src.endsWith(".svg") ||
-    src.startsWith("data:");
+  const safeSrc = src?.trim();
+  if (!safeSrc) return null;
 
-  return <Image src={src} alt={alt} unoptimized={skipOptimizer || Boolean(unoptimized)} {...rest} />;
+  // next/image only supports images — videos must use CmsMedia or native <video>.
+  if (isVideoUrl(safeSrc) || isDirectVideoFileUrl(safeSrc)) return null;
+
+  const skipOptimizer =
+    safeSrc.startsWith("/uploads/") ||
+    safeSrc.startsWith("/media/") ||
+    safeSrc.startsWith("/video/") ||
+    safeSrc.startsWith("/api/media/") ||
+    safeSrc.startsWith("http://") ||
+    safeSrc.startsWith("https://") ||
+    safeSrc.endsWith(".svg") ||
+    safeSrc.startsWith("data:");
+
+  return <Image src={safeSrc} alt={alt} unoptimized={skipOptimizer || Boolean(unoptimized)} {...rest} />;
 }

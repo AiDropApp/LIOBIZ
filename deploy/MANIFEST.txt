@@ -1,0 +1,18 @@
+# Minimal deploy — SEO SSR fix + performance (Aug 2026)
+# One path per line. Lines starting with # are ignored.
+
+app/page.tsx
+next.config.ts
+components/AboutLiobiz.tsx
+components/Portfolio.tsx
+components/BlogSection.tsx
+components/Backstage.tsx
+components/Services.tsx
+components/Process.tsx
+components/Plans.tsx
+components/FAQ.tsx
+components/Testimonials.tsx
+components/Partners.tsx
+components/CreativePartners.tsx
+components/GoogleTagManager.tsx
+scripts/apply-deploy-changes.sh

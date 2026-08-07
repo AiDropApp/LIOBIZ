@@ -2,10 +2,11 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { AUTH_COOKIE, findUserById, parseAuthCookie } from "@/lib/auth";
 import {
-  MAX_BACKUPS,
+  MAX_AUTO_BACKUPS,
+  MANUAL_BACKUP_FILENAME,
   createBackup,
   deleteBackup,
-  listBackups,
+  listBackupGroups,
   runAutoBackupIfNeeded,
 } from "@/lib/backup";
 
@@ -25,11 +26,16 @@ export async function GET() {
     return NextResponse.json({ message: "دسترسی غیرمجاز" }, { status: 401 });
   }
 
-  const backups = await listBackups();
+  const groups = await listBackupGroups();
   return NextResponse.json({
     ok: true,
-    maxBackups: MAX_BACKUPS,
-    backups,
+    maxAutoBackups: MAX_AUTO_BACKUPS,
+    manualFilename: MANUAL_BACKUP_FILENAME,
+    autoBackups: groups.auto,
+    manualBackup: groups.manual,
+    preRestoreBackups: groups.preRestore,
+    /** @deprecated */ backups: [...groups.auto, ...(groups.manual ? [groups.manual] : []), ...groups.preRestore],
+    /** @deprecated */ maxBackups: MAX_AUTO_BACKUPS,
   });
 }
 
@@ -54,7 +60,7 @@ export async function POST(request: Request) {
   }
 
   const backup = await createBackup("manual");
-  return NextResponse.json({ ok: true, backup });
+  return NextResponse.json({ ok: true, backup, message: "آخرین بک‌آپ دستی ذخیره شد." });
 }
 
 export async function DELETE(request: Request) {
@@ -69,8 +75,15 @@ export async function DELETE(request: Request) {
 
   try {
     await deleteBackup(id);
-    const backups = await listBackups();
-    return NextResponse.json({ ok: true, message: "بک‌آپ حذف شد.", backups });
+    const groups = await listBackupGroups();
+    return NextResponse.json({
+      ok: true,
+      message: "بک‌آپ حذف شد.",
+      autoBackups: groups.auto,
+      manualBackup: groups.manual,
+      preRestoreBackups: groups.preRestore,
+      backups: [...groups.auto, ...(groups.manual ? [groups.manual] : []), ...groups.preRestore],
+    });
   } catch (error) {
     const message = error instanceof Error ? error.message : "حذف ناموفق بود.";
     return NextResponse.json({ message }, { status: 400 });

@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { defaultLanding } from "@/lib/cms-defaults";
 import { defaultHeroStats } from "@/lib/landing-defaults";
+import EditableText from "@/components/cms-edit/EditableText";
 
 const iconMap: Record<string, LucideIcon> = {
   heart: Heart,
@@ -51,13 +52,17 @@ export default function HeroStats({
       transition={{ duration: 0.55, delay }}
       className="hero-stats-bar"
     >
-      {stats.map((item) => {
+      {stats.map((item, index) => {
         const Icon = iconMap[item.icon] ?? Briefcase;
         return (
-          <div key={item.label} className="hero-stats-item">
+          <div key={item.label} className="hero-stats-item cms-editable-card">
             <Icon className="mx-auto mb-2 text-primary" size={18} aria-hidden="true" />
-            <div className="text-xl font-extrabold text-primary md:text-2xl">{item.value}</div>
-            <div className="mt-1 text-sm text-white/65">{item.label}</div>
+            <EditableText path={`landing.heroStats.${index}.value`} as="div" className="text-xl font-extrabold text-primary md:text-2xl">
+              {item.value}
+            </EditableText>
+            <EditableText path={`landing.heroStats.${index}.label`} as="div" className="mt-1 text-sm text-white/65">
+              {item.label}
+            </EditableText>
           </div>
         );
       })}

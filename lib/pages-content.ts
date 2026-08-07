@@ -8,7 +8,25 @@ export type ServicePageContent = {
   deliverables: { title: string; description: string }[];
   process: { title: string; description: string }[];
   audience: string;
+  audienceHeading: string;
+  ctaBlurb: string;
+  contactCta: string;
+  contactHref: string;
+  deliverablesHeading: string;
+  processHeading: string;
 };
+
+const SERVICE_PAGE_UI_DEFAULTS = {
+  audienceHeading: "این خدمت برای چه کسانی مناسب است؟",
+  ctaBlurb:
+    "اگر می‌خواهید این خدمت را برای برند خود شروع کنید، یک گفتگوی کوتاه کافی است تا مسیر را طراحی کنیم.",
+  contactCta: "شروع همکاری",
+  contactHref: "/contact",
+  deliverablesHeading: "چه چیزهایی تحویل می‌گیرید؟",
+  processHeading: "فرآیند اجرای این خدمت",
+} as const;
+
+export { SERVICE_PAGE_UI_DEFAULTS };
 
 export const SERVICE_PAGES: ServicePageContent[] = [
   {
@@ -215,11 +233,58 @@ export const SERVICE_PAGES: ServicePageContent[] = [
     ],
     audience: "برندهایی که برای لانچ، فصل فروش یا رشد سهم بازار به کمپین هدفمند نیاز دارند.",
   },
-];
-
-export function getServiceBySlug(slug: string) {
-  return SERVICE_PAGES.find((item) => item.slug === slug);
-}
+  {
+    slug: "content",
+    title: "تولید محتوا",
+    label: "خدمات محتوا",
+    headline: "محتوایی که دیده می‌شود، به یاد می‌ماند و نتیجه می‌دهد",
+    intro:
+      "تولید محتوا در لیوبیز فقط پست‌گذاری نیست؛ برنامه‌ریزی، نگارش، طراحی و انتشار محتوایی که با هویت برند شما هم‌خوان است و مخاطب را به اقدام نزدیک می‌کند.",
+    outcomes: [
+      "تقویم محتوای منظم و قابل پیگیری",
+      "لحن یکپارچه در همه کانال‌ها",
+      "افزایش تعامل و زمان ماندگاری مخاطب",
+      "تبدیل مخاطب به لید یا مشتری",
+    ],
+    deliverables: [
+      {
+        title: "استراتژی و تقویم محتوا",
+        description: "تعریف ستون‌های محتوایی، اولویت کانال‌ها و برنامه انتشار ماهانه.",
+      },
+      {
+        title: "تولید متن و کپشن",
+        description: "مقاله، پست، سناریو ویدیو و متن‌های تبلیغاتی متناسب با برند.",
+      },
+      {
+        title: "طراحی بصری محتوا",
+        description: "قالب پست، استوری، کاور ویدیو و المان‌های گرافیکی هماهنگ با هویت.",
+      },
+      {
+        title: "گزارش عملکرد",
+        description: "تحلیل بازخورد، تعامل و پیشنهاد بهینه‌سازی برای دوره بعد.",
+      },
+    ],
+    process: [
+      {
+        title: "شناخت برند و مخاطب",
+        description: "تعیین لحن، اهداف و پیام‌های کلیدی.",
+      },
+      {
+        title: "برنامه‌ریزی محتوا",
+        description: "ساخت تقویم و تعریف فرمت هر محتوا.",
+      },
+      {
+        title: "تولید و بازبینی",
+        description: "اجرای محتوا، هماهنگی با شما و اصلاح نهایی.",
+      },
+      {
+        title: "انتشار و بهینه‌سازی",
+        description: "انتشار در کانال‌های هدف و پایش نتیجه.",
+      },
+    ],
+    audience: "برندهایی که به محتوای منظم، حرفه‌ای و فروش‌محور برای وب، سوشال یا کمپین نیاز دارند.",
+  },
+].map((page) => ({ ...SERVICE_PAGE_UI_DEFAULTS, ...page }));
 
 export const ABOUT_PAGE = {
   label: "درباره لیوبیز",
@@ -267,4 +332,10 @@ export const PORTFOLIO_PAGE = {
   title: "پروژه‌هایی که برندها را جلو بردند",
   intro:
     "در این صفحه می‌توانید نمونه کارهای لیوبیز را بر اساس دسته‌بندی ببینید. هر پروژه جدید که در پنل ادمین اضافه شود، همین‌جا هم نمایش داده می‌شود.",
+};
+
+export const BLOG_PAGE = {
+  label: "بلاگ",
+  title: "دانش و تجربه رشد برند",
+  intro: "مقالات تیم لیوبیز درباره استراتژی، محتوا، تبلیغات و ساخت برندهای ماندگار.",
 };

@@ -2,10 +2,10 @@ import { randomUUID } from "crypto";
 import { promises as fs } from "fs";
 import path from "path";
 import { NextResponse } from "next/server";
-import { adminGuard, filesIrGuard, handleFilesIrError, isAllowedUploadMime } from "@/lib/admin-media-guard";
-import { initUpload, uploadSimple } from "@/lib/filesir/client";
+import { adminGuard, isAllowedUploadMime } from "@/lib/admin-media-guard";
 import type { MediaSection } from "@/lib/filesir/types";
-import { getMediaRootDir, readLocalMap, writeLocalMap } from "@/lib/media-center/local-map";
+import { categoryDiskRelPath } from "@/lib/media-center/local-categories";
+import { getMediaRootDir, readLocalMap, writeLocalMap, absoluteMediaPath } from "@/lib/media-center/local-map";
 import { publicMediaUrl } from "@/lib/media-center/local-url";
 import { stableLocalEntryId } from "@/lib/media-center/local-library";
 import { readMediaCenterStore } from "@/lib/media-center/store";
@@ -16,33 +16,34 @@ function safeSegment(name: string): string {
   return name.replace(/[<>:"|?*\x00-\x1f\\]/g, "_").replace(/^\.+$/, "_").trim() || "unnamed";
 }
 
-function resolveParentId(body: {
-  parentId?: number | null;
-  section?: MediaSection;
-  categoryFolderId?: number | null;
-}) {
-  if (body.categoryFolderId) return body.categoryFolderId;
-  if (body.parentId != null) return body.parentId;
-  if (body.section) {
-    return readMediaCenterStore().then((s) => s.sectionFolderIds[body.section!] ?? null);
-  }
-  return Promise.resolve(null);
-}
-
 async function saveLocalUpload(opts: {
   file: File;
   section?: MediaSection;
-  categoryName?: string;
+  categoryId?: string | null;
+  categoryDiskPath?: string;
 }) {
   const section = opts.section || "portfolio";
-  const folder = opts.categoryName
-    ? `${safeSegment(section)}/${safeSegment(opts.categoryName)}`
-    : `${safeSegment(section)}/uploads`;
+  let folder: string;
+
+  if (opts.categoryDiskPath) {
+    const normalized = opts.categoryDiskPath.replace(/\\/g, "/").replace(/^\/+/, "");
+    if (normalized.includes("..") || path.isAbsolute(normalized)) {
+      throw new Error("مسیر دسته‌بندی نامعتبر است.");
+    }
+    folder = normalized;
+  } else if (opts.categoryId) {
+    const store = await readMediaCenterStore();
+    const rel = categoryDiskRelPath(store.categories, opts.categoryId);
+    folder = rel || `${safeSegment(section)}/uploads`;
+  } else {
+    folder = `${safeSegment(section)}/uploads`;
+  }
+
   const ext = path.extname(opts.file.name) || (opts.file.type.startsWith("video/") ? ".mp4" : ".jpg");
   const base = safeSegment(path.basename(opts.file.name, path.extname(opts.file.name))) || randomUUID();
   const fileName = `${base}-${randomUUID().slice(0, 8)}${ext}`;
   const localPath = `${folder}/${fileName}`;
-  const abs = path.join(getMediaRootDir(), localPath);
+  const abs = absoluteMediaPath(localPath);
   await fs.mkdir(path.dirname(abs), { recursive: true });
   const buf = Buffer.from(await opts.file.arrayBuffer());
   await fs.writeFile(abs, buf);
@@ -84,64 +85,35 @@ export async function POST(request: Request) {
   const contentType = request.headers.get("content-type") || "";
 
   try {
-    if (contentType.includes("multipart/form-data")) {
-      const form = await request.formData();
-      const file = form.get("file");
-      const section = form.get("section") ? (String(form.get("section")) as MediaSection) : undefined;
-      const categoryFolderId = form.get("categoryFolderId")
-        ? Number(form.get("categoryFolderId"))
-        : undefined;
-      const categoryName = form.get("categoryName") ? String(form.get("categoryName")) : undefined;
-      const formMode = form.get("storageMode") ? String(form.get("storageMode")) : undefined;
-      const store = await readMediaCenterStore();
-      const storageMode =
-        formMode === "filesir" || formMode === "local"
-          ? formMode
-          : store.storageMode === "filesir"
-            ? "filesir"
-            : "local";
-
-      if (!(file instanceof File)) {
-        return NextResponse.json({ message: "فایل ارسال نشده." }, { status: 400 });
-      }
-      if (!isAllowedUploadMime(file.type || "application/octet-stream")) {
-        return NextResponse.json({ message: "فقط تصویر یا ویدیو مجاز است." }, { status: 400 });
-      }
-
-      if (storageMode === "local") {
-        const saved = await saveLocalUpload({ file, section, categoryName });
-        return NextResponse.json({
-          ok: true,
-          mode: "local",
-          fileEntry: saved.fileEntry,
-          localPath: saved.localPath,
-          publicUrl: saved.publicUrl,
-        });
-      }
-
-      const cfg = filesIrGuard();
-      if (cfg) return cfg;
-
-      const parentId =
-        categoryFolderId ?? (section ? store.sectionFolderIds[section] : null);
-      const result = await uploadSimple(file, file.name, parentId ?? null);
-      return NextResponse.json({ ok: true, mode: "simple", fileEntry: result.fileEntry });
+    if (!contentType.includes("multipart/form-data")) {
+      return NextResponse.json({ message: "فقط آپلود multipart پشتیبانی می‌شود." }, { status: 400 });
     }
 
-    const cfg = filesIrGuard();
-    if (cfg) return cfg;
+    const form = await request.formData();
+    const file = form.get("file");
+    const section = form.get("section") ? (String(form.get("section")) as MediaSection) : undefined;
+    const categoryId = form.get("categoryId") ? String(form.get("categoryId")) : undefined;
+    const categoryDiskPath = form.get("categoryDiskPath")
+      ? String(form.get("categoryDiskPath"))
+      : undefined;
 
-    const body = await request.json();
-    const filename = String(body?.filename || "").trim();
-    const size = Number(body?.size || 0);
-    if (!filename || !size) {
-      return NextResponse.json({ message: "filename و size الزامی است." }, { status: 400 });
+    if (!(file instanceof File)) {
+      return NextResponse.json({ message: "فایل ارسال نشده." }, { status: 400 });
+    }
+    if (!isAllowedUploadMime(file.type || "application/octet-stream")) {
+      return NextResponse.json({ message: "فقط تصویر یا ویدیو مجاز است." }, { status: 400 });
     }
 
-    const parentId = await resolveParentId(body);
-    const init = await initUpload({ filename, size, parentId });
-    return NextResponse.json({ ok: true, init });
+    const saved = await saveLocalUpload({ file, section, categoryId, categoryDiskPath });
+    return NextResponse.json({
+      ok: true,
+      mode: "local",
+      fileEntry: saved.fileEntry,
+      localPath: saved.localPath,
+      publicUrl: saved.publicUrl,
+    });
   } catch (error) {
-    return handleFilesIrError(error);
+    const msg = error instanceof Error ? error.message : "آپلود ناموفق";
+    return NextResponse.json({ message: msg }, { status: 500 });
   }
 }

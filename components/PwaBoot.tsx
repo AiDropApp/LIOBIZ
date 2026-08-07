@@ -1,14 +1,13 @@
-"use client";
+import Script from "next/script";
 
 /**
  * Captures beforeinstallprompt as early as possible (before React children hydrate).
  * Chrome may fire this event once; missing it means Install button does nothing.
  */
-export default function PwaBoot() {
+export default function PwaBoot({ nonce }: { nonce?: string }) {
   return (
-    <script
-      dangerouslySetInnerHTML={{
-        __html: `
+    <Script id="pwa-boot" strategy="afterInteractive" nonce={nonce}>
+      {`
 (function () {
   try {
     var path = window.location.pathname || "";
@@ -31,9 +30,8 @@ export default function PwaBoot() {
     });
   } catch (err) {}
 })();
-        `.trim(),
-      }}
-    />
+      `.trim()}
+    </Script>
   );
 }
 

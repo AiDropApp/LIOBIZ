@@ -1,73 +1,109 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { Check } from "lucide-react";
 import { motion } from "framer-motion";
-import { defaultLanding, type LandingContent } from "@/lib/cms-defaults";
-import CmsRichText from "@/components/CmsRichText";
+import LandingSectionHeader from "@/components/cms-edit/LandingSectionHeader";
+import EditableText from "@/components/cms-edit/EditableText";
+import EditableCta from "@/components/cms-edit/EditableCta";
+import CmsCardEditor from "@/components/cms-edit/CmsCardEditor";
+import type { LandingContent } from "@/lib/cms-defaults";
+import { useHomeDataOptional } from "@/components/HomeDataProvider";
+import { useHomeLanding } from "@/hooks/useHomeLanding";
 import { defaultPlans, type PlanItem } from "@/lib/landing-defaults";
 import usePrefersReducedMotion from "@/hooks/usePrefersReducedMotion";
 
-export default function Plans() {
+export default function Plans({
+  initialLanding,
+  initialPlans,
+}: {
+  initialLanding?: LandingContent;
+  initialPlans?: PlanItem[];
+} = {}) {
   const reducedMotion = usePrefersReducedMotion();
-  const [landing, setLanding] = useState<LandingContent>(defaultLanding);
-  const [plans, setPlans] = useState<PlanItem[]>(defaultPlans);
+  const home = useHomeDataOptional();
+  const landing = useHomeLanding(initialLanding);
+  const [plans, setPlans] = useState<PlanItem[]>(home?.plans ?? initialPlans ?? defaultPlans);
 
   useEffect(() => {
+    if (home?.plans || initialPlans) return;
     fetch("/api/content", { cache: "no-store" })
       .then((r) => r.json())
       .then((data) => {
-        if (data?.landing) setLanding({ ...defaultLanding, ...data.landing });
         if (Array.isArray(data?.plans)) setPlans(data.plans);
       })
       .catch(() => undefined);
-  }, []);
+  }, [home?.plans, initialPlans]);
 
   return (
     <section id="plans" className="section-block bg-white">
       <div className="container mx-auto">
-        <div className="mb-12 text-center">
-          <span className="section-label">{landing.plansLabel}</span>
-          <h2 className="section-title">{landing.plansTitle}</h2>
-          <CmsRichText content={landing.plansIntro} className="mx-auto mt-4 max-w-2xl" />
-        </div>
+        <LandingSectionHeader
+          labelPath="landing.plansLabel"
+          titlePath="landing.plansTitle"
+          introPath="landing.plansIntro"
+          label={landing.plansLabel}
+          title={landing.plansTitle}
+          intro={landing.plansIntro}
+        />
 
         <div className="plans-grid">
           {plans.map((plan, index) => (
-            <motion.article
+            <CmsCardEditor
               key={plan.id}
-              className={`plan-card ${plan.featured ? "is-featured" : ""}`}
-              initial={reducedMotion ? false : { opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.25 }}
-              transition={{ duration: 0.45, delay: index * 0.08 }}
+              title={plan.name}
+              className={`plan-card-wrap ${plan.featured ? "is-featured" : ""}`}
+              fields={[
+                { type: "richtext", path: `plans.${index}.name`, label: "نام پلن" },
+                { type: "richtext", path: `plans.${index}.description`, label: "توضیح کوتاه" },
+                { type: "richtext", path: `plans.${index}.price`, label: "قیمت" },
+                { type: "text", path: `plans.${index}.ctaLabel`, label: "متن دکمه", plain: true },
+                { type: "lines", path: `plans.${index}.features`, label: "ویژگی‌ها (هر خط یک مورد)" },
+                { type: "checkbox", path: `plans.${index}.featured`, label: "پلن پیشنهادی (هایلایت)" },
+              ]}
             >
-              <div className="plan-card-head">
-                <h3>{plan.name}</h3>
-                <p>{plan.description}</p>
-              </div>
-              <div className="plan-card-body">
-                <ul className="plan-features">
-                  {plan.features.map((feature) => (
-                    <li key={feature}>
-                      <Check size={16} aria-hidden="true" />
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-                <div className="plan-price">
-                  <strong>{plan.price}</strong>
-                  <span>تومان / ماه</span>
+              <motion.article
+                className={`plan-card ${plan.featured ? "is-featured" : ""}`}
+                initial={reducedMotion ? false : { opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.25 }}
+                transition={{ duration: 0.45, delay: index * 0.08 }}
+              >
+                <div className="plan-card-head">
+                  <EditableText path={`plans.${index}.name`} as="h3">
+                    {plan.name}
+                  </EditableText>
+                  <EditableText path={`plans.${index}.description`} as="p">
+                    {plan.description}
+                  </EditableText>
                 </div>
-                <Link
-                  href="/contact"
-                  className={`btn-accent plan-cta ${plan.featured ? "" : "btn-accent--outline"}`}
-                >
-                  انتخاب پلن
-                </Link>
-              </div>
-            </motion.article>
+                <div className="plan-card-body">
+                  <ul className="plan-features">
+                    {plan.features.map((feature, fi) => (
+                      <li key={`${plan.id}-${fi}`}>
+                        <Check size={16} aria-hidden="true" />
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="plan-price">
+                    <EditableText path={`plans.${index}.price`} as="span" className="font-bold" inline>
+                      {plan.price}
+                    </EditableText>
+                    <EditableText path="landing.planPriceSuffix" inline>
+                      {landing.planPriceSuffix}
+                    </EditableText>
+                  </div>
+                  <EditableCta
+                    labelPath={`plans.${index}.ctaLabel`}
+                    hrefPath="landing.planSelectHref"
+                    label={plan.ctaLabel || `${landing.planSelectCta} ${plan.name}`}
+                    href={landing.planSelectHref}
+                    className={`btn-accent plan-cta ${plan.featured ? "" : "btn-accent--outline"}`}
+                  />
+                </div>
+              </motion.article>
+            </CmsCardEditor>
           ))}
         </div>
       </div>

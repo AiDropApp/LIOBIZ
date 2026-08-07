@@ -2,12 +2,32 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
+import EditableText from "@/components/cms-edit/EditableText";
+import { useHomeLanding } from "@/hooks/useHomeLanding";
 
+const BOOT_KEY = "liobiz-booted";
+
+/** Client-only boot overlay — avoids SSR/client visibility mismatch (React #418). */
 export default function LoadingScreen() {
-  const [visible, setVisible] = useState(true);
+  const [visible, setVisible] = useState(false);
+  const landing = useHomeLanding();
 
   useEffect(() => {
-    const timer = window.setTimeout(() => setVisible(false), 1200);
+    try {
+      if (sessionStorage.getItem(BOOT_KEY) === "1") return;
+    } catch {
+      // sessionStorage unavailable
+    }
+
+    setVisible(true);
+    const timer = window.setTimeout(() => {
+      setVisible(false);
+      try {
+        sessionStorage.setItem(BOOT_KEY, "1");
+      } catch {
+        // sessionStorage unavailable
+      }
+    }, 600);
     return () => window.clearTimeout(timer);
   }, []);
 
@@ -41,7 +61,9 @@ export default function LoadingScreen() {
             transition={{ delay: 0.25, duration: 0.8 }}
             className="absolute bottom-16 text-center text-sm uppercase tracking-[0.35em] text-white/60"
           >
-            Liobiz • Brand Engine
+            <EditableText path="landing.loadingTagline" dir="ltr">
+              {landing.loadingTagline}
+            </EditableText>
           </motion.div>
         </motion.div>
       ) : null}

@@ -1,8 +1,11 @@
 "use client";
 
+import { useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import MediaLibraryBrowser, { type LibraryEntry } from "@/components/admin/media/MediaLibraryBrowser";
 import type { MediaSection } from "@/lib/filesir/types";
+import { useModalScrollLock, useScrollContainerWheel } from "@/hooks/useModalScrollLock";
 
 type Props = {
   open: boolean;
@@ -18,32 +21,47 @@ export default function MediaPickerModal({
   open,
   title,
   section,
-  folderId,
   filterTypes,
   onClose,
   onSelect,
 }: Props) {
-  if (!open) return null;
+  const bodyRef = useRef<HTMLDivElement>(null);
+  useModalScrollLock(open);
+  useScrollContainerWheel(bodyRef, open);
 
-  return (
-    <div className="admin-media-modal-backdrop" onClick={onClose}>
-      <div className="admin-media-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="admin-media-modal-head">
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
+
+  if (!open || typeof document === "undefined") return null;
+
+  return createPortal(
+    <div className="cms-media-picker-backdrop" onClick={onClose}>
+      <div className="cms-media-picker-modal" onClick={(e) => e.stopPropagation()} dir="rtl">
+        <div className="cms-media-picker-head">
           <h3>{title}</h3>
-          <button type="button" className="btn-sm" onClick={onClose} aria-label="بستن">
-            <X size={16} />
+          <button type="button" className="cms-modal-close-btn" onClick={onClose} aria-label="بستن">
+            <X size={16} aria-hidden />
           </button>
         </div>
-        <MediaLibraryBrowser
-          section={section}
-          mode="pick"
-          filterTypes={filterTypes}
-          onPick={(entry) => {
-            onSelect(entry);
-            onClose();
-          }}
-        />
+        <div ref={bodyRef} className="cms-media-picker-body">
+          <MediaLibraryBrowser
+            section={section}
+            mode="pick"
+            filterTypes={filterTypes}
+            onPick={(entry) => {
+              onSelect(entry);
+              onClose();
+            }}
+          />
+        </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

@@ -74,3 +74,5 @@ export function categoryFolderId(
   }
   return sectionFolderId;
 }
+
+export { categoryDiskPrefixes, categoryDiskRelPath, resolveCategoryIdFromLocalPath } from "@/lib/media-center/category-path-utils";

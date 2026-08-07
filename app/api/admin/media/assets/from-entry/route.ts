@@ -1,13 +1,23 @@
 import { NextResponse } from "next/server";
-import { adminGuard, filesIrGuard, handleFilesIrError } from "@/lib/admin-media-guard";
-import { entryKind, getOrCreateShareableLink, moveEntries, toAssetRef, updateEntry } from "@/lib/filesir/client";
+import { adminGuard } from "@/lib/admin-media-guard";
 import type { MediaAssetRef } from "@/lib/filesir/types";
 import { getLocalEntry } from "@/lib/media-center/local-map";
 import { publicMediaUrl } from "@/lib/media-center/local-url";
-import { readMediaCenterStore } from "@/lib/media-center/store";
-import { resolveTargetFolderId } from "@/lib/media-center/sync-folders";
 
 export const runtime = "nodejs";
+
+function entryKindFromMeta(opts: {
+  type?: string;
+  mime?: string;
+  name?: string;
+}): "image" | "video" | "other" {
+  if (opts.type === "video" || opts.mime?.startsWith("video/")) return "video";
+  if (opts.type === "image" || opts.mime?.startsWith("image/")) return "image";
+  const ext = (opts.name || "").split(".").pop()?.toLowerCase();
+  if (ext && ["mp4", "webm", "mov", "mkv", "m4v"].includes(ext)) return "video";
+  if (ext && ["jpg", "jpeg", "png", "webp", "gif", "avif"].includes(ext)) return "image";
+  return "other";
+}
 
 export async function POST(request: Request) {
   const admin = await adminGuard();
@@ -20,76 +30,34 @@ export async function POST(request: Request) {
   }
 
   try {
-    const store = await readMediaCenterStore();
-    const storageMode = store.storageMode === "filesir" ? "filesir" : "local";
     const localPath = typeof body?.localPath === "string" ? body.localPath.trim() : "";
     const mapped = await getLocalEntry(entryId);
-
-    if (storageMode === "local" || localPath || mapped?.localPath) {
-      const path = localPath || mapped?.localPath || "";
-      if (!path) {
-        return NextResponse.json(
-          { message: "این فایل روی سرور پیدا نشد. حالت ذخیره را روی سرور بگذارید یا مهاجرت را کامل کنید." },
-          { status: 404 },
-        );
-      }
-      const kind =
-        body?.type === "video" || mapped?.kind === "video"
-          ? "video"
-          : body?.type === "image" || mapped?.kind === "image"
-            ? "image"
-            : entryKind({
-                id: entryId,
-                name: String(body?.fileName || mapped?.fileName || "file"),
-                type: body?.type || mapped?.kind || "image",
-                mime: body?.mime || mapped?.mime,
-              });
-      const asset: MediaAssetRef = {
-        entryId,
-        shareUrl: publicMediaUrl(path),
-        mime: body?.mime || mapped?.mime,
-        fileName: String(body?.fileName || mapped?.fileName || path.split("/").pop() || "file"),
-        kind,
-        localPath: path,
-      };
-      return NextResponse.json({ ok: true, asset, storageMode: "local" });
+    const path = localPath || mapped?.localPath || "";
+    if (!path) {
+      return NextResponse.json({ message: "این فایل روی سرور پیدا نشد." }, { status: 404 });
     }
 
-    const cfg = filesIrGuard();
-    if (cfg) return cfg;
-
-    let targetFolderId: number | null = body?.targetFolderId != null ? Number(body.targetFolderId) : null;
-
-    if (targetFolderId == null && body?.section) {
-      const fakeCard = {
-        section: body.section,
-        categoryId: body?.categoryId ?? null,
-      } as Parameters<typeof resolveTargetFolderId>[0];
-      targetFolderId = resolveTargetFolderId(fakeCard, store);
-    }
-
-    if (body?.move !== false && targetFolderId) {
-      await moveEntries([entryId], targetFolderId);
-    }
-
-    if (body?.description) {
-      await updateEntry(entryId, { description: String(body.description) }).catch(() => undefined);
-    }
-
-    const { link, publicUrl } = await getOrCreateShareableLink(entryId);
-    const asset = toAssetRef(
-      {
-        id: entryId,
-        name: String(body?.fileName || "file"),
-        type: body?.type || "image",
-        mime: body?.mime,
-      },
-      publicUrl,
-      link.hash,
-    );
-
-    return NextResponse.json({ ok: true, asset, link, publicUrl, storageMode: "filesir" });
+    const kind =
+      body?.type === "video" || mapped?.kind === "video"
+        ? "video"
+        : body?.type === "image" || mapped?.kind === "image"
+          ? "image"
+          : entryKindFromMeta({
+              type: body?.type || mapped?.kind,
+              mime: body?.mime || mapped?.mime,
+              name: String(body?.fileName || mapped?.fileName || "file"),
+            });
+    const asset: MediaAssetRef = {
+      entryId,
+      shareUrl: publicMediaUrl(path),
+      mime: body?.mime || mapped?.mime,
+      fileName: String(body?.fileName || mapped?.fileName || path.split("/").pop() || "file"),
+      kind,
+      localPath: path,
+    };
+    return NextResponse.json({ ok: true, asset, storageMode: "local" });
   } catch (error) {
-    return handleFilesIrError(error);
+    const msg = error instanceof Error ? error.message : "اتصال فایل ناموفق";
+    return NextResponse.json({ message: msg }, { status: 500 });
   }
 }

@@ -1,6 +1,13 @@
 import { createElement } from "react";
 import { parseCmsRichText } from "@/lib/cms-rich-text";
 import { needsIframeVideoEmbed, toPlayableVideoUrl } from "@/lib/media-types";
+import { sanitizePublicUrl } from "@/lib/safe-url";
+import {
+  blockMediaContextMenu,
+  MEDIA_PROTECT_CLASS,
+  protectedImageProps,
+  protectedVideoProps,
+} from "@/lib/media-protect";
 
 type Props = {
   content?: string;
@@ -42,18 +49,62 @@ export default function CmsRichText({
           );
         }
         if (block.type === "image") {
+          const src = sanitizePublicUrl(block.src);
+          if (!src) return null;
           return (
-            <figure key={`img-${index}`} className="cms-rich-media my-6">
+            <figure
+              key={`img-${index}`}
+              className={`cms-rich-media my-6 ${MEDIA_PROTECT_CLASS}`}
+              onContextMenu={blockMediaContextMenu}
+            >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={block.src} alt={block.alt} className="w-full rounded-xl object-cover" loading="lazy" />
+              <img
+                src={src}
+                alt={block.alt}
+                className="w-full rounded-xl object-cover"
+                loading="lazy"
+                {...protectedImageProps}
+              />
             </figure>
           );
         }
-        if (block.type === "video") {
-          const src = toPlayableVideoUrl(block.src);
-          if (needsIframeVideoEmbed(block.src)) {
+        if (block.type === "link") {
+          const href = sanitizePublicUrl(block.href);
+          if (!href) {
             return (
-              <div key={`vid-${index}`} className="cms-rich-media my-6 aspect-video overflow-hidden rounded-xl">
+              <p key={`link-${index}`} className={paragraphClassName}>
+                {block.text}
+              </p>
+            );
+          }
+          return (
+            <p key={`link-${index}`} className={paragraphClassName}>
+              <a href={href} className="text-primary underline underline-offset-2 hover:opacity-80">
+                {block.text}
+              </a>
+            </p>
+          );
+        }
+        if (block.type === "audio") {
+          const src = sanitizePublicUrl(block.src);
+          if (!src) return null;
+          return (
+            <div key={`aud-${index}`} className="cms-rich-media my-6">
+              <audio src={src} controls preload="metadata" className="w-full" />
+            </div>
+          );
+        }
+        if (block.type === "video") {
+          const safeSrc = sanitizePublicUrl(block.src);
+          if (!safeSrc) return null;
+          const src = toPlayableVideoUrl(safeSrc);
+          if (needsIframeVideoEmbed(safeSrc)) {
+            return (
+              <div
+                key={`vid-${index}`}
+                className={`cms-rich-media my-6 aspect-video overflow-hidden rounded-xl ${MEDIA_PROTECT_CLASS}`}
+                onContextMenu={blockMediaContextMenu}
+              >
                 <iframe
                   src={src}
                   title="ویدیو"
@@ -66,8 +117,19 @@ export default function CmsRichText({
             );
           }
           return (
-            <div key={`vid-${index}`} className="cms-rich-media my-6 overflow-hidden rounded-xl">
-              <video src={src} controls playsInline preload="metadata" className="w-full" />
+            <div
+              key={`vid-${index}`}
+              className={`cms-rich-media my-6 overflow-hidden rounded-xl ${MEDIA_PROTECT_CLASS}`}
+              onContextMenu={blockMediaContextMenu}
+            >
+              <video
+                src={src}
+                controls
+                playsInline
+                preload="metadata"
+                className="w-full"
+                {...protectedVideoProps}
+              />
             </div>
           );
         }

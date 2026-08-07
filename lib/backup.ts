@@ -16,7 +16,11 @@ function createZipArchiver(): Archiver {
   return new ZipArchive({ zlib: { level: 9 } });
 }
 
+/** @deprecated use MAX_AUTO_BACKUPS — kept for tests importing MAX_BACKUPS */
 export const MAX_BACKUPS = 14;
+export const MAX_AUTO_BACKUPS = 3;
+export const MAX_PRE_RESTORE_BACKUPS = 2;
+export const MANUAL_BACKUP_FILENAME = "backup-manual-latest.zip";
 export const BACKUP_MANIFEST = "manifest.json";
 
 const PROJECT_ROOT = getProjectRoot();
@@ -58,6 +62,12 @@ export type BackupEntry = {
   includes: BackupManifest["includes"];
   buildId?: string;
   sha256?: string;
+};
+
+export type BackupLists = {
+  auto: BackupEntry[];
+  manual: BackupEntry | null;
+  preRestore: BackupEntry[];
 };
 
 export type RestorePreview = {
@@ -159,6 +169,7 @@ async function collectStats(): Promise<BackupManifest["stats"]> {
 }
 
 function backupFilename(type: BackupType, date = new Date()): string {
+  if (type === "manual") return MANUAL_BACKUP_FILENAME;
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, "0");
   const d = String(date.getDate()).padStart(2, "0");
@@ -166,12 +177,19 @@ function backupFilename(type: BackupType, date = new Date()): string {
   const mm = String(date.getMinutes()).padStart(2, "0");
   const ss = String(date.getSeconds()).padStart(2, "0");
   if (type === "auto") return `backup-${y}-${m}-${d}-auto.zip`;
-  if (type === "pre-restore") return `pre-restore-${y}-${m}-${d}-${hh}${mm}${ss}.zip`;
-  return `backup-${y}-${m}-${d}-${hh}${mm}${ss}-manual.zip`;
+  return `pre-restore-${y}-${m}-${d}-${hh}${mm}${ss}.zip`;
 }
 
 export function todayAutoBackupFilename(date = new Date()) {
   return backupFilename("auto", date);
+}
+
+function isAutoBackupFilename(filename: string) {
+  return /^backup-\d{4}-\d{2}-\d{2}-auto\.zip$/.test(filename);
+}
+
+function isPreRestoreFilename(filename: string) {
+  return filename.startsWith("pre-restore-") && filename.endsWith(".zip");
 }
 
 export async function ensureBackupsDir() {
@@ -273,6 +291,33 @@ function finalizeArchive(archive: Archiver, outFile: string): Promise<void> {
   });
 }
 
+async function loadBackupEntry(filename: string): Promise<BackupEntry | null> {
+  const full = path.join(BACKUPS_DIR, filename);
+  try {
+    const stat = await fs.stat(full);
+    const meta = await readMeta(filename);
+    if (meta?.manifest) {
+      return entryFromMeta(filename, stat, meta);
+    }
+    const buffer = await fs.readFile(full);
+    const zip = new AdmZip(buffer);
+    const manifest = readManifestFromZipSync(zip);
+    return {
+      id: filename,
+      filename,
+      createdAt: manifest.createdAt,
+      type: manifest.type,
+      sizeBytes: Number(stat.size),
+      stats: manifest.stats,
+      includes: manifest.includes,
+      buildId: manifest.buildId,
+      sha256: meta?.sha256 ?? manifest.sha256,
+    };
+  } catch {
+    return null;
+  }
+}
+
 async function createBackupInternal(type: BackupType): Promise<BackupEntry> {
   await ensureBackupsDir();
   getDb();
@@ -300,6 +345,10 @@ async function createBackupInternal(type: BackupType): Promise<BackupEntry> {
     } catch {
       // no same-day auto yet
     }
+  }
+  if (type === "manual") {
+    await fs.unlink(path.join(BACKUPS_DIR, filename)).catch(() => undefined);
+    await fs.unlink(metaPathFor(filename)).catch(() => undefined);
   }
 
   const outPath = path.join(BACKUPS_DIR, filename);
@@ -330,7 +379,9 @@ async function createBackupInternal(type: BackupType): Promise<BackupEntry> {
   const sha256 = hashBuffer(zipBuffer);
   manifest = { ...manifest, sha256 };
   await writeMeta(filename, sha256, manifest);
-  await rotateBackups();
+
+  if (type === "auto") await rotateAutoBackups();
+  else if (type === "pre-restore") await rotatePreRestoreBackups();
 
   const stat = await fs.stat(outPath);
   return {
@@ -350,38 +401,50 @@ export async function createBackup(type: BackupType): Promise<BackupEntry> {
   return withBackupLock(() => createBackupInternal(type));
 }
 
-export async function rotateBackups() {
+export async function rotateAutoBackups() {
   await ensureBackupsDir();
-  const files = await fs.readdir(BACKUPS_DIR);
-  const zips = files.filter((f) => f.endsWith(".zip"));
+  const files = (await fs.readdir(BACKUPS_DIR)).filter((f) => f.endsWith(".zip") && isAutoBackupFilename(f));
   const withStat = await Promise.all(
-    zips.map(async (filename) => {
+    files.map(async (filename) => {
       const full = path.join(BACKUPS_DIR, filename);
       const stat = await fs.stat(full);
       return { filename, mtime: stat.mtimeMs };
     }),
   );
   withStat.sort((a, b) => b.mtime - a.mtime);
-  const toDelete = withStat.slice(MAX_BACKUPS);
-  for (const item of toDelete) {
+  for (const item of withStat.slice(MAX_AUTO_BACKUPS)) {
     await fs.unlink(path.join(BACKUPS_DIR, item.filename)).catch(() => undefined);
     await fs.unlink(metaPathFor(item.filename)).catch(() => undefined);
   }
 }
 
-async function readManifestFromZip(zip: AdmZip): Promise<BackupManifest> {
-  return readManifestFromZipSync(zip);
+export async function rotatePreRestoreBackups() {
+  await ensureBackupsDir();
+  const files = (await fs.readdir(BACKUPS_DIR)).filter((f) => f.endsWith(".zip") && isPreRestoreFilename(f));
+  const withStat = await Promise.all(
+    files.map(async (filename) => {
+      const full = path.join(BACKUPS_DIR, filename);
+      const stat = await fs.stat(full);
+      return { filename, mtime: stat.mtimeMs };
+    }),
+  );
+  withStat.sort((a, b) => b.mtime - a.mtime);
+  for (const item of withStat.slice(MAX_PRE_RESTORE_BACKUPS)) {
+    await fs.unlink(path.join(BACKUPS_DIR, item.filename)).catch(() => undefined);
+    await fs.unlink(metaPathFor(item.filename)).catch(() => undefined);
+  }
 }
 
-async function ensureMetaSidecar(filename: string, buffer: Buffer, manifest: BackupManifest) {
-  const meta = await readMeta(filename);
-  if (meta?.sha256) return meta.sha256;
-  const sha256 = hashBuffer(buffer);
-  await writeMeta(filename, sha256, { ...manifest, sha256 });
-  return sha256;
+/** @deprecated use rotateAutoBackups */
+export async function rotateBackups() {
+  await rotateAutoBackups();
 }
 
-function entryFromMeta(filename: string, stat: Awaited<ReturnType<typeof fs.stat>>, meta: { sha256?: string; manifest?: BackupManifest }): BackupEntry | null {
+function entryFromMeta(
+  filename: string,
+  stat: Awaited<ReturnType<typeof fs.stat>>,
+  meta: { sha256?: string; manifest?: BackupManifest },
+): BackupEntry | null {
   const manifest = meta.manifest;
   if (!manifest) return null;
   return {
@@ -398,60 +461,26 @@ function entryFromMeta(filename: string, stat: Awaited<ReturnType<typeof fs.stat
 }
 
 export async function listBackups(): Promise<BackupEntry[]> {
+  const grouped = await listBackupGroups();
+  return [...grouped.auto, ...(grouped.manual ? [grouped.manual] : []), ...grouped.preRestore].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+  );
+}
+
+export async function listBackupGroups(): Promise<BackupLists> {
   await ensureBackupsDir();
   const files = (await fs.readdir(BACKUPS_DIR)).filter((f) => f.endsWith(".zip"));
-  const entries: BackupEntry[] = [];
+  const entries = (
+    await Promise.all(files.map((filename) => loadBackupEntry(filename)))
+  ).filter((e): e is BackupEntry => e !== null);
 
-  await Promise.all(
-    files.map(async (filename) => {
-      const full = path.join(BACKUPS_DIR, filename);
-      try {
-        const stat = await fs.stat(full);
-        const meta = await readMeta(filename);
-        if (meta?.manifest) {
-          const entry = entryFromMeta(filename, stat, meta);
-          if (entry) {
-            entries.push(entry);
-            return;
-          }
-        }
+  const auto = entries.filter((e) => e.type === "auto").sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  const manual = entries.find((e) => e.type === "manual" || e.filename === MANUAL_BACKUP_FILENAME) ?? null;
+  const preRestore = entries
+    .filter((e) => e.type === "pre-restore")
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
-        // Legacy backups without sidecar — read manifest only (no checksum on list)
-        const buffer = await fs.readFile(full);
-        const zip = new AdmZip(buffer);
-        const manifest = readManifestFromZipSync(zip);
-        entries.push({
-          id: filename,
-          filename,
-          createdAt: manifest.createdAt,
-          type: manifest.type,
-          sizeBytes: Number(stat.size),
-          stats: manifest.stats,
-          includes: manifest.includes,
-          buildId: manifest.buildId,
-          sha256: meta?.sha256 ?? manifest.sha256,
-        });
-      } catch {
-        try {
-          const stat = await fs.stat(full);
-          entries.push({
-            id: filename,
-            filename,
-            createdAt: stat.mtime.toISOString(),
-            type: "manual",
-            sizeBytes: Number(stat.size),
-            stats: { users: 0, portfolioItems: 0, uploadsFiles: 0, uploadsBytes: 0 },
-            includes: ["database", "cms", "uploads"],
-          });
-        } catch {
-          /* skip missing file */
-        }
-      }
-    }),
-  );
-
-  entries.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-  return entries;
+  return { auto, manual, preRestore };
 }
 
 export function getBackupPath(filename: string): string {

@@ -1,5 +1,6 @@
 "use client";
 
+import { AutoDirText } from "@/lib/ltr-text";
 import { useEffect, useState } from "react";
 import {
   LayoutDashboard,
@@ -32,7 +33,7 @@ import {
 
 type Tab =
   | "overview"
-  | "landing"
+  | "content"
   | "blog"
   | "orders"
   | "tickets"
@@ -48,6 +49,7 @@ type UserRow = {
   phone: string | null;
   company: string | null;
   blocked: boolean;
+  blockReason?: string | null;
   createdAt: string;
 };
 
@@ -99,7 +101,7 @@ type TicketRow = {
 
 const NAV = [
   { id: "overview", label: "نمای کلی", icon: LayoutDashboard },
-  { id: "landing", label: "مدیریت لندینگ", icon: Layout },
+  { id: "content", label: "تنظیمات سایت", icon: Layout },
   { id: "blog", label: "بلاگ", icon: BookOpen },
   { id: "orders", label: "سفارش‌ها", icon: ShoppingBag },
   { id: "tickets", label: "تیکت‌ها", icon: MessageSquare },
@@ -217,10 +219,16 @@ export default function AdminPanel() {
   };
 
   const toggleBlock = async (id: number, blocked: boolean) => {
+    let blockReason: string | undefined;
+    if (blocked) {
+      const reason = window.prompt("دلیل مسدودسازی (برای نمایش به کاربر):");
+      if (reason === null) return;
+      blockReason = reason.trim() || "مسدودسازی توسط مدیر";
+    }
     const res = await fetch("/api/admin/users", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, blocked }),
+      body: JSON.stringify({ id, blocked, blockReason }),
     });
     if (!res.ok) return flash("خطا در تغییر وضعیت کاربر");
     flash(blocked ? "کاربر مسدود شد." : "مسدودیت برداشته شد.");
@@ -373,23 +381,23 @@ export default function AdminPanel() {
               icon={Layout}
               label="نمونه کار"
               value={overview?.stats.portfolio}
-              onClick={() => setTab("landing")}
+              onClick={() => setTab("media")}
             />
             <DashStatCard
               seed="backstage"
               icon={LayoutDashboard}
               label="بک‌استیج"
               value={overview?.stats.backstage}
-              onClick={() => setTab("landing")}
+              onClick={() => setTab("media")}
             />
           </div>
 
           <div className="dash-quick-grid">
             <DashQuickCard
               icon={Layout}
-              title="مدیریت لندینگ"
+              title="محتوا و ظاهر"
               description="ویرایش هیرو، پلن‌ها، FAQ و بیشتر"
-              onClick={() => setTab("landing")}
+              onClick={() => setTab("content")}
             />
             <DashQuickCard
               icon={ShoppingBag}
@@ -470,7 +478,7 @@ export default function AdminPanel() {
         </section>
       )}
 
-      {tab === "landing" && <AdminLandingEditor />}
+      {tab === "content" && <AdminLandingEditor />}
 
       {tab === "blog" && <AdminBlogEditor />}
 
@@ -510,9 +518,9 @@ export default function AdminPanel() {
               </div>
             ) : (
               filteredOrders.map((order) => (
-                <article key={order.id} className="lux-card dash-message">
+                <article key={order.id} className="lux-card dash-message dash-order-card">
                   <div className="dash-message-top">
-                    <div>
+                    <div className="dash-order-head">
                       <h3>{order.title}</h3>
                       <p>
                         {order.user?.name || "کاربر"} · {order.service} ·{" "}
@@ -529,18 +537,21 @@ export default function AdminPanel() {
                     <span>#{order.id}</span>
                   </div>
                   <div className="dash-order-actions">
-                    <select
-                      value={order.status}
-                      onChange={(e) => updateOrder(order.id, e.target.value)}
-                      aria-label="تغییر وضعیت سفارش"
-                    >
-                      {Object.entries(ORDER_STATUS).map(([status, label]) => (
-                        <option key={status} value={status}>
-                          {label}
-                        </option>
-                      ))}
-                    </select>
-                    <label className="btn-primary cursor-pointer">
+                    <label className="dash-order-status-field">
+                      <span className="sr-only">وضعیت سفارش</span>
+                      <select
+                        value={order.status}
+                        onChange={(e) => updateOrder(order.id, e.target.value)}
+                        aria-label="تغییر وضعیت سفارش"
+                      >
+                        {Object.entries(ORDER_STATUS).map(([status, label]) => (
+                          <option key={status} value={status}>
+                            {label}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <label className="btn-primary cursor-pointer dash-order-upload">
                       آپلود فایل تحویل
                       <input
                         type="file"
@@ -548,20 +559,27 @@ export default function AdminPanel() {
                         onChange={(e) => {
                           const file = e.target.files?.[0];
                           if (file) uploadDelivery(order.id, file);
+                          e.target.value = "";
                         }}
                       />
                     </label>
                   </div>
                   {!!order.files?.length && (
-                    <ul className="mt-3 space-y-1 text-sm">
-                      {order.files.map((f) => (
-                        <li key={f.id}>
-                          <a href={f.fileUrl} className="text-primary" target="_blank" rel="noreferrer">
-                            {f.fileName} ({f.kind})
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
+                    <div className="dash-order-files">
+                      <p className="dash-order-files-title">فایل‌های پیوست ({order.files.length})</p>
+                      <ul className="dash-order-files-list">
+                        {order.files.map((f) => (
+                          <li key={f.id}>
+                            <a href={f.fileUrl} className="dash-order-file-chip" target="_blank" rel="noreferrer">
+                              <AutoDirText className="dash-order-file-name">{f.fileName}</AutoDirText>
+                              <span className={`dash-order-file-kind is-${f.kind}`}>
+                                {f.kind === "delivery" ? "تحویل" : f.kind === "request" ? "درخواست" : f.kind}
+                              </span>
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   )}
                 </article>
               ))
@@ -662,6 +680,7 @@ export default function AdminPanel() {
                     <th>ایمیل</th>
                     <th>تلفن</th>
                     <th>وضعیت</th>
+                    <th>دلیل مسدودی</th>
                     <th>عملیات</th>
                   </tr>
                 </thead>
@@ -679,6 +698,9 @@ export default function AdminPanel() {
                         <span className={`dash-badge ${user.blocked ? "order-cancelled" : "order-completed"}`}>
                           {user.blocked ? "مسدود" : "فعال"}
                         </span>
+                      </td>
+                      <td data-label="دلیل مسدودی" className="text-sm text-muted">
+                        {user.blocked && user.blockReason ? user.blockReason : "—"}
                       </td>
                       <td data-label="عملیات" className="space-x-2 space-x-reverse">
                         <button

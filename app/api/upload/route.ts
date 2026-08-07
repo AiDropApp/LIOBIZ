@@ -1,15 +1,29 @@
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { promises as fs } from "fs";
 import path from "path";
-import { AUTH_COOKIE, parseAuthCookie } from "@/lib/auth";
+import { findUserById } from "@/lib/auth";
+import { getActiveSession } from "@/lib/require-session";
 import { getDb, orderFiles } from "@/lib/db";
 
 export const runtime = "nodejs";
 
+const CMS_UPLOAD_KINDS = new Set([
+  "hero",
+  "video",
+  "creative-partners",
+  "about",
+  "portfolio",
+  "backstage",
+]);
+
+function isVerifiedAdmin(session: Awaited<ReturnType<typeof getActiveSession>>) {
+  if (!session || session.role !== "admin") return false;
+  const user = findUserById(session.userId);
+  return Boolean(user && !user.blocked && user.role === "admin");
+}
+
 export async function POST(request: Request) {
-  const cookieStore = await cookies();
-  const session = parseAuthCookie(cookieStore.get(AUTH_COOKIE)?.value);
+  const session = await getActiveSession();
   if (!session) {
     return NextResponse.json({ message: "وارد شوید" }, { status: 401 });
   }
@@ -21,6 +35,10 @@ export async function POST(request: Request) {
 
   if (!(file instanceof File)) {
     return NextResponse.json({ message: "فایل ارسال نشده است." }, { status: 400 });
+  }
+
+  if (CMS_UPLOAD_KINDS.has(kind) && !isVerifiedAdmin(session)) {
+    return NextResponse.json({ message: "دسترسی غیرمجاز" }, { status: 403 });
   }
 
   const isVideo = file.type.startsWith("video/");

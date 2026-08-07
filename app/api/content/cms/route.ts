@@ -1,20 +1,15 @@
 import { NextResponse } from "next/server";
-import { parseAuthCookie } from "@/lib/auth-session";
+import { requireAdminFromRequest } from "@/lib/admin-media-guard";
 import { readSiteContent, writeSiteContent, type BackstageItem, type PortfolioItem, type SiteContent } from "@/lib/content-store";
+import { readMediaCenterStore } from "@/lib/media-center/store";
 import { isVideoUrl, normalizeMediaFields } from "@/lib/media-types";
 import type { CreativePartnerItem } from "@/lib/landing-defaults";
 
 export const runtime = "nodejs";
 
-function requireAdmin(request: Request) {
-  const session = parseAuthCookie(request.headers.get("cookie"));
-  if (!session || session.role !== "admin") return null;
-  return session;
-}
-
 /** Update CMS sections from admin landing editor */
 export async function PUT(request: Request) {
-  if (!requireAdmin(request)) {
+  if (!requireAdminFromRequest(request)) {
     return NextResponse.json({ message: "دسترسی غیرمجاز" }, { status: 401 });
   }
 
@@ -24,6 +19,11 @@ export async function PUT(request: Request) {
   }
 
   const current = await readSiteContent();
+  const mediaStore = await readMediaCenterStore();
+  const hasMediaPortfolio = mediaStore.cards.some((c) => c.section === "portfolio" && c.published);
+  const hasMediaBackstage = mediaStore.cards.some((c) => c.section === "backstage");
+  const hasMediaPartners = mediaStore.cards.some((c) => c.section === "creative-partners" && c.published);
+
   const next: SiteContent = {
     ...current,
     landing: body.landing ? { ...current.landing, ...body.landing } : current.landing,
@@ -49,18 +49,30 @@ export async function PUT(request: Request) {
         }
       : current.site,
     theme: body.theme ? { ...current.theme, ...body.theme } : current.theme,
-    portfolioCategories: Array.isArray(body.portfolioCategories)
-      ? body.portfolioCategories
-      : current.portfolioCategories,
-    portfolio: Array.isArray(body.portfolio) ? body.portfolio : current.portfolio,
-    backstage: Array.isArray(body.backstage) ? body.backstage : current.backstage,
+    portfolioCategories: hasMediaPortfolio
+      ? current.portfolioCategories
+      : Array.isArray(body.portfolioCategories)
+        ? body.portfolioCategories
+        : current.portfolioCategories,
+    portfolio: hasMediaPortfolio
+      ? current.portfolio
+      : Array.isArray(body.portfolio)
+        ? body.portfolio
+        : current.portfolio,
+    backstage: hasMediaBackstage
+      ? current.backstage
+      : Array.isArray(body.backstage)
+        ? body.backstage
+        : current.backstage,
     plans: Array.isArray(body.plans) ? body.plans : current.plans,
     faq: Array.isArray(body.faq) ? body.faq : current.faq,
     testimonials: Array.isArray(body.testimonials) ? body.testimonials : current.testimonials,
     partners: Array.isArray(body.partners) ? body.partners : current.partners,
-    creativePartners: Array.isArray(body.creativePartners)
-      ? body.creativePartners
-      : current.creativePartners,
+    creativePartners: hasMediaPartners
+      ? current.creativePartners
+      : Array.isArray(body.creativePartners)
+        ? body.creativePartners
+        : current.creativePartners,
     teamStats: Array.isArray(body.teamStats) ? body.teamStats : current.teamStats,
     footerQuickLinks: Array.isArray(body.footerQuickLinks)
       ? body.footerQuickLinks
@@ -69,6 +81,9 @@ export async function PUT(request: Request) {
       ? body.footerServiceLinks
       : current.footerServiceLinks,
     blogPosts: Array.isArray(body.blogPosts) ? body.blogPosts : current.blogPosts,
+    blogCategories: Array.isArray(body.blogCategories) ? body.blogCategories : current.blogCategories,
+    redirects: Array.isArray(body.redirects) ? body.redirects : current.redirects,
+    servicePages: Array.isArray(body.servicePages) ? body.servicePages : current.servicePages,
   };
 
   if (body.landing?.heroStats) {
@@ -81,15 +96,15 @@ export async function PUT(request: Request) {
     next.landing.heroMediaType = isVideoUrl(heroMediaUrl) ? "video" : "image";
   }
 
-  if (Array.isArray(body.portfolio)) {
+  if (Array.isArray(body.portfolio) && !hasMediaPortfolio) {
     next.portfolio = (body.portfolio as PortfolioItem[]).map((item) => normalizeMediaFields(item));
   }
 
-  if (Array.isArray(body.backstage)) {
+  if (Array.isArray(body.backstage) && !hasMediaBackstage) {
     next.backstage = (body.backstage as BackstageItem[]).map((item) => normalizeMediaFields(item));
   }
 
-  if (Array.isArray(body.creativePartners)) {
+  if (Array.isArray(body.creativePartners) && !hasMediaPartners) {
     next.creativePartners = (body.creativePartners as CreativePartnerItem[]).map((item) =>
       normalizeMediaFields({
         ...item,

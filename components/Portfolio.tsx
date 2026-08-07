@@ -1,44 +1,87 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import CmsMedia from "@/components/CmsMedia";
 import PortfolioDetailModal from "@/components/PortfolioDetailModal";
 import { defaultLanding, type LandingContent } from "@/lib/cms-defaults";
 import type { PortfolioCategory, PortfolioItem } from "@/lib/content-store";
 import { resolveMediaKind } from "@/lib/media-types";
-import { DEFAULT_PORTFOLIO_CATEGORIES, portfolioMatchesCategoryFilter, sortCategories } from "@/lib/portfolio";
+import { normalizePortfolioCategories, portfolioMatchesCategoryFilter } from "@/lib/portfolio";
+import LandingSectionHeader from "@/components/cms-edit/LandingSectionHeader";
+import EditableText from "@/components/cms-edit/EditableText";
+import EditableCta from "@/components/cms-edit/EditableCta";
+import EditableImage from "@/components/cms-edit/EditableImage";
+import { useCmsEdit } from "@/components/cms-edit/CmsEditProvider";
 
-const LANDING_LIMIT = 8;
+import { HOME_PORTFOLIO_LIMIT } from "@/lib/homepage-limits";
+import { useHomeDataOptional } from "@/components/HomeDataProvider";
+import { useHomeLanding } from "@/hooks/useHomeLanding";
 
-export default function Portfolio() {
+type PortfolioProps = {
+  initialLanding?: LandingContent;
+  initialItems?: PortfolioItem[];
+  initialCategories?: PortfolioCategory[];
+};
+
+export default function Portfolio({
+  initialLanding,
+  initialItems,
+  initialCategories,
+}: PortfolioProps = {}) {
+  const cms = useCmsEdit();
+  const edit = cms?.isAdmin && cms.editMode;
   const [filter, setFilter] = useState("همه");
-  const [items, setItems] = useState<PortfolioItem[]>([]);
-  const [categories, setCategories] = useState<PortfolioCategory[]>(DEFAULT_PORTFOLIO_CATEGORIES);
+  const home = useHomeDataOptional();
+  const landing = useHomeLanding(initialLanding);
+  const [items, setItems] = useState<PortfolioItem[]>(home?.portfolio ?? initialItems ?? []);
+  const [categories, setCategories] = useState<PortfolioCategory[]>(
+    home?.portfolioCategories ?? initialCategories ?? [],
+  );
+  const [categoriesReady, setCategoriesReady] = useState(
+    Boolean((home?.portfolioCategories ?? initialCategories)?.length),
+  );
   const [selected, setSelected] = useState<PortfolioItem | null>(null);
-  const [landing, setLanding] = useState<LandingContent>(defaultLanding);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
   useEffect(() => {
-    fetch("/api/content")
+    if (home?.portfolio || (initialItems && initialCategories)) return;
+    fetch("/api/content", { cache: "no-store" })
       .then((res) => res.json())
       .then((data) => {
         setItems(Array.isArray(data.portfolio) ? data.portfolio : []);
-        if (Array.isArray(data.portfolioCategories) && data.portfolioCategories.length) {
-          setCategories(sortCategories(data.portfolioCategories));
-        }
-        if (data?.landing) setLanding({ ...defaultLanding, ...data.landing });
+        setCategories(normalizePortfolioCategories(data.portfolioCategories));
+        setCategoriesReady(true);
       })
-      .catch(() => setItems([]));
-  }, []);
+      .catch(() => {
+        setItems([]);
+        setCategoriesReady(true);
+      });
+  }, [home?.portfolio, initialItems, initialCategories]);
 
-  const tabs = useMemo(() => ["همه", ...categories.map((c) => c.name)], [categories]);
+  const tabs = useMemo(
+    () =>
+      categories.filter((cat) =>
+        items.some((item) => portfolioMatchesCategoryFilter(item, cat.name, categories)),
+      ),
+    [categories, items],
+  );
+
+  const filterAll = landing.portfolioFilterAll || "همه";
+
+  useEffect(() => {
+    if (filter === filterAll) return;
+    const valid = tabs.some((cat) => cat.name === filter);
+    if (!valid) setFilter(filterAll);
+  }, [filter, tabs, filterAll]);
 
   const visible = useMemo(() => {
     const filtered =
-      filter === "همه" ? items : items.filter((item) => portfolioMatchesCategoryFilter(item, filter));
-    return filtered.slice(0, LANDING_LIMIT);
-  }, [filter, items]);
+      filter === filterAll
+        ? items
+        : items.filter((item) => portfolioMatchesCategoryFilter(item, filter, categories));
+    return filtered.slice(0, HOME_PORTFOLIO_LIMIT);
+  }, [filter, items, filterAll, categories]);
 
   return (
     <section id="portfolio" className="portfolio-section section-block">
@@ -49,31 +92,80 @@ export default function Portfolio() {
           viewport={{ once: true }}
           className="mb-10 text-center"
         >
-          {landing.portfolioLabel?.trim() ? (
-            <span className="section-label">{landing.portfolioLabel}</span>
-          ) : null}
-          {landing.portfolioTitle?.trim() ? (
-            <h2 className="section-title">{landing.portfolioTitle}</h2>
-          ) : null}
+          <LandingSectionHeader
+            labelPath="landing.portfolioLabel"
+            titlePath="landing.portfolioTitle"
+            label={landing.portfolioLabel}
+            title={landing.portfolioTitle}
+            className="mb-10 text-center"
+          />
         </motion.div>
 
         <div className="filter-chip-track mb-8" role="tablist" aria-label="فیلتر نمونه کارها">
-          {tabs.map((item) => (
-            <button
-              key={item}
-              type="button"
-              onClick={() => setFilter(item)}
-              className={`filter-chip ${filter === item ? "is-active" : ""}`}
+          {edit ? (
+            <div
+              className={`filter-chip ${filter === filterAll ? "is-active" : ""}`}
+              role="presentation"
             >
-              {item}
+              <EditableText path="landing.portfolioFilterAll" inline>
+                {filterAll}
+              </EditableText>
+            </div>
+          ) : (
+            <button
+              type="button"
+              role="tab"
+              id="portfolio-tab-all"
+              aria-selected={filter === filterAll}
+              aria-controls="portfolio-panel"
+              onClick={() => setFilter(filterAll)}
+              className={`filter-chip ${filter === filterAll ? "is-active" : ""}`}
+            >
+              {filterAll}
             </button>
-          ))}
+          )}
+          {categoriesReady
+            ? tabs.map((cat) => (
+                <button
+                  key={cat.id}
+                  type="button"
+                  role="tab"
+                  id={`portfolio-tab-${cat.id}`}
+                  aria-selected={filter === cat.name}
+                  aria-controls="portfolio-panel"
+                  onClick={() => setFilter(cat.name)}
+                  className={`filter-chip ${filter === cat.name ? "is-active" : ""}`}
+                >
+                  {cat.name}
+                </button>
+              ))
+            : null}
         </div>
 
-        <div className="portfolio-grid" aria-label="نمونه کارهای منتخب">
+        <div
+          id="portfolio-panel"
+          role="tabpanel"
+          aria-labelledby="portfolio-tab-all"
+          className="portfolio-grid"
+          aria-label="نمونه کارهای منتخب"
+        >
           <AnimatePresence mode="popLayout">
             {visible.map((item, index) => {
+              const globalIndex = items.findIndex((p) => p.id === item.id);
               const isVideo = resolveMediaKind(item) === "video" && Boolean(item.videoSrc);
+              const TriggerTag = edit ? "div" : "button";
+              const triggerProps = edit
+                ? { className: "portfolio-card-trigger w-full text-right" }
+                : {
+                    type: "button" as const,
+                    className: "portfolio-card-trigger w-full text-right",
+                    onClick: () => {
+                      setSelected(item);
+                      setSelectedIndex(globalIndex);
+                    },
+                    "aria-label": `مشاهده جزئیات ${item.title}`,
+                  };
+
               return (
                 <motion.article
                   key={item.id}
@@ -82,27 +174,34 @@ export default function Portfolio() {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.96 }}
                   transition={{ duration: 0.25, delay: Math.min(index, 6) * 0.02 }}
-                  className="portfolio-card group"
+                  className="portfolio-card group cms-editable-card"
                 >
-                  <button
-                    type="button"
-                    className="portfolio-card-trigger w-full text-right"
-                    onClick={() => setSelected(item)}
-                    aria-label={`مشاهده جزئیات ${item.title}`}
-                  >
+                  <TriggerTag {...triggerProps}>
                     <div className="portfolio-card-media">
-                      <CmsMedia
-                        image={item.image}
-                        mediaKind="image"
-                        aspectRatio={item.aspectRatio}
-                        alt={item.title}
-                        fill
-                        fitParent
-                        objectFit="cover"
-                        sizes="(max-width: 768px) 50vw, 25vw"
-                        priority={index < 4}
-                        className="transition-transform duration-700 group-hover:scale-105"
-                      />
+                      {edit && globalIndex >= 0 ? (
+                        <EditableImage
+                          path={`portfolio.${globalIndex}.image`}
+                          src={item.image}
+                          alt={item.title}
+                          fill
+                          fillParent
+                          className="object-cover transition-transform duration-700 group-hover:scale-105"
+                          sizes="(max-width: 768px) 50vw, 25vw"
+                          uploadKind="about"
+                        />
+                      ) : (
+                        <CmsMedia
+                          image={item.image}
+                          mediaKind="image"
+                          aspectRatio={item.aspectRatio}
+                          alt={item.title}
+                          fill
+                          fitParent
+                          objectFit="cover"
+                          sizes="(max-width: 768px) 50vw, 25vw"
+                          className="transition-transform duration-700 group-hover:scale-105"
+                        />
+                      )}
                       {isVideo ? (
                         <span className="portfolio-card-play" aria-hidden>
                           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
@@ -112,11 +211,24 @@ export default function Portfolio() {
                       ) : null}
                       <div className="portfolio-card-overlay" />
                       <div className="portfolio-card-meta">
-                        <p>{item.category}</p>
-                        <h3>{item.title}</h3>
+                        {edit && globalIndex >= 0 ? (
+                          <>
+                            <EditableText path={`portfolio.${globalIndex}.category`} as="p">
+                              {item.category}
+                            </EditableText>
+                            <EditableText path={`portfolio.${globalIndex}.title`} as="h3">
+                              {item.title}
+                            </EditableText>
+                          </>
+                        ) : (
+                          <>
+                            <p>{item.category}</p>
+                            <h3>{item.title}</h3>
+                          </>
+                        )}
                       </div>
                     </div>
-                  </button>
+                  </TriggerTag>
                 </motion.article>
               );
             })}
@@ -124,13 +236,24 @@ export default function Portfolio() {
         </div>
 
         <div className="mt-10 flex justify-center sm:mt-12">
-          <Link href="/portfolio" className="btn-accent portfolio-all-cta">
-            مشاهده همه پروژه‌ها
-          </Link>
+          <EditableCta
+            labelPath="landing.portfolioViewAllCta"
+            hrefPath="landing.portfolioViewAllHref"
+            label={landing.portfolioViewAllCta}
+            href={landing.portfolioViewAllHref}
+            className="btn-accent portfolio-all-cta"
+          />
         </div>
       </div>
 
-      <PortfolioDetailModal item={selected} onClose={() => setSelected(null)} />
+      <PortfolioDetailModal
+        item={selected}
+        itemIndex={selectedIndex}
+        onClose={() => {
+          setSelected(null);
+          setSelectedIndex(null);
+        }}
+      />
     </section>
   );
 }

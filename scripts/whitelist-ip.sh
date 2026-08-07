@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-IP="31.171.100.101"
+IP="${1:-159.26.100.229}"
 echo "Whitelisting $IP"
 JAIL=/etc/fail2ban/jail.d/liobiz-whitelist.local
 mkdir -p /etc/fail2ban/jail.d

@@ -12,8 +12,13 @@ import {
 import CmsMedia from "@/components/CmsMedia";
 import { aspectRatioClass } from "@/lib/media-types";
 import usePrefersReducedMotion from "@/hooks/usePrefersReducedMotion";
-import { defaultLanding, type LandingContent } from "@/lib/cms-defaults";
-import CmsRichText from "@/components/CmsRichText";
+import LandingSectionHeader from "@/components/cms-edit/LandingSectionHeader";
+import EditableText from "@/components/cms-edit/EditableText";
+import CmsCardEditor from "@/components/cms-edit/CmsCardEditor";
+import { useCmsEdit } from "@/components/cms-edit/CmsEditProvider";
+import type { LandingContent } from "@/lib/cms-defaults";
+import { useHomeDataOptional } from "@/components/HomeDataProvider";
+import { useHomeLanding } from "@/hooks/useHomeLanding";
 import { defaultTeamStats, type TeamStatItem } from "@/lib/landing-defaults";
 import type { BackstageItem } from "@/lib/content-store";
 
@@ -33,14 +38,18 @@ function hasSlideMedia(item: BackstageItem): boolean {
 
 function MarqueeRow({
   items,
+  allItems,
   reverse = false,
   speed = 42,
   reduced,
+  edit = false,
 }: {
   items: BackstageItem[];
+  allItems: BackstageItem[];
   reverse?: boolean;
   speed?: number;
   reduced: boolean;
+  edit?: boolean;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -76,7 +85,7 @@ function MarqueeRow({
     if (!track || !groupA) return;
     if (seamlessLoop && !groupB) return;
 
-    if (reduced || !seamlessLoop) {
+    if (reduced || !seamlessLoop || edit) {
       track.style.transform = "translate3d(0, 0, 0)";
       return;
     }
@@ -144,7 +153,7 @@ function MarqueeRow({
       cancelAnimationFrame(raf);
       ro.disconnect();
     };
-  }, [items, reduced, reverse, seamlessLoop, speed]);
+  }, [items, reduced, reverse, seamlessLoop, speed, edit]);
 
   const renderGroup = (
     key: string,
@@ -158,33 +167,66 @@ function MarqueeRow({
     >
       {items.map((item, index) => {
         const showMedia = hasSlideMedia(item);
-        return (
-        <article key={`${key}-${item.id}-${index}`} className="backstage-slide">
-          <div
-            className={`backstage-slide-frame ${aspectRatioClass(item.aspectRatio ?? "portrait")}${showMedia ? "" : " backstage-slide-frame--empty"}`}
-          >
-            {showMedia ? (
-              <CmsMedia
-                image={item.image}
-                videoSrc={item.videoSrc}
-                mediaKind={item.mediaKind}
-                aspectRatio={item.aspectRatio}
-                alt={item.caption}
-                fill
-                fitParent
-                sizes="(max-width: 768px) 55vw, 280px"
-                priority={index < 4}
-              />
-            ) : (
-              <div className="backstage-slide-empty" aria-hidden />
-            )}
-            <div className="backstage-slide-overlay" />
-            <div className="backstage-slide-meta">
-              <span>{item.caption}</span>
+        const globalIndex = allItems.findIndex((g) => g.id === item.id);
+        const slide = (
+          <article className="backstage-slide">
+            <div
+              className={`backstage-slide-frame ${aspectRatioClass(item.aspectRatio ?? "portrait")}${showMedia || edit ? "" : " backstage-slide-frame--empty"}`}
+            >
+              {showMedia ? (
+                <CmsMedia
+                  image={item.image}
+                  videoSrc={item.videoSrc}
+                  mediaKind={item.mediaKind}
+                  aspectRatio={item.aspectRatio}
+                  alt={item.caption}
+                  fill
+                  fitParent
+                  sizes="(max-width: 768px) 55vw, 280px"
+                />
+              ) : (
+                <div className="backstage-slide-empty" aria-hidden />
+              )}
+              <div className="backstage-slide-overlay" />
+              <div className="backstage-slide-meta">
+                <span>{item.caption}</span>
+              </div>
             </div>
-          </div>
-        </article>
+          </article>
         );
+
+        if (edit && globalIndex >= 0) {
+          return (
+            <CmsCardEditor
+              key={`${key}-${item.id}-${index}`}
+              title={item.caption}
+              fields={[
+                {
+                  type: "image",
+                  path: `backstage.${globalIndex}.image`,
+                  label: "تصویر",
+                  src: item.image,
+                  uploadKind: "backstage",
+                },
+                {
+                  type: "text",
+                  path: `backstage.${globalIndex}.videoSrc`,
+                  label: "ویدیو (URL)",
+                  dir: "ltr",
+                },
+                {
+                  type: "richtext",
+                  path: `backstage.${globalIndex}.caption`,
+                  label: "عنوان",
+                },
+              ]}
+            >
+              {slide}
+            </CmsCardEditor>
+          );
+        }
+
+        return <div key={`${key}-${item.id}-${index}`}>{slide}</div>;
       })}
     </div>
   );
@@ -192,7 +234,7 @@ function MarqueeRow({
   return (
     <div
       ref={containerRef}
-      className={`backstage-marquee-track is-ready${seamlessLoop ? "" : " is-static"}`}
+      className={`backstage-marquee-track is-ready${seamlessLoop && !edit ? "" : " is-static"}`}
       onMouseEnter={() => {
         pausedRef.current = true;
       }}
@@ -202,7 +244,7 @@ function MarqueeRow({
     >
       <div
         ref={trackRef}
-        className={`backstage-marquee-row is-js${seamlessLoop ? "" : " is-static"}`}
+        className={`backstage-marquee-row is-js${seamlessLoop && !edit ? "" : " is-static"}`}
       >
         {renderGroup("a", groupARef)}
         {seamlessLoop && renderGroup("b", groupBRef, true)}
@@ -211,19 +253,32 @@ function MarqueeRow({
   );
 }
 
-export default function Backstage() {
+export default function Backstage({
+  initialLanding,
+  initialGallery,
+  initialTeamStats,
+}: {
+  initialLanding?: LandingContent;
+  initialGallery?: BackstageItem[];
+  initialTeamStats?: TeamStatItem[];
+} = {}) {
+  const cms = useCmsEdit();
+  const edit = cms?.isAdmin && cms.editMode;
   const reduced = usePrefersReducedMotion();
-  const [landing, setLanding] = useState<LandingContent>(defaultLanding);
-  const [teamStats, setTeamStats] = useState<TeamStatItem[]>(defaultTeamStats);
-  const [gallery, setGallery] = useState<BackstageItem[]>([]);
+  const home = useHomeDataOptional();
+  const landing = useHomeLanding(initialLanding);
+  const [teamStats, setTeamStats] = useState<TeamStatItem[]>(
+    home?.teamStats ?? initialTeamStats ?? defaultTeamStats,
+  );
+  const [gallery, setGallery] = useState<BackstageItem[]>(home?.backstage ?? initialGallery ?? []);
 
   useEffect(() => {
+    if ((home?.backstage || initialGallery) && (home?.teamStats || initialTeamStats)) return;
     let cancelled = false;
     fetch("/api/content", { cache: "no-store" })
       .then((res) => res.json())
       .then((data) => {
         if (cancelled) return;
-        if (data?.landing) setLanding({ ...defaultLanding, ...data.landing });
         if (Array.isArray(data?.teamStats)) setTeamStats(data.teamStats);
         if (Array.isArray(data.backstage)) setGallery(data.backstage);
       })
@@ -231,7 +286,7 @@ export default function Backstage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [home?.backstage, home?.teamStats, initialGallery, initialTeamStats]);
 
   const rowA = useMemo(() => gallery.slice(0, 10), [gallery]);
   const rowB = useMemo(() => gallery.slice(10, 20), [gallery]);
@@ -245,32 +300,42 @@ export default function Backstage() {
           viewport={{ once: true }}
           className="mb-10 text-center"
         >
-          <span className="section-label">{landing.backstageLabel}</span>
-          <h2 className="section-title">{landing.backstageTitle}</h2>
-          <CmsRichText content={landing.backstageIntro} className="mx-auto mt-4 max-w-2xl" />
+          <LandingSectionHeader
+            labelPath="landing.backstageLabel"
+            titlePath="landing.backstageTitle"
+            introPath="landing.backstageIntro"
+            label={landing.backstageLabel}
+            title={landing.backstageTitle}
+            intro={landing.backstageIntro}
+            className="mb-10 text-center"
+          />
         </motion.div>
       </div>
 
       {rowA.length > 0 && (
         <div className="backstage-marquee-full" dir="ltr" aria-label="گالری پشت صحنه">
-          <MarqueeRow items={rowA} speed={46} reduced={reduced} />
+          <MarqueeRow items={rowA} allItems={gallery} speed={46} reduced={reduced} edit={edit} />
           {rowB.length > 0 && (
-            <MarqueeRow items={[...rowB].reverse()} reverse speed={40} reduced={reduced} />
+            <MarqueeRow items={[...rowB].reverse()} allItems={gallery} reverse speed={40} reduced={reduced} edit={edit} />
           )}
         </div>
       )}
 
       <div className="container mx-auto">
         <div className="team-stats">
-          {teamStats.map((stat) => {
+          {teamStats.map((stat, index) => {
             const Icon = iconMap[stat.icon] ?? Headphones;
             return (
-              <div key={stat.label} className="team-stat">
+              <div key={stat.label} className="team-stat cms-editable-card">
                 <div className="team-stat-icon" aria-hidden="true">
                   <Icon size={24} strokeWidth={1.75} />
                 </div>
-                <strong>{stat.value}</strong>
-                <span>{stat.label}</span>
+                <EditableText path={`teamStats.${index}.value`} as="span" className="font-bold block">
+                  {stat.value}
+                </EditableText>
+                <EditableText path={`teamStats.${index}.label`} as="span">
+                  {stat.label}
+                </EditableText>
               </div>
             );
           })}

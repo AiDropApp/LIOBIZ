@@ -42,13 +42,24 @@ tar -cf deploy-full.tar `
   --exclude=.git `
   --exclude=.deploy `
   --exclude=data `
+  --exclude=data/backups `
+  --exclude=docs `
   --exclude=header.mp4 `
   --exclude=docs/screenshots `
+  --exclude=public/media `
   --exclude=public/uploads `
+  --exclude=public/video `
+  --exclude=public/videos `
   --exclude=.env.local `
   --exclude=deploy-full.tar `
   --exclude=next-build.tar `
   -C $Root .
+
+$tarMb = [math]::Round((Get-Item deploy-full.tar).Length / 1MB, 1)
+Write-Host "deploy-full.tar size: ${tarMb} MB"
+if ($tarMb -gt 400) {
+  throw "deploy-full.tar too large (${tarMb} MB). Check excludes (public/media must stay off)."
+}
 tar -cf next-build.tar -C $Root .next
 
 Write-Host "=== WAIT SSH ==="

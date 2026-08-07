@@ -1,16 +1,19 @@
 import { NextResponse } from "next/server";
 import { readPublicSiteContent } from "@/lib/content-store";
 import { parseAuthCookie } from "@/lib/auth-session";
+import { isVerifiedAdminSession, toPublicApiContent } from "@/lib/public-content";
 
 export const runtime = "nodejs";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const session = parseAuthCookie(request.headers.get("cookie"));
     const content = await readPublicSiteContent();
-    return NextResponse.json(content, {
+    const payload = isVerifiedAdminSession(session) ? content : toPublicApiContent(content);
+    return NextResponse.json(payload, {
       headers: {
-        // Browser/CDN can reuse JSON briefly; admin edits refresh within a minute.
-        "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+        // Avoid stale portfolio titles after media-center edits.
+        "Cache-Control": "private, no-store, max-age=0",
       },
     });
   } catch (error) {
@@ -21,7 +24,7 @@ export async function GET() {
 
 export async function HEAD(request: Request) {
   const session = parseAuthCookie(request.headers.get("cookie"));
-  if (!session || session.role !== "admin") {
+  if (!isVerifiedAdminSession(session)) {
     return new NextResponse(null, { status: 401 });
   }
   return new NextResponse(null, { status: 200 });

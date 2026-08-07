@@ -1,8 +1,24 @@
 /**
- * Full platform audit: pages, APIs, auth, backup, CMS
+ * Full platform audit: pages, APIs, auth, backup, CMS, security headers
  */
-import { writeFileSync, mkdirSync } from "fs";
+import { writeFileSync, mkdirSync, readFileSync, existsSync } from "fs";
 import path from "path";
+
+function loadEnvLocal() {
+  const file = path.join(process.cwd(), ".env.local");
+  if (!existsSync(file)) return;
+  for (const line of readFileSync(file, "utf8").split(/\r?\n/)) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) continue;
+    const eq = trimmed.indexOf("=");
+    if (eq <= 0) continue;
+    const key = trimmed.slice(0, eq).trim();
+    const value = trimmed.slice(eq + 1).trim().replace(/^["']|["']$/g, "");
+    if (!process.env[key]) process.env[key] = value;
+  }
+}
+
+loadEnvLocal();
 
 const BASE = process.env.BASE_URL || "http://127.0.0.1:3001";
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@liobiz.com";
@@ -72,6 +88,40 @@ async function main() {
   const clientJar = {};
   const adminJar = {};
   const anonJar = {};
+
+  // Security headers (HTTP Observatory / securityheaders.com)
+  {
+    const r = await fetch(`${BASE}/`);
+    const required = {
+      "content-security-policy": "CSP",
+      "x-frame-options": "X-Frame-Options",
+      "referrer-policy": "Referrer-Policy",
+      "permissions-policy": "Permissions-Policy",
+      "x-content-type-options": "nosniff",
+      "strict-transport-security": "HSTS",
+    };
+    for (const [header, label] of Object.entries(required)) {
+      const value = r.headers.get(header);
+      log(!!value?.trim(), "security", `${label} present`, { header, ok: !!value });
+      if (!value) {
+        issue("security", label, `هدر ${label} روی صفحه اصلی نیست`, "next.config.ts + middleware — بعد deploy دوباره اسکن کنید");
+      }
+    }
+    const poweredBy = r.headers.get("x-powered-by");
+    log(!poweredBy, "security", "X-Powered-By absent", { value: poweredBy || null });
+    if (poweredBy) {
+      issue("security", "X-Powered-By", "هدر X-Powered-By لو می‌رود", "poweredByHeader: false در next.config.ts");
+    }
+  }
+
+  if (process.env.NODE_ENV === "production" && !process.env.AUTH_SECRET?.trim()) {
+    issue(
+      "auth",
+      "AUTH_SECRET",
+      "در production بدون AUTH_SECRET کوکی session امضا نمی‌شود و APIها 401 می‌دهند",
+      "AUTH_SECRET را در env سرور تنظیم کنید یا audit را روی dev (pnpm dev) اجرا کنید",
+    );
+  }
 
   const publicPages = [
     "/",
@@ -270,10 +320,16 @@ async function main() {
     });
   }
 
-  // Dashboard pages
-  for (const p of ["/dashboard", "/admin"]) {
-    const r = await req(p, { jar: p === "/admin" ? adminJar : clientJar });
-    log(r.status === 200, "pages", `GET ${p} (auth)`, { status: r.status });
+  // Dashboard pages (must not redirect when authenticated)
+  for (const [p, jar, role] of [
+    ["/dashboard", clientJar, "client"],
+    ["/admin", adminJar, "admin"],
+  ]) {
+    const r = await req(p, { jar, redirect: "manual" });
+    log(r.status === 200, "pages", `GET ${p} (${role}, auth)`, { status: r.status });
+    if (r.status >= 300 && r.status < 400) {
+      issue("auth", p, "با کوکی معتبر به login ریدایرکت می‌شود", "بررسی AUTH_SECRET و امضای کوکی");
+    }
   }
 
   // Known UX / infra findings (static audit)

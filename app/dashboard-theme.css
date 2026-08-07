@@ -44,10 +44,16 @@
 }
 
 .dash-page .dash-shell,
-.dash-page .dash-sidebar,
 .dash-page .dash-main {
   position: relative;
   z-index: 1;
+}
+
+@media (min-width: 1024px) {
+  .dash-page .dash-sidebar {
+    position: relative;
+    z-index: 1;
+  }
 }
 
 /* Typography */
@@ -137,41 +143,42 @@
   }
 }
 
-/* Glass sidebar */
+/* Sidebar — shared layout; glass treatment is desktop-only below */
 .dash-page .dash-sidebar {
-  position: relative;
-  background:
-    var(--liobiz-glass-shine),
-    var(--liobiz-glass-depth),
-    var(--liobiz-glass-sidebar) !important;
-  border: 1px solid var(--liobiz-glass-border) !important;
-  outline: 1px solid var(--liobiz-indigo-soft);
-  backdrop-filter: blur(var(--liobiz-blur-heavy)) saturate(190%);
-  -webkit-backdrop-filter: blur(var(--liobiz-blur-heavy)) saturate(190%);
-  box-shadow: var(--liobiz-shadow-sidebar-dash) !important;
   border-radius: var(--liobiz-radius-sidebar) !important;
   gap: 0.65rem !important;
   padding: 1rem !important;
   overflow: hidden !important;
 }
 
-.dash-page .dash-sidebar::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  border-radius: inherit;
-  background: linear-gradient(180deg, var(--liobiz-indigo-soft), transparent 28%);
-}
-
 @media (min-width: 1024px) {
+  /* Glass sidebar — desktop sticky panel only */
   .dash-page .dash-sidebar {
+    position: relative;
+    background:
+      var(--liobiz-glass-shine),
+      var(--liobiz-glass-depth),
+      var(--liobiz-glass-sidebar) !important;
+    border: 1px solid var(--liobiz-glass-border) !important;
+    outline: 1px solid var(--liobiz-indigo-soft);
+    backdrop-filter: blur(var(--liobiz-blur-heavy)) saturate(190%);
+    -webkit-backdrop-filter: blur(var(--liobiz-blur-heavy)) saturate(190%);
+    box-shadow: var(--liobiz-shadow-sidebar-dash) !important;
     position: sticky !important;
     top: 0 !important;
     align-self: start !important;
     height: fit-content !important;
     min-height: auto !important;
     max-height: calc(100dvh - 2rem) !important;
+  }
+
+  .dash-page .dash-sidebar::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    background: linear-gradient(180deg, var(--liobiz-indigo-soft), transparent 28%);
   }
 }
 
@@ -1253,6 +1260,60 @@
   }
 }
 
+/* ——— Mobile admin topbar: keep hamburger visible (Aug 2026) ——— */
+@media (max-width: 1023px) {
+  .dash-page .dash-topbar {
+    display: flex !important;
+    align-items: center;
+    gap: 0.65rem;
+    z-index: 140;
+  }
+
+  .dash-page .dash-topbar-logo {
+    flex: 0 1 auto;
+    min-width: 0;
+    max-width: 38vw;
+  }
+
+  .dash-page .dash-topbar-logo .header-logo {
+    min-width: 0;
+    max-width: 100%;
+    flex-shrink: 1;
+  }
+
+  .dash-page .dash-topbar-logo .header-logo,
+  .dash-page .dash-topbar-logo .header-logo-image {
+    max-height: 36px !important;
+    width: auto !important;
+  }
+
+  .dash-page .dash-topbar-copy {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .dash-page .dash-topbar-copy strong {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.88rem;
+  }
+
+  .dash-page .dash-menu-btn {
+    display: inline-flex !important;
+    flex: 0 0 2.75rem;
+    width: 2.75rem;
+    height: 2.75rem;
+    margin-inline-start: auto;
+    position: relative;
+    z-index: 121;
+    border: 1px solid rgba(255, 255, 255, 0.35) !important;
+    background: linear-gradient(135deg, rgba(255, 77, 36, 0.35), rgba(255, 106, 0, 0.22)) !important;
+    color: #fff !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35) !important;
+  }
+}
+
 /* ——— Server hotfix: select options, empty states, media cards (Jul 2026) ——— */
 
 /* Native dropdown list: dark surface so ink-colored text stays readable */
@@ -1371,6 +1432,41 @@
   color: var(--liobiz-muted) !important;
 }
 
+.dash-page .dash-order-files {
+  border-top-color: var(--liobiz-border) !important;
+}
+
+.dash-page .dash-order-files-title {
+  color: var(--liobiz-muted) !important;
+}
+
+.dash-page .dash-order-file-chip {
+  background: rgba(148, 163, 184, 0.08) !important;
+  border-color: var(--liobiz-border) !important;
+  color: var(--liobiz-secondary) !important;
+}
+
+.dash-page .dash-order-file-chip:hover {
+  background: var(--liobiz-indigo-soft) !important;
+  border-color: var(--liobiz-indigo-border) !important;
+}
+
+.dash-page .dash-order-file-kind.is-delivery {
+  background: rgba(52, 211, 153, 0.14) !important;
+  color: #6ee7b7 !important;
+}
+
+.dash-page .dash-order-file-kind.is-request {
+  background: rgba(251, 191, 36, 0.14) !important;
+  color: #fcd34d !important;
+}
+
+.dash-page .dash-order-actions select {
+  background: rgba(15, 23, 42, 0.55) !important;
+  border-color: var(--liobiz-border) !important;
+  color: var(--liobiz-ink) !important;
+}
+
 /* Delete category confirm modal — dark theme */
 .dash-page .admin-media-delete-modal {
   width: min(400px, calc(100vw - 2rem)) !important;
@@ -1408,4 +1504,134 @@
 .dash-page .admin-media-delete-modal-field input[aria-invalid="true"] {
   border-color: rgba(248, 113, 113, 0.55) !important;
   box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.18) !important;
+}
+
+/* ——— Mobile drawer: solid opaque sidebar (after all glass / .lux-card rules) ——— */
+@media (max-width: 1023px) {
+  /* dash-shell z-index:1 trapped the drawer below the backdrop (z-125) */
+  .dash-page .dash-shell,
+  .dash-page .dash-main {
+    z-index: auto !important;
+  }
+
+  .dash-page .dash-sidebar,
+  .dash-page .dash-sidebar.lux-card {
+    position: fixed !important;
+    z-index: 130 !important;
+    background: var(--liobiz-navy-1) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    outline: none !important;
+    isolation: isolate;
+    mix-blend-mode: normal !important;
+    box-shadow:
+      -6px 0 32px rgba(0, 0, 0, 0.5),
+      0 0 0 1px var(--liobiz-border) !important;
+    border: 1px solid var(--liobiz-border) !important;
+  }
+
+  .dash-page .dash-sidebar::before,
+  .dash-page .dash-sidebar.lux-card::before {
+    display: none !important;
+    content: none !important;
+  }
+
+  .dash-page .dash-drawer-backdrop {
+    position: fixed !important;
+    z-index: 125 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  .dash-page .dash-topbar {
+    z-index: 140 !important;
+  }
+
+  /* Nav legibility — light tokens on solid navy drawer */
+  .dash-page .dash-sidebar .dash-nav button {
+    color: var(--liobiz-secondary) !important;
+  }
+
+  .dash-page .dash-sidebar .dash-nav-icon {
+    color: var(--liobiz-muted) !important;
+  }
+
+  .dash-page .dash-sidebar .dash-sidebar-copy h1 {
+    color: var(--liobiz-ink) !important;
+  }
+
+  .dash-page .dash-sidebar .dash-sidebar-copy p {
+    color: var(--liobiz-secondary) !important;
+  }
+
+  .dash-sidebar--desktop {
+    display: none !important;
+  }
+}
+
+/* Portaled mobile drawer — direct children of body, above aurora/backdrop traps */
+@media (max-width: 1023px) {
+  .dash-mobile-drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 9990;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    cursor: pointer;
+    background: rgba(0, 0, 0, 0.62);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .dash-mobile-drawer-sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 9991;
+    display: grid;
+    gap: 0.65rem;
+    width: min(86vw, 20rem);
+    height: 100dvh;
+    overflow-y: auto;
+    padding: 1rem;
+    padding-top: max(1rem, env(safe-area-inset-top));
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+    border-radius: 0;
+    transform: translateX(0);
+    background: var(--liobiz-navy-1);
+    border: 1px solid var(--liobiz-border);
+    box-shadow: -6px 0 32px rgba(0, 0, 0, 0.5);
+    color: var(--liobiz-ink);
+    box-sizing: border-box;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .dash-mobile-drawer-sidebar::before {
+    display: none;
+    content: none;
+  }
+
+  .dash-mobile-drawer-sidebar .dash-nav button {
+    color: var(--liobiz-secondary);
+  }
+
+  .dash-mobile-drawer-sidebar .dash-nav-icon {
+    color: var(--liobiz-muted);
+  }
+
+  .dash-mobile-drawer-sidebar .dash-sidebar-copy h1 {
+    color: var(--liobiz-ink);
+  }
+
+  .dash-mobile-drawer-sidebar .dash-sidebar-copy p {
+    color: var(--liobiz-secondary);
+  }
+}
+
+@media (min-width: 1024px) {
+  .dash-mobile-drawer-backdrop,
+  .dash-mobile-drawer-sidebar {
+    display: none !important;
+  }
 }

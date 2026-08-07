@@ -30,6 +30,7 @@ export async function GET() {
       company: u.company,
       role: u.role,
       blocked: Boolean(u.blocked),
+      blockReason: u.blockReason || null,
       createdAt: u.createdAt,
     }));
 
@@ -52,10 +53,17 @@ export async function PATCH(request: Request) {
   }
 
   if (typeof body.blocked === "boolean") {
-    db.update(users)
-      .set({ blocked: body.blocked, updatedAt: new Date().toISOString() })
-      .where(eq(users.id, id))
-      .run();
+    const patch: { blocked: boolean; updatedAt: string; blockReason?: string | null } = {
+      blocked: body.blocked,
+      updatedAt: new Date().toISOString(),
+    };
+    if (body.blocked) {
+      const reason = String(body.blockReason || "").trim();
+      patch.blockReason = reason || "مسدودسازی توسط مدیر";
+    } else {
+      patch.blockReason = null;
+    }
+    db.update(users).set(patch).where(eq(users.id, id)).run();
   }
 
   const updated = db.select().from(users).where(eq(users.id, id)).get();

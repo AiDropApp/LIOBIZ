@@ -3,9 +3,21 @@ import { defaultHeroStats } from "@/lib/landing-defaults";
 
 export type LandingContent = {
   heroBadge: string;
+  heroTitleBrand: string;
   heroTitle: string;
   heroTitleHighlight: string;
+  heroTitlePart3: string;
+  heroTitlePart4: string;
   heroDescription: string;
+  aboutLinkCta: string;
+  aboutLinkHref: string;
+  planSelectHref: string;
+  portfolioViewAllHref: string;
+  blogViewAllHref: string;
+  headerLoginHref: string;
+  headerContactHref: string;
+  footerContactPageHref: string;
+  portfolioModalCtaHref: string;
   heroPrimaryCta: string;
   heroPrimaryHref: string;
   heroSecondaryCta: string;
@@ -52,33 +64,66 @@ export type LandingContent = {
   footerCtaButton: string;
   footerCtaHref: string;
   footerCopyright: string;
+  portfolioViewAllCta: string;
+  portfolioFilterAll: string;
+  portfolioEmptyText: string;
+  portfolioLoadMoreLabel: string;
+  portfolioModalCta: string;
+  portfolioModalCategoryLabel: string;
+  portfolioModalClientLabel: string;
+  portfolioModalYearLabel: string;
+  blogViewAllCta: string;
+  planPriceSuffix: string;
+  planSelectCta: string;
+  creativePartnersShowcaseLabel: string;
+  footerQuickLinksTitle: string;
+  footerServicesTitle: string;
+  footerContactTitle: string;
+  footerContactPageLink: string;
+  headerLoginLabel: string;
+  headerMobileLoginLabel: string;
+  headerContactButton: string;
+  headerMobileServicesLabel: string;
+  loadingTagline: string;
 };
 
 export const defaultLanding: LandingContent = {
-  heroBadge: "آژانس رشد کسب‌وکار",
+  heroBadge: "آژانس خلاقیت و تبلیغات دیجیتال",
+  heroTitleBrand: "لیوبیز | آژانس خلاقیت و تبلیغات دیجیتال",
   heroTitle: "ما رشد",
   heroTitleHighlight: "کسب‌وکار شما",
+  heroTitlePart3: "را",
+  heroTitlePart4: "می‌سازیم",
+  aboutLinkCta: "بیشتر درباره ما",
+  aboutLinkHref: "/about",
+  planSelectHref: "/contact",
+  portfolioViewAllHref: "/portfolio",
+  blogViewAllHref: "/blog",
+  headerLoginHref: "/login",
+  headerContactHref: "/contact",
+  footerContactPageHref: "/contact",
+  portfolioModalCtaHref: "/contact",
   heroDescription:
-    "تبلیغات خلاقانه، فروش هدفمند و پشتیبانی حرفه‌ای؛ همه در یک مسیر رشد یکپارچه برای برند شما.",
+    "آژانس تبلیغات دیجیتال لیوبیز در مشهد؛ برندینگ، طراحی وب، مدیریت شبکه‌های اجتماعی و تولید محتوا را با تبلیغات خلاقانه برای رشد برند و فروش کسب‌وکار شما یکپارچه می‌کند.",
   heroPrimaryCta: "شروع همکاری",
   heroPrimaryHref: "/contact",
-  heroSecondaryCta: "مشاهده خدمات",
+  heroSecondaryCta: "مشاهدهٔ خدمات لیوبیز",
   heroSecondaryHref: "/#services",
   heroMediaType: "image",
   heroMediaUrl: "/images/hero-lion.png",
   heroStats: defaultHeroStats,
   aboutLabel: "درباره لیوبیز",
-  aboutTitle: "لیوبیز، شریک رشد کسب‌وکار شما",
+  aboutTitle: "لیوبیز، آژانس برندینگ و تبلیغات دیجیتال در مشهد",
   aboutText1:
-    "ما با ترکیب استراتژی، طراحی و اجرای دیجیتال، مسیر رشد برندها را از ایده تا نتیجه همراهی می‌کنیم؛ شفاف، حرفه‌ای و نتیجه‌محور.",
+    "به‌عنوان آژانس خلاقیت در مشهد، با ترکیب استراتژی برندینگ، طراحی و اجرای دیجیتال، مسیر رشد برندها را از ایده تا نتیجه همراهی می‌کنیم؛ شفاف، حرفه‌ای و نتیجه‌محور.",
   aboutText2:
-    "از هویت بصری و وب‌سایت تا شبکه‌های اجتماعی و کمپین‌های تبلیغاتی، همه چیز در یک موتور برندینگ یکپارچه کنار هم قرار می‌گیرد.",
+    "از هویت بصری و طراحی وب‌سایت تا مدیریت شبکه‌های اجتماعی و کمپین‌های تبلیغاتی، همه خدمات تبلیغات دیجیتال در یک موتور برندینگ یکپارچه کنار هم قرار می‌گیرد.",
   aboutImage1: "/images/about-liobiz-office.png",
   aboutImage2: "/images/about-liobiz-float.png",
   aboutBadge: "ارزش ما رشد شماست؛ افتخار ما",
   servicesLabel: "خدمات ما",
   servicesTitle: "راهکارهای جامع برای رشد کسب‌وکار شما",
-  servicesIntro: "از هویت برند تا تبلیغات و محتوا؛ همه خدمات در یک مسیر هماهنگ.",
+  servicesIntro: "خدمات برندینگ، طراحی وب، تولید محتوا و مدیریت شبکه‌های اجتماعی در مشهد؛ همه در یک مسیر هماهنگ برای رشد کسب‌وکار شما.",
   portfolioLabel: "نمونه کارها",
   portfolioTitle: "پروژه‌هایی که به آن‌ها افتخار می‌کنیم",
   processLabel: "فرآیند همکاری",
@@ -106,7 +151,28 @@ export const defaultLanding: LandingContent = {
   partnersTitle: "برندهایی که به ما اعتماد کردند",
   footerCtaTitle: "آمادهٔ ساختن برند بعدی هستید؟",
   footerCtaText: "یک گفتگوی کوتاه کافی است تا مسیر رشد را طراحی کنیم.",
-  footerCtaButton: "شروع همکاری",
+  footerCtaButton: "درخواست مشاوره رایگان",
   footerCtaHref: "/contact",
   footerCopyright: "لیوبیز. تمامی حقوق محفوظ است.",
+  portfolioViewAllCta: "مشاهده همه پروژه‌ها",
+  portfolioFilterAll: "همه",
+  portfolioEmptyText: "هنوز نمونه‌کاری در این دسته ثبت نشده است.",
+  portfolioLoadMoreLabel: "نمایش بیشتر",
+  portfolioModalCta: "سفارش پروژه مشابه",
+  portfolioModalCategoryLabel: "دسته‌بندی",
+  portfolioModalClientLabel: "کارفرما",
+  portfolioModalYearLabel: "سال",
+  blogViewAllCta: "همه مقالات",
+  planPriceSuffix: "تومان / ماه",
+  planSelectCta: "انتخاب پلن",
+  creativePartnersShowcaseLabel: "نمونه کار:",
+  footerQuickLinksTitle: "دسترسی سریع",
+  footerServicesTitle: "خدمات",
+  footerContactTitle: "تماس با ما",
+  footerContactPageLink: "صفحه تماس و فرم پیام",
+  headerLoginLabel: "ورود",
+  headerMobileLoginLabel: "ورود به حساب",
+  headerContactButton: "مشاوره تخصصی",
+  headerMobileServicesLabel: "خدمات",
+  loadingTagline: "Liobiz • Brand Engine",
 };
