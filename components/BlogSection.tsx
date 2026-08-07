@@ -72,7 +72,7 @@ export default function BlogSection({
   if (posts.length === 0 && !edit) return null;
 
   return (
-    <section id="blog" className="section-padding blog-home-section">
+    <section id="blog" className="section-block blog-home-section blog-home-section--pre-footer">
       <div className="container mx-auto px-4 lg:px-8">
         <div className="blog-section-header">
           <LandingSectionHeader

@@ -345,13 +345,14 @@ ssh liobiz "systemctl is-active liobiz && cat /var/www/liobiz/.next/BUILD_ID"
 | Phase | Status | Desktop Perf | Mobile Perf | A11y | BP | Verified date |
 |-------|--------|--------------|-------------|------|----|----|
 | 0 Sync | ✅ | — | — | — | — | 2026-08-07 |
-| 1 Quick wins | ✅ | — | — | D:97 | 100 | 2026-08-07 |
+| 1 Quick wins | ✅ | — | — | 97 | 100 | 2026-08-07 |
 | 2 Hydration + CSP | ✅ | — | — | — | 100 | 2026-08-07 |
-| 3 Third-party | ⬜ | — | — | — | — | |
-| 4 LCP/Hero | ⬜ | — | — | — | — | |
-| 5 JS/payload | ⬜ | — | — | — | — | |
-| 6 CSP/headers | ⬜ | — | — | — | — | |
-| 7 Polish | ⬜ | — | — | — | — | |
+| 2.5 UX layout | ✅ | — | — | — | — | 2026-08-07 |
+| 3 Third-party | 🟡 | 97 | 97 | — | 100 | 2026-08-07 |
+| 4 LCP/Hero | 🟡 | 97 | 97 | — | — | 2026-08-07 |
+| 5 JS/payload | 🟡 | 97 | 97 | — | — | 2026-08-07 |
+| 6 CSP/headers | ⬜ | — | — | — | 100 | optional |
+| 7 Polish | 🟡 | — | — | target 100 | — | 2026-08-07 |
 
 Update this table after each phase verification.
 
